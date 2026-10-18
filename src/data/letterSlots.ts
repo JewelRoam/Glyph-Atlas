@@ -494,6 +494,24 @@ export const SLOTS: LetterSlot[] = [
   { id: 'p-ejective', label: 'პ（挤喉音 pʼ）' },
   { id: 'tse-ejective', label: 'წ（挤喉音 tsʼ）' },
   { id: 'che-ejective', label: 'ჭ（挤喉音 tʃʼ）' },
+  // 格鲁吉亚字母表比这 33 个还要长一截：10F1–10F6 是旧格鲁吉亚（阿索姆塔夫
+  // 鲁利）用过、后来停用的六个古字母；10F7–10FA 与 10FD 是近代为明格列尔语、
+  // 斯凡语、奥塞梯语、阿布哈兹语补进来的字母（Unicode 名里的分组标题写得很
+  // 清楚：Archaic letters / Additional letters for Mingrelian and Svan /
+  // Additional letters / Additional letters for Ossetian and Abkhaz）。
+  // 它们各占一格，走到格鲁吉亚那一站时从下方飞入；亚美尼亚没有这些字母，
+  // 回来时再飞出去。
+  { id: 'geo-he', label: 'ჱ he ē（格鲁吉亚古字母）' },
+  { id: 'geo-hie', label: 'ჲ hie y（格鲁吉亚古字母）' },
+  { id: 'geo-we', label: 'ჳ we w（格鲁吉亚古字母）' },
+  { id: 'geo-har', label: 'ჴ har q̇（格鲁吉亚古字母）' },
+  { id: 'geo-hoe', label: 'ჵ hoe ō（格鲁吉亚古字母）' },
+  { id: 'geo-fi', label: 'ჶ fi f（格鲁吉亚古字母）' },
+  { id: 'geo-yn', label: 'ჷ yn ə（明格列尔语、斯凡语）' },
+  { id: 'geo-elifi', label: 'ჸ elifi ʾ（明格列尔语）' },
+  { id: 'geo-turned-gan', label: 'ჹ turned gan ɢ（斯凡语）' },
+  { id: 'geo-ain', label: 'ჺ ain ʿ（斯凡语）' },
+  { id: 'geo-aen', label: 'ჽ aen ǣ（奥塞梯语、阿布哈兹语）' },
   // ── 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇 ─────────
   // 这四套字母都在希腊字母的辐射圈里，却不是彼此的直系后代：
   //   · 高加索阿尔巴尼亚字母（N4131）——5 世纪为高加索阿尔巴尼亚语造的 52
@@ -1087,7 +1105,12 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
   },
 
   // 曼达字母：名称为 halqa、ab、ag、ad、ah、ushenna、az、it、att、aksa、ak…
-  // 编码提案把它们按字母表顺序排列，也就是西闪米特 abjad 的常规顺序
+  // 编码提案把它们按字母表顺序排列，也就是西闪米特 abjad 的常规顺序。
+  // Unicode 在 0856–0858 另收了三枚字：DUSHENNA 与 KAD 本是从 ad+i、ak+di
+  // 凝固成的连字（提案原话"used as an undecomposable letter"，像丹麦语的 æ），
+  // AIN 是从阿拉伯字母 ʿayn 借来的 ʕ 的非连写体——前者归连字、后者归同一字母
+  // 的另一字面，都按本表"同一字母只取一个字形"的规矩排除：ayin 一格取
+  // 连写体的 IN ࡏ，DUSHENNA 与 KAD 不进表。
   mandaic: {
     aleph: 'ࡀ',
     beth: 'ࡁ',
@@ -2096,6 +2119,20 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     chi: 'ხ',
     je: 'ჯ',
     h: 'ჰ',
+    // 六个古字母与近代补的五个字（见上面 geo-* 槽位）。Unicode 名里另有
+    // 10FE HARD SIGN 与 10FF LABIAL SIGN 两枚，名分是"符号"而不是字母，
+    // 与位置变体、连字一样不进对照表。
+    'geo-he': 'ჱ',
+    'geo-hie': 'ჲ',
+    'geo-we': 'ჳ',
+    'geo-har': 'ჴ',
+    'geo-hoe': 'ჵ',
+    'geo-fi': 'ჶ',
+    'geo-yn': 'ჷ',
+    'geo-elifi': 'ჸ',
+    'geo-turned-gan': 'ჹ',
+    'geo-ain': 'ჺ',
+    'geo-aen': 'ჽ',
   },
   // ── 婆罗米系 20 种文字（梵语字音表的 33 个辅音位）────────────────────
   // 对照关系来自各文字的梵语/Pali 字音对应表，字符按 Unicode 名逐个核对
