@@ -19,6 +19,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      pages_enabled: ${{ steps.pages.outputs.enabled }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,19 +38,43 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Pages 站点需要先在仓库设置里启用。只有确定是“尚未启用”（404）时才跳过发布，
+      # 其它错误照常往下走并暴露出来，避免悄悄不部署。
+      - name: Check Pages status
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages")
+          if [ "$status" = "200" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          elif [ "$status" = "404" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Pages 尚未启用::在仓库 Settings → Pages 把 Source 设为 GitHub Actions，然后重新运行本工作流即可发布。"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Pages 状态未知::接口返回 $status，继续尝试发布。"
+          fi
+
       - name: Configure Pages
+        if: steps.pages.outputs.enabled == 'true'
         uses: actions/configure-pages@v5
         with:
           # 仓库尚未启用 Pages 时，尝试用工作流令牌自动启用
           enablement: true
 
       - name: Upload artifact
+        if: steps.pages.outputs.enabled == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
     needs: build
+    if: needs.build.outputs.pages_enabled == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
