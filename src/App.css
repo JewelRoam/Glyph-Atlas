@@ -453,10 +453,26 @@ main {
   gap: 2px;
   flex-shrink: 0;
   border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+.walk-tabs::-webkit-scrollbar {
+  height: 5px;
+}
+.walk-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+.walk-tabs::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 3px;
 }
 .walk-tabs button {
   position: relative;
+  flex: 0 0 auto;
   padding: 8px 16px;
+  white-space: nowrap;
   font-family: var(--display);
   font-size: 13.5px;
   color: var(--ink-dim);

@@ -220,4 +220,52 @@ export const lineages: Lineage[] = [
       { script: 'katakana', char: 'カ', label: '片假名「カ」', phonetic: 'ka' },
     ],
   },
+
+  {
+    id: 'aramaic-west',
+    nameZh: '阿拉米 ʾālep → 西支诸字母',
+    nameEn: 'Aramaic ʾālep → western branches',
+    mode: 'cognate',
+    description:
+      '阿拉米字母西传后，帕尔米拉、哈特拉和叙利亚各自发展出地方字母。' +
+      '四站都以 ʾālep 为祖形，却分别收束成不同骨架：帕尔米拉与哈特拉留下石刻的棱角，' +
+      '叙利亚字母则长出连写与变体传统。',
+    stops: [
+      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'palmyrene', char: '𐡠', label: '帕尔米拉 ʾālep', phonetic: 'ʔ' },
+      { script: 'hatran', char: '𐣠', label: '哈特拉 ʾālep', phonetic: 'ʔ' },
+      { script: 'syriac', char: 'ܐ', label: '叙利亚 ʾālep', phonetic: 'ʔ' },
+    ],
+  },
+
+  {
+    id: 'slavic-alphabet',
+    nameZh: '希腊 Α → 格拉哥里与西里尔',
+    nameEn: 'Greek Α → Glagolitic and Cyrillic',
+    mode: 'cognate',
+    description:
+      '九世纪，君士坦丁—基里尔为斯拉夫语创制格拉哥里字母；不久，保加利亚第一帝国' +
+      '以希腊安色尔体为骨架，并受格拉哥里影响形成西里尔字母。' +
+      '两套字母都从希腊 Α 的模型出发，却各自长成不同的笔画秩序。',
+    stops: [
+      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'glagolitic', char: 'Ⰰ', label: '格拉哥里 azъ', phonetic: 'a' },
+      { script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'aramaic-mandaic',
+    nameZh: '阿拉米 ʾālep → 曼达 a',
+    nameEn: 'Aramaic ʾālep → Mandaic a',
+    mode: 'chain',
+    description:
+      '阿拉米字母东传的一支在美索不达米亚南部发展为曼达字母。' +
+      '第一个字母仍对应 /a/，字形却已变成弯曲的 halqa——' +
+      '同一条字母血统，在宗教写本里留下了另一种走向。',
+    stops: [
+      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'mandaic', char: 'ࡀ', label: '曼达 halqa', phonetic: 'a' },
+    ],
+  },
 ];
