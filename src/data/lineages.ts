@@ -99,6 +99,23 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'arabic-alef',
+    nameZh: '阿拉米 ʾālep → 阿拉伯 ا',
+    nameEn: "Aramaic ʾālep → Arabic alif",
+    mode: 'chain',
+    description:
+      '阿拉伯字母并不是无源之水：它的字形可沿纳巴泰、阿拉米一路追到腓尼基。' +
+      '这条轨道只走北方主线，展示同一个辅音 ʾ 如何从西奈—黎凡特的古老字母，' +
+      '收束成今天阿拉伯文的 ا。',
+    stops: [
+      { script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
+      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'nabataean', char: '𐢀', label: '纳巴泰 ʾālep', phonetic: 'ʔ' },
+      { script: 'arabic', char: 'ا', label: '阿拉伯 ʾalif', phonetic: 'ʔ / aː' },
+    ],
+  },
+
+  {
     id: 'kana',
     nameZh: '汉字 → 平假名',
     nameEn: 'Kanji → hiragana',
