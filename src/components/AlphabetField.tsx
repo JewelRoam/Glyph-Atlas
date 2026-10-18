@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { rosterFor, sharedSlots, slotLabel } from '../data/letterSlots';
 import { scriptById } from '../data/writingSystems';
 import { familyFor } from '../data/fontFallback';
@@ -133,6 +133,24 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
   const pathsPending = !paths && (Boolean(alphabetGroup(a)) || Boolean(alphabetGroup(b)));
 
   /**
+   * 字母场最多长多高。
+   *
+   * 几百格的音节文字表（吉兹、加拿大原住民、彝文）全铺开有三四屏高，会把上面的
+   * 舞台挤成一条缝，所以字母场只吃"剩下的高度"：视口减去 MICRO 里它以外的开销
+   * （舞台保底 190px + 展签、控件、时间轴、页头，实测约 675px）。高屏上能多铺几
+   * 行就多铺几行，矮屏上再窄也有 150px 可看，其余交给场内滚动，窗口变了就重算。
+   */
+  const [viewportH, setViewportH] = useState(() =>
+    typeof window === 'undefined' ? 900 : window.innerHeight,
+  );
+  useEffect(() => {
+    const onResize = () => setViewportH(window.innerHeight);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const scrollCap = Math.round(Math.min(300, Math.max(150, viewportH - 745)));
+
+  /**
    * 一段轨道上的格子数会变（走到下一站时这一段的槽位增减），网格就会换行重排。
    * 直接重排会让整排字母"啪"地跳一下，所以这里按 FLIP 把每个格子从旧位置
    * 滑到新位置，连带网格高度一起过渡。
@@ -175,7 +193,7 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
     paintedRef.current = true;
 
     const natural = grid.offsetHeight;
-    const capped = Math.min(natural, 196);
+    const capped = Math.min(natural, scrollCap);
     scroll.style.height = `${capped}px`;
     scroll.style.overflowY = natural > capped + 1 ? 'auto' : 'hidden';
 
@@ -200,7 +218,8 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
         el.style.opacity = '1';
       }
     });
-  }, [slotKey]);
+    // 视口高度变了会重跑一遍：格子位置没动的话下面会直接返回，只更新外层高度
+  }, [slotKey, scrollCap]);
 
   if (!slots.length) return null;
 
@@ -224,7 +243,11 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
   const heading = a === b ? nameA : `${nameA} → ${nameB}`;
 
   return (
-    <section className="alpha-field" aria-label={`${nameA}到${nameB}的字母对照`}>
+    <section
+      className="alpha-field"
+      aria-label={`${nameA}到${nameB}的字母对照`}
+      style={{ '--alpha-cap': `${scrollCap}px` } as CSSProperties}
+    >
       <div className="alpha-head">
         <span className="alpha-title">
           字母全表

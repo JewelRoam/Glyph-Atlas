@@ -603,7 +603,10 @@ main {
   flex-direction: column;
   align-items: center;
   padding: 20px 32px 16px;
-  overflow: hidden;
+  /* 字母场铺开时内容会比一屏高（几百格的音节文字表），这里允许纵向滚动，
+     舞台由下面的 min-height 保底，不会被挤成一条缝。 */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .walk > * {
@@ -775,7 +778,8 @@ main {
 .walk-stage {
   position: relative;
   flex: 1;
-  min-height: 0;
+  /* 舞台的保底高度：矮屏 + 大字母表时不让中央字形被压到展签上 */
+  min-height: 190px;
   margin: 4px 0;
   user-select: none;
   touch-action: none;
@@ -971,14 +975,13 @@ main {
 .alpha-legend b.out {
   color: var(--line-strong);
 }
-/* 外层高度由 AlphabetField 按内容量出，格子增减时整块一起收放 */
+/* 高度由 AlphabetField 按内容量出（并封顶到 --alpha-cap，那是它留给自己的可用高度），
+   格子增减时整块一起收放；超出封顶的部分在场内滚动 */
 .alpha-scroll {
   height: 0;
-  /* JS 按内容量出的高度是"想长多高"；这里再按视口封顶，
-     窄屏 / 矮屏上字母场不抢走舞台的全部高度 */
-  max-height: min(196px, 24vh);
+  max-height: min(var(--alpha-cap, 196px), 46vh);
   overflow: hidden;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
   transition: height 0.32s cubic-bezier(0.22, 0.68, 0.28, 1);
 }
 .alpha-grid {

@@ -4000,8 +4000,15 @@ const ALPHABETIC_TYPES = new Set<string>([
   'featural',
 ]);
 
-/** 每个体系最多自动补多少格：音节文字动辄几百字，其余的不进字母场 */
-const AUTO_LIMIT = 240;
+/**
+ * 自动补位的安全上限。
+ *
+ * 这是护栏，不是产品规则：字母场要铺出这一家字母表的**全部**字母，任何一个
+ * 体系都不应该被截断。目前最大的字表是加拿大原住民音节文字（520 格），上限
+ * 留出一倍余量。tools/audit-rosters.mjs 会在任何字表真的撞到上限时报错——
+ * 到时候要么提高上限，要么在注释里说明为什么这一家不该整表铺开。
+ */
+const AUTO_LIMIT = 1200;
 
 /**
  * 不进自动补位的"长得像字、其实不是字"的记号。
@@ -4074,7 +4081,11 @@ function letterKey(char: string): string {
  * 只对有确定字表、有可核验字体、且覆盖表里确实有字形的体系补位。图版体系
  * 排不出逐字表；没有可靠来源的体系宁可空着，也不拿现代字体凑数。
  */
-function autoRoster(scriptId: string, manual?: Record<string, string>): Record<string, string> {
+function autoRoster(
+  scriptId: string,
+  manual?: Record<string, string>,
+  audit?: RosterAudit,
+): Record<string, string> {
   const system = scriptById[scriptId];
   if (!system || !ALPHABETIC_TYPES.has(system.type)) return {};
   const family = familyFor(scriptId, system.fontFamily);
@@ -4087,14 +4098,26 @@ function autoRoster(scriptId: string, manual?: Record<string, string>): Record<s
   let count = 0;
 
   for (const char of chars) {
-    if (count >= AUTO_LIMIT) break;
     const cp = char.codePointAt(0);
     // 纯附加记号不铺格（见 NON_LETTER_MARKS）
-    if (cp !== undefined && NON_LETTER_MARKS.has(cp)) continue;
+    if (cp !== undefined && NON_LETTER_MARKS.has(cp)) {
+      if (audit) audit.marks++;
+      continue;
+    }
     const key = letterKey(char);
-    if (used.has(key)) continue;
+    if (used.has(key)) {
+      if (audit) audit.folded++;
+      continue;
+    }
     // 字库里没有这个字形就不铺格，免得字母场里飞进一堆"字库未收"的小名片
-    if (coverageOf(family, char) === 'no') continue;
+    if (coverageOf(family, char) === 'no') {
+      if (audit) audit.uncovered++;
+      continue;
+    }
+    if (count >= AUTO_LIMIT) {
+      if (audit) audit.truncated++;
+      continue;
+    }
     used.add(key);
     out[autoSlot(scriptId, char)] = char;
     count++;
@@ -4111,6 +4134,43 @@ const rosterCache = new Map<string, Record<string, string>>();
  * 不会被塞进一个没核对过的同源关系里。要让某个字原地变形，先在 letterMaps
  * 里给它一个真正对应的槽位。
  */
+/**
+ * 一个体系的字表体检报告：样本集里的字都去哪了。
+ *
+ * 字母场要铺出全部字母，所以除了"同字母的另一种写法"（大小写、附加符号）与
+ * "长得像字其实不是字"的记号，别的字都不该缺席。tools/audit-rosters.mjs 用这
+ * 份报告守着这条线：truncated 不为 0 就是撞上了 AUTO_LIMIT，属于要修的数据事故。
+ */
+export interface RosterAudit {
+  /** 这一家的字形样本总数 */
+  inventory: number;
+  /** 自动补位真正铺出来的格数 */
+  displayed: number;
+  /** 与手工表里某个字面是同一个字母，不单独占格 */
+  folded: number;
+  /** 纯组合 / 叠字 / 标调一类记号，不单独占格 */
+  marks: number;
+  /** 声明的字族里没有这个字形，铺出来只会是"字库未收"名片 */
+  uncovered: number;
+  /** 被 AUTO_LIMIT 截掉的格数 */
+  truncated: number;
+}
+
+/** 字表体检（只给校验脚本用，页面走 rosterFor() 的缓存） */
+export function rosterAudit(scriptId: string): RosterAudit {
+  const manual = letterMaps[scriptId];
+  const audit: RosterAudit = {
+    inventory: glyphSets[scriptId]?.chars.length ?? 0,
+    displayed: 0,
+    folded: 0,
+    marks: 0,
+    uncovered: 0,
+    truncated: 0,
+  };
+  audit.displayed = Object.keys(autoRoster(scriptId, manual, audit)).length;
+  return audit;
+}
+
 export function rosterFor(scriptId: string): Record<string, string> {
   const cached = rosterCache.get(scriptId);
   if (cached) return cached;
