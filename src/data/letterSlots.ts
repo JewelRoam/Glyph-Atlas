@@ -21,6 +21,12 @@
  *  · 后起的字母（希腊 Φ，罗马 G，阿拉伯 ث）单独占一个槽位。它们在字母场里
  *    没有祖先格，移动到相邻文字时按"新增"处理，飞入/飞出。
  *
+ * 已建表的书写体系：
+ *  · 西闪米特：腓尼基、阿拉米、纳巴泰、希伯来、叙利亚、撒玛利亚、曼达、
+ *    帕尔米拉、哈特拉、阿拉伯；
+ *  · 希腊—罗马：希腊、拉丁；
+ *  · 希腊的东支：科普特、西里尔。
+ *
  * 暂不收录：拉丁 J / U / W。它们是中世纪以后从 I / V 分出来的，
  * 与希腊字母不是一对一的对应关系，放进对照表反而会误导，故排除。
  */
@@ -31,14 +37,20 @@ export interface LetterSlot {
   label: string;
 }
 
-/** 槽位的全局顺序：先闪米特 22 个祖形，再希腊—罗马的后起字母 */
+/**
+ * 槽位的全局顺序：先闪米特 22 个祖形，再希腊—罗马的后起字母，
+ * 最后是科普特与西里尔各自新立的字母。格子只按这个顺序排，
+ * 具体某一段字母场里出现哪几格，由两端文字的对照表取并集决定。
+ */
 export const SLOTS: LetterSlot[] = [
   { id: 'aleph', label: '牛头 ʾālep' },
   { id: 'beth', label: '房子 bēt' },
+  { id: 'vede', label: 'в / В（与 б 同出希腊 Β，斯拉夫分写）' },
   { id: 'gimel', label: '骆驼 gīml' },
   { id: 'daleth', label: '门 dālet' },
   { id: 'dhal', label: 'ذ（د 加点）' },
   { id: 'he', label: '窗 hē' },
+  { id: 'zhe', label: 'ж / Ж（斯拉夫新造）' },
   { id: 'waw', label: '钩 wāw' },
   { id: 'zayin', label: '武器 zayin' },
   { id: 'heth', label: '篱笆 ḥēt' },
@@ -67,6 +79,31 @@ export const SLOTS: LetterSlot[] = [
   { id: 'chi', label: 'Χ / X（希腊新造）' },
   { id: 'psi', label: 'Ψ（希腊新造）' },
   { id: 'omega', label: 'Ω（希腊新造）' },
+  // 科普特从世俗体借来的七个字母，排在希腊字母之后
+  { id: 'shei', label: 'Ϣ šai（源自世俗体）' },
+  { id: 'fei', label: 'Ϥ fai（源自世俗体）' },
+  { id: 'khei', label: 'Ϧ ḫai（源自世俗体）' },
+  { id: 'hori', label: 'Ϩ hori（源自世俗体）' },
+  { id: 'gangia', label: 'Ϫ ḏanja（源自世俗体）' },
+  { id: 'shima', label: 'Ϭ čima（源自世俗体）' },
+  { id: 'dei', label: 'Ϯ dei（源自世俗体）' },
+  // 西里尔为斯拉夫语音位另立的字母：希腊字母表里没有对应项
+  { id: 'tse', label: 'ц / Ц' },
+  { id: 'che', label: 'ч / Ч' },
+  { id: 'sha', label: 'ш / Ш' },
+  { id: 'shcha', label: 'щ / Щ' },
+  { id: 'er', label: 'ъ（硬符号）' },
+  { id: 'ery', label: 'ы' },
+  { id: 'erj', label: 'ь（软符号）' },
+  { id: 'jat', label: 'ѣ / Ѣ' },
+  { id: 'yu', label: 'ю / Ю' },
+  { id: 'ya', label: 'Ꙗ / Я（iotated a）' },
+  { id: 'ye', label: 'ѥ / Ѥ' },
+  { id: 'yus-small', label: 'ѧ / Ѧ（小尤斯）' },
+  { id: 'yus-big', label: 'ѫ / Ѫ（大尤斯）' },
+  { id: 'yus-iot-small', label: 'ѩ / Ѩ（iotated 小尤斯）' },
+  { id: 'yus-iot-big', label: 'ѭ / Ѭ（iotated 大尤斯）' },
+  { id: 'izhitsa', label: 'ѵ / Ѵ（希腊 Υ，借词用）' },
   { id: 'gai', label: 'G（罗马新造，由 C 分化）' },
 ];
 
@@ -353,6 +390,95 @@ export const letterMaps: Record<string, Record<string, string>> = {
   },
 
   // 希腊字母：24 个古典字母 + 3 个早期废弃字母（Ϝ Ϙ Ϻ）
+  // 科普特字母：前 24 个直接照搬希腊，末尾 7 个取自埃及世俗体的符号。
+  // 希腊 Υ 在希腊那一行落在 waw 槽，所以科普特 Ⲩ 也进 waw 槽，两边的 Υ 才对得上。
+  coptic: {
+    aleph: 'Ⲁ',
+    beth: 'Ⲃ',
+    gimel: 'Ⲅ',
+    daleth: 'Ⲇ',
+    he: 'Ⲉ',
+    // Ⲋ 是希腊 Ϝ（digamma）的数字 6 之位，音值已变成 /s/
+    digamma: 'Ⲋ',
+    zayin: 'Ⲍ',
+    // Ⲏ 就是希腊 Η
+    heth: 'Ⲏ',
+    teth: 'Ⲑ',
+    yodh: 'Ⲓ',
+    kaph: 'Ⲕ',
+    lamedh: 'Ⲗ',
+    mem: 'Ⲙ',
+    nun: 'Ⲛ',
+    samekh: 'Ⲝ',
+    ayin: 'Ⲟ',
+    pe: 'Ⲡ',
+    resh: 'Ⲣ',
+    shin: 'Ⲥ',
+    taw: 'Ⲧ',
+    waw: 'Ⲩ',
+    phi: 'Ⲫ',
+    chi: 'Ⲭ',
+    psi: 'Ⲯ',
+    omega: 'Ⲱ',
+    shei: 'Ϣ',
+    fei: 'Ϥ',
+    khei: 'Ϧ',
+    hori: 'Ϩ',
+    gangia: 'Ϫ',
+    shima: 'Ϭ',
+    dei: 'Ϯ',
+  },
+
+  // 西里尔字母：以希腊安色尔体为骨架，24 个希腊字母大多原样搬了过来。
+  // 数字值能对上希腊的，就直接进那个槽：И 是 8（Η）、Ѕ 是 6（Ϝ/Ϛ）、
+  // У 是 400（Υ）、Ф 500（Φ）、Х 600（Χ）、Ѯ 60（Ξ）、Ѱ 700（Ψ）、
+  // Ѳ 9（Θ）、Ѡ 800（Ω）。斯拉夫语特有的音另立新字，飞入而不假装有希腊祖形。
+  cyrillic: {
+    aleph: 'А',
+    beth: 'Б',
+    vede: 'В',
+    gimel: 'Г',
+    daleth: 'Д',
+    he: 'Е',
+    zhe: 'Ж',
+    digamma: 'Ѕ',
+    zayin: 'З',
+    heth: 'И',
+    yodh: 'І',
+    kaph: 'К',
+    lamedh: 'Л',
+    mem: 'М',
+    nun: 'Н',
+    ayin: 'О',
+    pe: 'П',
+    resh: 'Р',
+    shin: 'С',
+    taw: 'Т',
+    waw: 'У',
+    phi: 'Ф',
+    chi: 'Х',
+    omega: 'Ѡ',
+    teth: 'Ѳ',
+    samekh: 'Ѯ',
+    psi: 'Ѱ',
+    tse: 'Ц',
+    che: 'Ч',
+    sha: 'Ш',
+    shcha: 'Щ',
+    er: 'Ъ',
+    ery: 'Ы',
+    erj: 'Ь',
+    jat: 'Ѣ',
+    yu: 'Ю',
+    ya: 'Ꙗ',
+    ye: 'Ѥ',
+    'yus-small': 'Ѧ',
+    'yus-big': 'Ѫ',
+    'yus-iot-small': 'Ѩ',
+    'yus-iot-big': 'Ѭ',
+    izhitsa: 'Ѵ',
+  },
+
   greek: {
     aleph: 'Α',
     beth: 'Β',

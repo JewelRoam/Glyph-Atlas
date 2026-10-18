@@ -298,4 +298,20 @@ export const lineages: Lineage[] = [
       { script: 'samaritan', char: 'ࠀ', label: '撒玛利亚 alaf', phonetic: 'ʔ' },
     ],
   },
-];
+
+  {
+    id: 'cyrillic-line',
+    nameZh: '希腊 Α → 西里尔 А',
+    nameEn: 'Greek Α → Cyrillic А',
+    mode: 'cognate',
+    description:
+      '九世纪末，保加利亚第一帝国的书手以希腊安色尔体为骨架、又参照格拉哥里字母，' +
+      '拼出了西里尔字母。数字值暴露了这层血缘：И 占 8（Η）、Ѕ 占 6（Ϝ/Ϛ）、' +
+      'У 占 400（Υ）、Ф 占 500（Φ）、Ѡ 占 800（Ω），都和希腊字母表一一对上。' +
+      '斯拉夫语特有的音——ж ц ч ш щ ъ ы ь ѣ ю ѧ ѫ——则另立新字，在字母场里飞入。',
+    stops: [
+      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
+    ],
+  },
+]

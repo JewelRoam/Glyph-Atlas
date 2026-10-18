@@ -114,6 +114,22 @@ const SCRIPT_OVERRIDE = {
   greek: 'Greek', // Greek and Coptic 区块里混着 14 个科普特字母
 };
 
+/**
+ * 字母散落在多个 Unicode 区块里的书写体系。
+ *
+ * 科普特字母并不全在 Coptic 区块：来自世俗体的七个字母（Ϣ Ϥ Ϧ Ϩ Ϫ Ϭ Ϯ）
+ * 当年沿用希腊区块的空位，落在 U+03E2–U+03EF。只按 Coptic 区块取字母会漏掉
+ * 它们，而它们恰恰是科普特字母表区别于希腊字母的那一部分。
+ *
+ * 西里尔同理：U+0400–U+04FF 只收了近现代字母，斯拉夫语特有的 Ꙗ（iotated a）、
+ * Ѧ Ѫ 那几个尤斯的扩展形与一批中世纪字母在 Cyrillic Extended-B（U+A640–A69F）
+ * 里，并进样本集才不至于把字母表截断。该区块 Noto Sans 全数覆盖，不会出豆腐块。
+ */
+const SCRIPT_EXTRA = {
+  coptic: [[0x03e2, 0x03ef]],
+  cyrillic: [[0xa640, 0xa69f]],
+};
+
 function loadSystems() {
   const src = read('src/data/writingSystems.ts')
     .replace(/^import[^;]*;$/gm, '')
@@ -254,6 +270,19 @@ for (const s of systems) {
       if (script) {
         const scriptOf = loadScripts();
         all = all.filter((c) => scriptOf(c.codePointAt(0)) === script);
+      }
+      const extra = SCRIPT_EXTRA[s.id];
+      if (extra) {
+        const seen = new Set(all);
+        for (const [a, b] of extra) {
+          for (const c of lettersInRange(letterRanges, a, b)) {
+            if (!seen.has(c)) {
+              seen.add(c);
+              all.push(c);
+            }
+          }
+        }
+        all.sort((x, y) => x.codePointAt(0) - y.codePointAt(0));
       }
       total = all.length;
       chars = all.slice(0, cap);
