@@ -464,6 +464,51 @@ main {
   color: var(--ink-faint);
 }
 
+/* 整幅图版：没有字符集可以逐字铺排的书写体系（印度河、玛雅、朗格朗日……） */
+.plate-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+.plate {
+  margin: 0;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+}
+.plate img {
+  display: block;
+  width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  mix-blend-mode: multiply;
+}
+.plate figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+}
+.plate-caption {
+  color: var(--ink-strong);
+}
+.plate-credit {
+  color: var(--ink-faint);
+}
+.plate figcaption a {
+  color: var(--cinnabar);
+  text-decoration: none;
+}
+.plate figcaption a:hover {
+  text-decoration: underline;
+}
+
 .board-font {
   display: flex;
   align-items: baseline;

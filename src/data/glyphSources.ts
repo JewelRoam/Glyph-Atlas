@@ -1,5 +1,6 @@
 import type { WritingSystem } from './types';
 import { localFont } from './localFonts';
+import { glyphPlates, type GlyphPlate } from './glyphPlates';
 
 /**
  * 字形来源解析。
@@ -28,6 +29,8 @@ export interface GlyphSource {
   home?: string;
   /** 逐字图片字形：字符 → public/ 下的路径 */
   images?: Record<string, string>;
+  /** 整幅图版：没有字符集可排时的代替物 */
+  plates?: GlyphPlate[];
   /** 给读者的说明 */
   note?: string;
 }
@@ -39,6 +42,20 @@ export interface GlyphSource {
  * 所以对绝大多数体系来说正合适。下面这些是例外——历史书体（甲骨、篆、隶）
  * 或没有 Unicode 编码的草写体（僧侣、世俗），默认字体画的是别的东西。
  */
+/**
+ * 以图版为字形来源的体系：没有可用字库，也没有（或几乎不设）Unicode 编码，
+ * 排不出逐字字表，就在详情里铺一两幅有出处的实物图 / 摹本。
+ */
+function plateSource(id: string, note: string): GlyphSource {
+  return { kind: 'image', plates: glyphPlates[id], note };
+}
+
+function plateSources(...ids: string[]): Record<string, GlyphSource> {
+  const out: Record<string, GlyphSource> = {};
+  for (const id of ids) out[id] = { kind: 'image', plates: glyphPlates[id] };
+  return out;
+}
+
 const OVERRIDES: Record<string, GlyphSource> = {
   'chinese-oracle': {
     kind: 'font',
@@ -56,18 +73,38 @@ const OVERRIDES: Record<string, GlyphSource> = {
     home: 'https://github.com/frankslin/kaiyuan-small-seal-font',
     note: '字面自《說文解字》刻本描摹；《說文》未收的字没有小篆字形，不列出。',
   },
-  'chinese-clerical': {
-    kind: 'none',
-    note: '隶书由小篆草写演变而来，笔画有波磔。目前没有授权明确、字形可靠的隶书字库，这里留空，不以宋体、楷体等现代字体顶替。',
-  },
-  hieratic: {
-    kind: 'none',
-    note: '僧侣体是圣书体的草写体，Unicode 未单独编码，也没有可用的开源字体或字形图。留在空位，不拿圣书体符号顶替。',
-  },
-  demotic: {
-    kind: 'none',
-    note: '世俗体是僧侣体进一步草写的结果，Unicode 未单独编码，暂无可靠字形来源。留在空位，不拿圣书体符号顶替。',
-  },
+  'chinese-clerical': plateSource( 'chinese-clerical',
+    '隶书把篆书的圆转改写成方折；没有授权明确、字形可靠的隶书字库，所以用东汉碑刻拓本代替，不以宋体、楷体等现代字体顶替。',
+  ),
+  hieratic: plateSource('hieratic',
+    '僧侣体是圣书体的草写体，Unicode 未单独编码，也没有可靠的开源字库；这里用真实的僧侣体纸草代替逐字字表。',
+  ),
+  demotic: plateSource('demotic',
+    '世俗体是僧侣体进一步草写的结果，Unicode 未单独编码；这里用真实的世俗体纸草代替逐字字表。',
+  ),
+  ...plateSources(
+    'indus',
+    'proto-elamite',
+    'olmec',
+    'rethra',
+    'rongorongo',
+    'proto-sinaitic',
+    'pahlavi',
+    'pallava',
+    'kadamba',
+    'nagari',
+    'khitan-large',
+    'jurchen',
+    'zapotec',
+    'epi-olmec',
+    'aztec',
+    'mixtec',
+    'nsibidi',
+    'mandombe',
+    'khipu',
+    'dongba',
+    'maya',
+  ),
 };
 
 /**

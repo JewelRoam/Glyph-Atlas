@@ -3,6 +3,7 @@ import type { WritingSystem } from '../data/types';
 import { glyphSets } from '../data/glyphSets';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { coverageOf, hasCoverage } from '../lib/coverage';
+import { assetUrl } from '../lib/assets';
 import { FontGlyph, ImageGlyph } from './Glyph';
 
 /** 折叠状态下先铺这么多，够看出这款文字的骨架 */
@@ -57,8 +58,10 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
   const cell = isSyllabic ? 42 : 36;
   const size = isSyllabic ? 28 : 24;
 
-  const countText =
-    source.kind === 'image'
+  const plateOnly = Boolean(source.plates?.length) && !plates.length;
+  const countText = plateOnly
+    ? `${source.plates!.length} 幅图版`
+    : source.kind === 'image'
       ? plates.length
         ? `${plates.length} 个字形图${missing ? `（另有 ${missing} 个字形未收）` : ''}`
         : '暂无字形样本'
@@ -76,6 +79,31 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
         <h3>{source.kind === 'image' ? '字形图版' : '字形样本'}</h3>
         <span className="board-count">{countText}</span>
       </div>
+
+      {source.plates && source.plates.length > 0 && (
+        <div className="plate-strip">
+          {source.plates.map((plate) => (
+            <figure className="plate" key={plate.src}>
+              <img src={assetUrl(plate.src)} alt={plate.caption} loading="lazy" decoding="async" />
+              <figcaption>
+                <span className="plate-caption">{plate.caption}</span>
+                <span className="plate-credit">
+                  {plate.credit} · {plate.license}
+                </span>
+                {plate.home ? (
+                  <a href={plate.home} target="_blank" rel="noreferrer">
+                    图版出处 ↗
+                  </a>
+                ) : null}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+
+      {source.kind === 'image' && source.note && source.plates?.length ? (
+        <p className="board-note">{source.note}</p>
+      ) : null}
 
       {source.kind === 'image' && plates.length > 0 && (
         <>
@@ -123,7 +151,7 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
         </>
       )}
 
-      {source.kind === 'image' && !plates.length && (
+      {source.kind === 'image' && !plates.length && !source.plates?.length && (
         <div className="board-empty">
           <p>{source.note ?? '这套文字的图片字形还在整理，字形位留空。'}</p>
         </div>
