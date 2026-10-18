@@ -400,9 +400,10 @@ npm run build && ls dist/
 ```
 
 - **Vercel / Netlify / Cloudflare Pages**：构建命令 `npm run build`，输出目录 `dist`。
-- **GitHub Pages**：已配置线上站点 <https://jewelroam.github.io/Glyph-Atlas/>，
-  由 `.github/workflows/deploy.yml` 在每次推送到 `main`（或手动触发）时构建并发布，
-  首次启用需在仓库 Settings → Pages 把 Source 设为 **GitHub Actions**。
+- **GitHub Pages**：线上站点 <https://jewelroam.github.io/Glyph-Atlas/>。
+  推送 `main`（或在 Actions 页手动触发）后，`.github/workflows/deploy.yml` 会执行
+  `npm ci` 与 `npm run build`，再把 `dist/` 的内容推送到 `gh-pages` 分支；
+  仓库的 Pages 源即该分支，因此无需额外的部署服务或密钥。
 - **子路径部署**：项目站点不在域名根目录，因此 `vite.config.ts` 里
   `base = '/Glyph-Atlas/'`，改名或改路径时要同步这个常量；
   本地 `npm run dev` 仍从根路径提供服务。
@@ -475,9 +476,10 @@ npm run build && ls dist/
   12 个独立起源，88 个今仍使用，7 条血统轨道。
   这一批的字体可用性由 `work/fontqa/audit.py` 逐个核验：请求 Google Fonts 的
   css2 接口取回全部 woff2 子集，再用字体的 cmap 表确认样例码位确实有字形。
-- **2026-10-18 · 部署到 GitHub Pages**：加入 GitHub Actions 发布流程，
-  站点上线于 <https://jewelroam.github.io/Glyph-Atlas/>；构建产物改用
-  `/Glyph-Atlas/` 作为资源前缀，并在本地用等效的静态服务验证过子路径下的加载。
+- **2026-10-18 · 部署到 GitHub Pages**：站点上线于
+  <https://jewelroam.github.io/Glyph-Atlas/>，由 GitHub Actions 在每次推送 `main` 时
+  构建并发布到 `gh-pages` 分支；构建产物改用 `/Glyph-Atlas/` 作为资源前缀，
+  并在本地用等效的静态服务验证过子路径下的加载。
 
 ---
 
