@@ -26,7 +26,8 @@
  *    帕尔米拉、哈特拉、阿拉伯；
  *  · 希腊—罗马：希腊、拉丁；
  *  · 希腊的东支：科普特、西里尔；
- *  · 希腊的两条支流：哥特（斯堪的纳维亚—黑海）、格拉哥里（斯拉夫）。
+ *  · 希腊的两条支流：哥特（斯堪的纳维亚—黑海）、格拉哥里（斯拉夫）；
+ *  · 阿拉米东支：粟特、回鹘、碑铭巴列维、诗篇巴列维。
  *
  * 暂不收录：拉丁 J / U / W。它们是中世纪以后从 I / V 分出来的，
  * 与希腊字母不是一对一的对应关系，放进对照表反而会误导，故排除。
@@ -74,6 +75,10 @@ export const SLOTS: LetterSlot[] = [
   { id: 'shin', label: '牙 šīn' },
   { id: 'taw', label: '记号 tāw' },
   { id: 'tha', label: 'ث（ت 加点）' },
+  // 粟特在阿拉米之上分出的两个擦音字母：feth 由 pē 分化，leš 表示 ž；
+  // 回鹘只继承了 leš。只出现在这两家的字母场里，别的对照表不建这一格。
+  { id: 'feth', label: '𐽃 feth（粟特由 pē 分出的擦音）' },
+  { id: 'lesh', label: '𐽄 leš（粟特/回鹘的 ž）' },
   { id: 'digamma', label: 'Ϝ / F（wāw 的另一支）' },
   { id: 'upsilon', label: 'Y（借自希腊 Υ）' },
   { id: 'phi', label: 'Φ（希腊新造）' },
@@ -613,6 +618,117 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'yus-iot-big': 'Ⱙ',
     teth: 'Ⱚ',
     izhitsa: 'Ⱛ',
+  },
+
+  // 粟特字母：阿拉米字母随丝路东传后留下的直系后代，22 个字母与阿拉米一一对应。
+  // 𐽀 是 resh 与 ayin 合流后的写法，所以只占 resh 一格；𐽃 feth 与 𐽄 leš 是
+  // 粟特自己在阿拉米之上分出的擦音字母，另立两格。𐽅 是 š 的独立形（词尾写法），
+  // 与叙利亚字母的处理一样，同一字母只取一个字形，不进对照表。
+  sogdian: {
+    aleph: '𐼰',
+    beth: '𐼱',
+    gimel: '𐼲',
+    he: '𐼳',
+    waw: '𐼴',
+    digamma: '𐼴',
+    zayin: '𐼵',
+    heth: '𐼶',
+    yodh: '𐼷',
+    kaph: '𐼸',
+    lamedh: '𐼹',
+    mem: '𐼺',
+    nun: '𐼻',
+    samekh: '𐼼',
+    ayin: '𐼽',
+    pe: '𐼾',
+    sadhe: '𐼿',
+    resh: '𐽀',
+    shin: '𐽁',
+    taw: '𐽂',
+    feth: '𐽃',
+    lesh: '𐽄',
+  },
+
+  // 回鹘字母：从粟特字母继承，字母数少了一截——he、heth、teth、ayin、qoph 都在
+  // 回鹘语里消失，g 与 h 并成一个字形。Unicode 把 g/h 合体写作 GIMEL-HETH
+  // (U+10F72)，另有词尾专用的 FINAL HETH (U+10F75)；对照表里 g 与 h 都取
+  // GIMEL-HETH，因为那正是回鹘人写这个字母时用的形体（同一字符占两格，
+  // 与哈特拉字母 d/r 的处理相同）。
+  'old-uyghur': {
+    aleph: '𐽰',
+    beth: '𐽱',
+    gimel: '𐽲',
+    waw: '𐽳',
+    digamma: '𐽳',
+    zayin: '𐽴',
+    heth: '𐽲',
+    yodh: '𐽶',
+    kaph: '𐽷',
+    lamedh: '𐽸',
+    mem: '𐽹',
+    nun: '𐽺',
+    samekh: '𐽻',
+    pe: '𐽼',
+    sadhe: '𐽽',
+    resh: '𐽾',
+    shin: '𐽿',
+    taw: '𐾀',
+    lesh: '𐾁',
+  },
+
+  // 碑铭巴列维字母：阿拉米字母在伊朗高原收窄成 19 形，waw/ayin/resh 三个字母
+  // 在石碑上写同一个字，mem 与 qoph 也合流；teth 在巴列维里已经不用。
+  // 于是它的字母场里能看到多格收成同一笔画的"合流"，以及 teth 的消失。
+  'inscriptional-pahlavi': {
+    aleph: '𐭠',
+    beth: '𐭡',
+    gimel: '𐭢',
+    daleth: '𐭣',
+    he: '𐭤',
+    waw: '𐭥',
+    digamma: '𐭥',
+    ayin: '𐭥',
+    resh: '𐭥',
+    zayin: '𐭦',
+    heth: '𐭧',
+    teth: '𐭨',
+    yodh: '𐭩',
+    kaph: '𐭪',
+    lamedh: '𐭫',
+    mem: '𐭬',
+    qoph: '𐭬',
+    nun: '𐭭',
+    samekh: '𐭮',
+    pe: '𐭯',
+    sadhe: '𐭰',
+    shin: '𐭱',
+    taw: '𐭲',
+  },
+
+  // 诗篇巴列维字母：碑铭体的草写体，字母表几乎照旧，只是 teth 一格空了。
+  'psalter-pahlavi': {
+    aleph: '𐮀',
+    beth: '𐮁',
+    gimel: '𐮂',
+    daleth: '𐮃',
+    he: '𐮄',
+    waw: '𐮅',
+    digamma: '𐮅',
+    ayin: '𐮅',
+    resh: '𐮅',
+    zayin: '𐮆',
+    heth: '𐮇',
+    yodh: '𐮈',
+    kaph: '𐮉',
+    lamedh: '𐮊',
+    mem: '𐮋',
+    qoph: '𐮋',
+    nun: '𐮌',
+    samekh: '𐮍',
+    pe: '𐮎',
+    sadhe: '𐮏',
+    shin: '𐮐',
+    taw: '𐮑',
   },
 };
 
