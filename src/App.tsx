@@ -14,13 +14,12 @@ import './App.css';
 type Tab = 'atlas' | 'walk' | 'table';
 
 /**
- * 主导航只写拉丁词：三个词各自指明一种观察尺度，中文名保留在
- * aria-label / title 里，屏幕阅读器与悬停提示仍然是中文。
+ * 主导航只写拉丁词：三个词各自指明一种观察尺度。
  */
-const TABS: { id: Tab; label: string; name: string }[] = [
-  { id: 'atlas', label: 'Macro', name: '演化图谱' },
-  { id: 'walk', label: 'Micro', name: '时间街景' },
-  { id: 'table', label: 'Index', name: '文字总表' },
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'atlas', label: 'MACRO' },
+  { id: 'walk', label: 'MICRO' },
+  { id: 'table', label: 'INDEX' },
 ];
 
 export default function App() {
@@ -30,14 +29,12 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <nav aria-label="主导航">
+        <nav aria-label="Primary navigation">
           {TABS.map((t) => (
             <button
               key={t.id}
               className={tab === t.id ? 'active' : ''}
               aria-current={tab === t.id ? 'page' : undefined}
-              aria-label={t.name}
-              title={t.name}
               onClick={() => setTab(t.id)}
             >
               {t.label}
