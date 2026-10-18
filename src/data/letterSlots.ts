@@ -675,6 +675,50 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-mran-shan-ha', label: 'ႁ shan ha（掸语的 ha）' },
   { id: 'varga-mran-palaung-fa', label: 'ႎ rumai palaung fa（勃欧语的 fa）' },
 
+  // ── 南亚与海岛文字在梵语字音表之外自己添的字母 ─────────────────────
+  // 这些是各文字字母表里真实存在、但与梵语 33 个音位对不上的字：藏文的
+  // 塞擦音 ཙ ཚ ཛ 与擦音 ཞ ཟ、元音载体 འ，马拉雅拉姆文的九个 chillu
+  // （词末辅音写法），僧伽罗语的鼻化浊音与 ෆ，爪哇语、巴厘语为古爪哇语与
+  // 萨萨克语另造的字母。它们在别的文字里没有对应格，走到那一站时成组飞入。
+  // 藏文的 jha 是组合字 ཛྷ，Unicode 没有单字，仍留空。
+  { id: 'varga-tsa', label: 'tsa ཙ（藏文的塞擦音，梵语 च 的转写字面）' },
+  { id: 'varga-tsha', label: 'tsha ཚ（藏文的送气塞擦音，梵语 छ 的转写字面）' },
+  { id: 'varga-dza', label: 'dza ཛ（藏文的浊塞擦音，梵语 ज 的转写字面）' },
+  { id: 'varga-zha', label: 'zha ཞ（藏文的浊擦音）' },
+  { id: 'varga-za', label: 'za ཟ（藏文的浊齿擦音）' },
+  { id: 'varga-a-chung', label: "a-chung འ（藏文的 -a，兼作元音载体）" },
+  { id: 'varga-kka', label: 'kka ཫ（藏文为外来音添的 ka）' },
+  { id: 'varga-rra-tib', label: 'rra ཬ（藏文为外来音添的 ra）' },
+  { id: 'varga-chillu-nn', label: 'chillu nn ൺ（马拉雅拉姆词的末 ṇa 写法）' },
+  { id: 'varga-chillu-n', label: 'chillu n ൻ（马拉雅拉姆词的末 na 写法）' },
+  { id: 'varga-chillu-rr', label: 'chillu rr ർ（马拉雅拉姆词的末 ra 写法）' },
+  { id: 'varga-chillu-l', label: 'chillu l ൽ（马拉雅拉姆词的末 la 写法）' },
+  { id: 'varga-chillu-ll', label: 'chillu ll ൾ（马拉雅拉姆词的末 ḷa 写法）' },
+  { id: 'varga-chillu-k', label: 'chillu k ൿ（马拉雅拉姆词的末 ka 写法）' },
+  { id: 'varga-chillu-m', label: 'chillu m ൔ（马拉雅拉姆词的末 ma 写法）' },
+  { id: 'varga-chillu-y', label: 'chillu y ൕ（马拉雅拉姆词的末 ya 写法）' },
+  { id: 'varga-chillu-lll', label: 'chillu lll ൖ（马拉雅拉姆词的末 ḻa 写法）' },
+  { id: 'varga-sinhala-gga', label: 'n̆ga ඟ（僧伽罗语的鼻化浊 g）' },
+  { id: 'varga-sinhala-jnya', label: 'jña ඥ（僧伽罗语合写的 ña+ja）' },
+  { id: 'varga-sinhala-jja', label: 'n̆ja ඦ（僧伽罗语的鼻化浊 j）' },
+  { id: 'varga-sinhala-dda', label: 'n̆ḍa ඬ（僧伽罗语的鼻化浊 ḍ）' },
+  { id: 'varga-sinhala-da', label: 'n̆da ඳ（僧伽罗语的鼻化浊 d）' },
+  { id: 'varga-sinhala-ba', label: 'm̆ba ඹ（僧伽罗语的鼻化浊 b）' },
+  { id: 'varga-sinhala-fa', label: 'fa ෆ（僧伽罗语为外来音添的 f）' },
+  { id: 'varga-java-i-kawi', label: 'i kawi ꦅ（古爪哇语与爪哇语分写的 i）' },
+  { id: 'varga-java-pa-cerek', label: 'pa cerek ꦉ（爪哇语的 /rə/ 字面）' },
+  { id: 'varga-java-nga-lelet', label: 'nga lelet ꦊ（爪哇语的 /lə/ 字面）' },
+  { id: 'varga-java-nga-lelet-raswadi', label: 'nga lelet raswadi ꦋ（爪哇语的 /l̥/ 字面）' },
+  { id: 'varga-java-ka-sasak', label: 'ka sasak ꦐ（爪哇语为萨萨克语添的 ka）' },
+  { id: 'varga-java-ra-agung', label: 'ra agung ꦬ（爪哇语的 re 字面）' },
+  { id: 'varga-balinese-kaf-sasak', label: 'kaf sasak ᭅ（巴厘文为萨萨克语添的 k）' },
+  { id: 'varga-balinese-khot-sasak', label: 'khot sasak ᭆ（巴厘文为萨萨克语添的 kh）' },
+  { id: 'varga-balinese-tzir-sasak', label: 'tzir sasak ᭇ（巴厘文为萨萨克语添的 ts）' },
+  { id: 'varga-balinese-ef-sasak', label: 'ef sasak ᭈ（巴厘文为萨萨克语添的 f）' },
+  { id: 'varga-balinese-ve-sasak', label: 've sasak ᭉ（巴厘文为萨萨克语添的 v）' },
+  { id: 'varga-balinese-zal-sasak', label: 'zal sasak ᭊ（巴厘文为萨萨克语添的 z）' },
+  { id: 'varga-balinese-asyura-sasak', label: 'asyura sasak ᭋ（巴厘文为萨萨克语添的 ʕ）' },
+
 
   // ── 假名（五十音）：汉字借字 → 平假名 → 片假名 ───────────────────
   // 格子的身份是"音节"而不是字源：一个音占一格，三种写法在同一格里换。
@@ -2489,7 +2533,17 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-llla': 'ഴ',
     'varga-rra': 'റ',
     'varga-nnna': 'ഩ',
-  },  // 马拉雅拉姆文：33/33
+    // 词末辅音写法（chillu）：Unicode 单列九个，另加三个历史写法
+    'varga-chillu-nn': 'ൺ',
+    'varga-chillu-n': 'ൻ',
+    'varga-chillu-rr': 'ർ',
+    'varga-chillu-l': 'ൽ',
+    'varga-chillu-ll': 'ൾ',
+    'varga-chillu-k': 'ൿ',
+    'varga-chillu-m': 'ൔ',
+    'varga-chillu-y': 'ൕ',
+    'varga-chillu-lll': 'ൖ',
+  },  // 马拉雅拉姆文：62/67（33 音位 + 九个 chillu）
   sinhala: {
     'varga-ka': 'ක',
     'varga-kha': 'ඛ',
@@ -2525,7 +2579,15 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'ස',
     'varga-ha': 'හ',
     'varga-lla': 'ළ',
-  },  // 僧伽罗文：33/33
+    // 僧伽罗语自己的鼻化浊音一系与外来音 ෆ
+    'varga-sinhala-gga': 'ඟ',
+    'varga-sinhala-jnya': 'ඥ',
+    'varga-sinhala-jja': 'ඦ',
+    'varga-sinhala-dda': 'ඬ',
+    'varga-sinhala-da': 'ඳ',
+    'varga-sinhala-ba': 'ඹ',
+    'varga-sinhala-fa': 'ෆ',
+  },  // 僧伽罗文：全部（33 音位 + 七个本语字母）
   // 藏文梵转写的 jha 写成 ཛྷ 组合字，Unicode 无单字，jha 一格空着
   tibetan: {
     'varga-ka': 'ཀ',
@@ -2560,7 +2622,16 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ཥ',
     'varga-sa': 'ས',
     'varga-ha': 'ཧ',
-  },  // 藏文：32/33
+    // 藏文在梵语 33 音之外还有自己的塞擦音一系与 -a 载体：
+    'varga-tsa': 'ཙ',
+    'varga-tsha': 'ཚ',
+    'varga-dza': 'ཛ',
+    'varga-zha': 'ཞ',
+    'varga-za': 'ཟ',
+    'varga-a-chung': 'འ',
+    'varga-kka': 'ཫ',
+    'varga-rra-tib': 'ཬ',
+  },  // 藏文：41/50（余下多为祭仪符号；jha 是组合字，留空）
   java: {
     'varga-ka': 'ꦏ',
     'varga-kha': 'ꦑ',
@@ -2571,7 +2642,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-cha': 'ꦖ',
     'varga-ja': 'ꦗ',
     'varga-jha': 'ꦙ',
-    'varga-nya': 'ꦘ',
+    // ꦚ 是正体 nya；ꦘ（nya murda）是同一字母的敬体变体，不入表
+    'varga-nya': 'ꦚ',
     'varga-tta': 'ꦛ',
     'varga-ttha': 'ꦜ',
     'varga-dda': 'ꦝ',
@@ -2595,7 +2667,14 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ꦰ',
     'varga-sa': 'ꦱ',
     'varga-ha': 'ꦲ',
-  },  // 爪哇文：33/33
+    // 爪哇语在梵语 33 音之外的独立字面
+    'varga-java-i-kawi': 'ꦅ',
+    'varga-java-pa-cerek': 'ꦉ',
+    'varga-java-nga-lelet': 'ꦊ',
+    'varga-java-nga-lelet-raswadi': 'ꦋ',
+    'varga-java-ka-sasak': 'ꦐ',
+    'varga-java-ra-agung': 'ꦬ',
+  },  // 爪哇文：46/48（余下两个是敬体变体与缩写符号）
   balinese: {
     'varga-ka': 'ᬓ',
     'varga-kha': 'ᬔ',
@@ -2630,7 +2709,15 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ᬱ',
     'varga-sa': 'ᬲ',
     'varga-ha': 'ᬳ',
-  },  // 巴厘文：33/33
+    // 巴厘文为萨萨克语添的七个字母
+    'varga-balinese-kaf-sasak': 'ᭅ',
+    'varga-balinese-khot-sasak': 'ᭆ',
+    'varga-balinese-tzir-sasak': 'ᭇ',
+    'varga-balinese-ef-sasak': 'ᭈ',
+    'varga-balinese-ve-sasak': 'ᭉ',
+    'varga-balinese-zal-sasak': 'ᭊ',
+    'varga-balinese-asyura-sasak': 'ᭋ',
+  },  // 巴厘文：全部（33 音位 + 七个萨萨克字母）
   khmer: {
     'varga-ka': 'ក',
     'varga-kha': 'ខ',
