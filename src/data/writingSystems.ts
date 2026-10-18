@@ -154,7 +154,7 @@ export const writingSystems: WritingSystem[] = [
     origin: 'derived', parents: ['egyptian'], dateFrom: -300, dateTo: 400,
     family: 'africa', region: '努比亚', countries: ['苏丹'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
-    unicodeBlock: 'Meroitic U+10980', sample: '𐦀', fontFamily: 'Noto Sans Meroitic',
+    unicodeBlock: 'Meroitic Hieroglyphs U+10980', sample: '𐦀', fontFamily: 'Noto Sans Meroitic',
   },
 
   // ─────────────────────────────────────────────
@@ -552,7 +552,7 @@ export const writingSystems: WritingSystem[] = [
     origin: 'derived', parents: ['takri'], dateFrom: 1800, dateTo: 1950,
     family: 'indic', region: '查谟', countries: ['印度', '巴基斯坦'],
     type: 'abugida', status: 'historical', direction: 'ltr',
-    unicodeBlock: 'Dogra U+11800', sample: '𑠀', fontFamily: 'Noto Sans Dogra',
+    unicodeBlock: 'Dogra U+11800', sample: '𑠀', fontFamily: 'Noto Serif Dogra',
     note: '塔克里文的多格拉体，19 世纪用于书写多格拉语，后主要改由天城文承担。',
   },
   {
@@ -877,7 +877,7 @@ export const writingSystems: WritingSystem[] = [
     origin: 'derived', parents: ['tibetan'], dateFrom: 1686, dateTo: 1900,
     family: 'centralasia', region: '蒙古高原', countries: ['蒙古'],
     type: 'abugida', status: 'historical', direction: 'ttb',
-    unicodeBlock: 'Soyombo U+11A50', sample: '𑩂',
+    unicodeBlock: 'Soyombo U+11A50', sample: '𑩐',
     fontFamily: 'Noto Sans Soyombo',
   },
 
@@ -1011,9 +1011,7 @@ export const writingSystems: WritingSystem[] = [
     origin: 'independent', parents: [], dateFrom: 1000, dateTo: null,
     family: 'sinic', region: '云南', countries: ['中国（云南）'],
     type: 'logographic', status: 'living',
-    unicodeBlock: 'Dongba U+11A00', sample: '𖠀',
-    fontFamily: 'Noto Sans Dongba',
-    note: '纳西族的图画象形文字，是仍在使用的象形文字之一。',
+    note: '纳西族的图画象形文字，是仍在使用的象形文字之一；该文字尚未纳入 Unicode，总表中以缺字形名片表示。',
   },
 
   // ─────────────────────────────────────────────
@@ -1079,8 +1077,8 @@ export const writingSystems: WritingSystem[] = [
     origin: 'derived', parents: ['sogdian'], dateFrom: 700, dateTo: 1300,
     family: 'centralasia', region: '西域', countries: ['中国', '蒙古'],
     type: 'alphabet', status: 'extinct', direction: 'ttb',
-    unicodeBlock: 'Old Uyghur U+10F70', sample: '𐰀',
-    fontFamily: 'Noto Sans Old Uyghur',
+    unicodeBlock: 'Old Uyghur U+10F70', sample: '𐽰',
+    fontFamily: 'Noto Serif Old Uyghur',
   },
   {
     id: 'mongolian', nameZh: '蒙古字母', nameEn: 'Mongolian',
@@ -1153,7 +1151,7 @@ export const writingSystems: WritingSystem[] = [
     origin: 'derived', parents: ['linear-a'], dateFrom: -1450, dateTo: -1200,
     family: 'other', region: '爱琴海', countries: ['希腊'],
     type: 'syllabary', status: 'extinct', direction: 'ltr',
-    unicodeBlock: 'Linear B U+10000', sample: '𐀀',
+    unicodeBlock: 'Linear B Syllabary U+10000', sample: '𐀀',
     fontFamily: 'Noto Sans Linear B',
     note: '已破译，记录的是早期希腊语。',
   },
@@ -1219,9 +1217,7 @@ export const writingSystems: WritingSystem[] = [
     origin: 'independent', parents: [], dateFrom: 400, dateTo: null,
     family: 'africa', region: '西非', countries: ['尼日利亚'],
     type: 'logographic', status: 'living',
-    unicodeBlock: 'Nsibidi U+1E100', sample: '𞤀',
-    fontFamily: 'Noto Sans Nsibidi',
-    note: '尼日利亚伊博等族的象形符号系统，可独立起源。',
+    note: '尼日利亚伊博等族的象形符号系统，可独立起源；该文字尚未纳入 Unicode，总表中以缺字形名片表示。',
   },
   {
     id: 'vai', nameZh: '瓦伊文', nameEn: 'Vai',

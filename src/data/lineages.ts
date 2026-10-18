@@ -116,6 +116,23 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'silk-road',
+    nameZh: '阿拉米 ʾālep → 蒙古 a',
+    nameEn: "Aramaic aleph → Mongolian a",
+    mode: 'chain',
+    description:
+      '字母沿丝绸之路向东传播的一条主干：阿拉米字母的 ʾālep 被粟特人借去，' +
+      '再由回鹘人继承，最后进入蒙古字母。语言换了，音值也变了，' +
+      '但纵向书写的骨架仍能一路辨认。',
+    stops: [
+      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'sogdian', char: '𐼰', label: '粟特 ʾālep', phonetic: 'ʔ' },
+      { script: 'old-uyghur', char: '𐽰', label: '回鹘 aleph', phonetic: 'a / ʔ' },
+      { script: 'mongolian', char: 'ᠠ', label: '蒙古 a', phonetic: 'a' },
+    ],
+  },
+
+  {
     id: 'kana',
     nameZh: '汉字 → 平假名',
     nameEn: 'Kanji → hiragana',

@@ -13,6 +13,7 @@
  *  6. 谱系轨道的每一站都指向存在的书写体系，且按时间递增
  *  7. 轨道站点至少两站，path 站点使用 0–100 的 viewBox
  *  8. 中国 / 汉字圈的样本、国家的字段不为空
+ *  9. 声明了 Unicode 区块的条目，样例码位确实落在该区块内
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -43,6 +44,8 @@ function loadData() {
 }
 
 const { writingSystems, scriptById, lineages } = loadData();
+const unicodeBlocks = JSON.parse(read('tools/unicode-block-ranges.json'));
+const blockByName = new Map(unicodeBlocks.blocks.map((b) => [b.name, b]));
 
 const errors = [];
 const warnings = [];
@@ -76,6 +79,37 @@ for (const s of writingSystems) {
     err(`[dates] ${s.id} 的终止年代早于起始年代`);
   if (s.dateFrom < TIME_DOMAIN[0] || (s.dateTo ?? 0) > TIME_DOMAIN[1])
     warn(`[dates] ${s.id} 超出全站时间域 ${TIME_DOMAIN.join(' – ')}`);
+  // Unicode 区块与样例码位必须自洽
+  if (s.unicodeBlock) {
+    const parsed = /^(.+?) U\+([0-9A-F]{4,6})$/.exec(s.unicodeBlock);
+    if (!parsed) {
+      err(`[unicode] ${s.id} 的 unicodeBlock 格式无法解析: ${s.unicodeBlock}`);
+    } else {
+      const [, blockName, declaredStart] = parsed;
+      const block = blockByName.get(blockName);
+      if (!block) {
+        err(`[unicode] ${s.id} 引用了未知 Unicode 区块: ${blockName}`);
+      } else {
+        const declared = parseInt(declaredStart, 16);
+        const start = parseInt(block.start, 16);
+        const end = parseInt(block.end, 16);
+        if (declared < start || declared > end) {
+          err(`[unicode] ${s.id} 的区块起点 U+${declaredStart} 不在 ${blockName} 内`);
+        }
+        if (s.sample) {
+          const sample = Array.from(s.sample)[0]?.codePointAt(0);
+          if (sample !== undefined && (sample < start || sample > end)) {
+            err(
+              `[unicode] ${s.id} 的样例 U+${sample.toString(16).toUpperCase()} 不在 ${blockName} 内（应为 U+${block.start}–U+${block.end}）`,
+            );
+          }
+        }
+      }
+    }
+  } else if (s.sample && !s.fontFamily) {
+    warn(`[unicode] ${s.id} 有样例字符但没有声明 Unicode 区块或字体`);
+  }
+
   // 展示所需字段
   if (!s.nameZh || !s.nameEn) err(`[fields] ${s.id} 缺少中/英文名`);
   if (!s.countries?.length) err(`[fields] ${s.id} 缺少使用国家 / 地区`);
