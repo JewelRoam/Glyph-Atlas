@@ -210,9 +210,9 @@ def letter_slots() -> list[dict]:
 def write_alphabets() -> int:
     """字母槽位表里每个字符的轮廓，供 MICRO 字母场做整套字母表的形变。
 
-    分成两包：闪米特—希腊—拉丁那条线（core）与婆罗米系的梵语字音表
-    （varga）。字母场只按当前这一段轨道需要的包去取，走闪米特轨道的读者
-    不必先下载印度那 600 多个轮廓。
+    分成两包：闪米特—希腊—拉丁那条线（core）与婆罗米系的元音位加梵语字音表
+    （varga，即 svara-* 与 varga-* 两套槽位）。字母场只按当前这一段轨道需要
+    的包去取，走闪米特轨道的读者不必先下载印度那 1000 多个轮廓。
     """
     groups: dict[str, dict[str, str]] = {'core': {}, 'varga': {}}
     sources: dict[str, str] = {}
@@ -224,7 +224,8 @@ def write_alphabets() -> int:
             failures.append(f"{item['script']}/{item['slot']} 没有可用字体")
             continue
         key = f"{item['script']}:{item['char']}"
-        group = 'varga' if item['slot'].startswith('varga-') else 'core'
+        brahmic = item['slot'].startswith('varga-') or item['slot'].startswith('svara-')
+        group = 'varga' if brahmic else 'core'
         if key in groups[group]:
             continue
         try:
@@ -235,7 +236,7 @@ def write_alphabets() -> int:
 
     for group, path, exported, title in (
         ('core', OUT_ALPHA, 'alphabetPaths', '闪米特—希腊—拉丁一线'),
-        ('varga', OUT_ALPHA_VARGA, 'alphabetPathsVarga', '婆罗米系（梵语字音表 varga）'),
+        ('varga', OUT_ALPHA_VARGA, 'alphabetPathsVarga', '婆罗米系（独立元音 svara 与梵语字音表 varga）'),
     ):
         entries = groups[group]
         lines = [

@@ -32,6 +32,7 @@ function loadData() {
       .replace(/export type[\s\S]*?;\n/g, '')
       .replace(/^export const/gm, 'const')
       .replace(/:\s*(WritingSystem|Lineage|GlyphSet|LetterSlot)\[\]/g, '')
+      .replace(/:\s*\{[^}]*\}\[\]/g, '')
       .replace(/:\s*Record<[^=]*?>(?=\s*=)/g, '');
 
   const wsSrc = strip(read('src/data/writingSystems.ts'));
@@ -39,6 +40,8 @@ function loadData() {
   // glyphSets.ts 末尾还有一个查表函数，这里只要数据本身
   const gsSrc = strip(read('src/data/glyphSets.ts')).replace(/export function[\s\S]*$/, '');
   const fcSrc = strip(read('src/data/fontCoverage.ts'));
+  // 元音槽位表要先于 letterSlots 求值：后者用扩展运算符把 SVARA_SLOTS 铺进去
+  const svSrc = strip(read('src/data/svaraSlots.ts')).replace(/export function[\s\S]*$/, '');
   const lsSrc = strip(read('src/data/letterSlots.ts')).replace(/export function[\s\S]*$/, '');
   const ffSrc = strip(read('src/data/fontFallback.ts')).replace(/export function[\s\S]*$/, '');
   const factory = new Function(`
@@ -46,6 +49,7 @@ function loadData() {
     ${lnSrc}
     ${gsSrc}
     ${fcSrc}
+    ${svSrc}
     ${lsSrc}
     ${ffSrc}
     return { writingSystems, scriptById, lineages, glyphSets, fontCoverage, letterMaps, SLOTS, fontFallback };
