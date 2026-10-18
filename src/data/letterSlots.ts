@@ -49,6 +49,9 @@
  *    这几家丢掉的元音位同样按消失处理（例如穆尔塔尼只剩 a i u e 四个）。
  *  · 尼瓦尔文：梵语音位表 33 格与那套独立元音，外加尼泊尔巴沙语的六个浊送音
  *    （ṅha ñha nha mha rha lha，见 varga- 末尾那五格与其后的映射）。
+ *  · 东南亚本语字母：泰、老两文把 ข ค ผ พ ห 加一笔分出的 /f/ /h/ 一系，加上
+ *    从印度 ḍ/d、b 一系来的 ฎ ด บ，以及泰、老、高棉三家都有的元音载体 อ/ອ/អ，
+ *    另占一格（见 varga- 末尾那十一格）；泰文的 ฤ ฦ 落在 svara 的 r̥ / l̥ 两格。
  *  · 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇——按音位
  *    位次与上面各表对齐，多出来的音位另立一格（见 per 系与 perm 系槽位）。
  *  · 假名：汉字借字、平假名、片假名三套——一个音节一格（见 kana-* 槽位），
@@ -552,6 +555,25 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-nha', label: 'nha（尼瓦尔语的浊送鼻音）' },
   { id: 'varga-mha', label: 'mha（尼瓦尔语的浊送鼻音）' },
   { id: 'varga-lha', label: 'lha（尼瓦尔语的浊送边音）' },
+
+  // ── 东南亚本语字母：泰、老、高棉、缅在梵语 33 音之外自己添的字 ────────
+  // 泰文与老挝文的字母表比梵语音位表长：两文把 ข ค ผ พ ห 一类的字加一笔或换
+  // 一个部件，分出 /s/ /f/ /d/ /b/ /h/ 这些本语要用的音；ฎ ด บ 三字来自印度的
+  // ḍa、da、ba，但在两文里与 ฏ ต ป 清浊成对、另占一格。高棉的 អ、泰的 อ、
+  // 老的 ອ 都是婆罗米独立元音 a 的后身，在本族文字里既当声门塞音又当元音载体；
+  // 泰文另有两个写开来的元音字母 ฤ ฦ（见 svaraSlots.ts）。这些字母在别的
+  // 婆罗米系文字里没有对应格，走到泰文／老挝文这一站时从下方飞入。
+  { id: 'varga-khuat', label: 'ฃ xo khuat（泰文的古 kha，由 ข 派生，今已废弃）' },
+  { id: 'varga-khon', label: 'ฅ xo khon（泰文的古 kha，由 ค 派生，今已废弃）' },
+  { id: 'varga-so-so', label: 'ซ so so（泰文的 /s/，由 ช 派生）' },
+  { id: 'varga-do-chada', label: 'ฎ do chada（泰文的 /d/，与 ฏ 清浊成对）' },
+  { id: 'varga-do-dek', label: 'ด do dek（泰文的 /d/）· ດ do（老挝文）' },
+  { id: 'varga-bo-baimai', label: 'บ bo baimai（泰文的 /b/）· ບ bo（老挝文）' },
+  { id: 'varga-fo-ta', label: 'ฝ fo ta（泰文高调 /f/，由 ผ 派生）· ຝ fo tam（老挝文）' },
+  { id: 'varga-fo-fan', label: 'ฟ fo fan（泰文低调 /f/，由 พ 派生）· ຟ fo sung（老挝文）' },
+  { id: 'varga-o-ang', label: 'อ o ang（泰文）· ອ o（老挝文）· អ QA（高棉文）——婆罗米独立元音 a 的后身，兼作声门塞音与元音载体' },
+  { id: 'varga-ho-nokhuk', label: 'ฮ ho nokhuk（泰文低调 /h/，由 ห 派生）· ຮ ho tam（老挝文）' },
+  { id: 'varga-nyo', label: 'ຍ nyo（老挝文的 /ɲ/）· ည nnya（缅文）——与巴利系列的 ຎ / ဉ 分工' },
 
   // ── 假名（五十音）：汉字借字 → 平假名 → 片假名 ───────────────────
   // 格子的身份是"音节"而不是字源：一个音占一格，三种写法在同一格里换。
@@ -2482,7 +2504,9 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'ស',
     'varga-ha': 'ហ',
     'varga-lla': 'ឡ',
-  },  // 高棉文：33/33
+    // អ 是高棉字母表的第 33 个辅音，也是写元音的载体，独立元音 a 的后身
+    'varga-o-ang': 'អ',
+  },  // 高棉文：35/35（梵语字音表 33 音 + ឡ + អ）
   thai: {
     'varga-ka': 'ก',
     'varga-kha': 'ข',
@@ -2518,7 +2542,18 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'ส',
     'varga-ha': 'ห',
     'varga-lla': 'ฬ',
-  },  // 泰文：33/33
+    // 泰文自己添的十个字母：梵语 33 音之外，这些格子别的婆罗米系文字没有
+    'varga-khuat': 'ฃ',
+    'varga-khon': 'ฅ',
+    'varga-so-so': 'ซ',
+    'varga-do-chada': 'ฎ',
+    'varga-do-dek': 'ด',
+    'varga-bo-baimai': 'บ',
+    'varga-fo-ta': 'ฝ',
+    'varga-fo-fan': 'ฟ',
+    'varga-o-ang': 'อ',
+    'varga-ho-nokhuk': 'ฮ',
+  },  // 泰文：44/44（梵语字音表 33 音 + 巴利 ḷa + 10 个本语字母）
   lao: {
     'varga-ka': 'ກ',
     'varga-kha': 'ຂ',
@@ -2554,7 +2589,15 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'ສ',
     'varga-ha': 'ຫ',
     'varga-lla': 'ຬ',
-  },  // 老挝文：33/33
+    // 老挝文比梵语字音表多出的七个常用辅音：/ɲ/ /d/ /b/ /f/ /ʔ/ /h/
+    'varga-nyo': 'ຍ',
+    'varga-do-dek': 'ດ',
+    'varga-bo-baimai': 'ບ',
+    'varga-fo-ta': 'ຝ',
+    'varga-fo-fan': 'ຟ',
+    'varga-o-ang': 'ອ',
+    'varga-ho-nokhuk': 'ຮ',
+  },  // 老挝文：41/41（梵语字音表 33 音 + 巴利 ḷa + 7 个本语字母）
   burmese: {
     'varga-ka': 'က',
     'varga-kha': 'ခ',
@@ -2590,7 +2633,9 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'သ',
     'varga-ha': 'ဟ',
     'varga-lla': 'ဠ',
-  },  // 缅文：33/33
+    // 缅文与巴利系列的 ဉ 分工：日常的 ñ 写作 ည，ဉ 只用于巴利梵语转写
+    'varga-nyo': 'ည',
+  },  // 缅文：35/35（梵语字音表 33 音 + ဠ + ည）
 
   // ── 夏拉达支系：夏拉达 → 塔克里 → 马哈贾尼 → 霍杰基 → 穆尔塔尼 →
   //    胡达瓦迪 → 多格拉 ─────────────────────────────────────────────
