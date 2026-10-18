@@ -268,4 +268,34 @@ export const lineages: Lineage[] = [
       { script: 'mandaic', char: 'ࡀ', label: '曼达 halqa', phonetic: 'a' },
     ],
   },
+
+  {
+    id: 'hebrew-squared',
+    nameZh: '阿拉米 ʾālep → 希伯来 alef',
+    nameEn: 'Aramaic ʾālep → Hebrew alef',
+    mode: 'chain',
+    description:
+      '今天写的方形希伯来字母并不是古希伯来字母的直系延续。巴比伦之囚以后，' +
+      '流亡社群改用阿拉米字母抄写经文，字母名与音值照旧，字形却整体换成了' +
+      '另一套骨架。',
+    stops: [
+      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'hebrew', char: 'א', label: '希伯来 alef', phonetic: 'ʔ' },
+    ],
+  },
+
+  {
+    id: 'samaritan-line',
+    nameZh: '腓尼基 ʾālep → 撒玛利亚 alaf',
+    nameEn: 'Phoenician ʾālep → Samaritan alaf',
+    mode: 'chain',
+    description:
+      '撒玛利亚人没有跟着改用方形希伯来字母，而是守着古希伯来书体一路写下来，' +
+      '成为后来的撒玛利亚字母——《撒玛利亚五经》到今天仍用它抄写。' +
+      '二十二个字母的骨架都能追回腓尼基。',
+    stops: [
+      { script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
+      { script: 'samaritan', char: 'ࠀ', label: '撒玛利亚 alaf', phonetic: 'ʔ' },
+    ],
+  },
 ];

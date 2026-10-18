@@ -11,10 +11,13 @@
  *  · SLOTS    —— 槽位的全局顺序（字母场的格子顺序按它排，跨文字保持稳定）；
  *  · letterMaps —— 文字 → (槽位 → 该文字里代表这个槽位的字符)。
  *
- * 两种特殊写法：
+ * 三种特殊写法：
  *  · 同一个字符可以出现在两个槽位里，用来表示"一个祖形分出两支"。
  *    例如腓尼基 𐤅 (wāw) 同时进 waw 槽（→ 希腊 Υ → 拉丁 V）和 digamma 槽
  *    （→ 希腊 Ϝ → 拉丁 F）。字母场里它就会出现两次，各自变形成后代。
+ *  · 两个槽位也可以指向同一个字符，表示两支合流成一个字形——哈特拉字母的
+ *    d 与 r 就是这样（Unicode 名就叫 DALETH-RESH）。走到它的时候两格会
+ *    收成同一种笔画。
  *  · 后起的字母（希腊 Φ，罗马 G，阿拉伯 ث）单独占一个槽位。它们在字母场里
  *    没有祖先格，移动到相邻文字时按"新增"处理，飞入/飞出。
  *
@@ -149,6 +152,172 @@ export const letterMaps: Record<string, Record<string, string>> = {
     resh: '𐢛',
     shin: '𐢝',
     taw: '𐢞',
+  },
+
+  // 希伯来字母：今用的方形体承自阿拉米，排序与音值照传统的 abjad 不变
+  hebrew: {
+    aleph: 'א',
+    beth: 'ב',
+    gimel: 'ג',
+    daleth: 'ד',
+    he: 'ה',
+    waw: 'ו',
+    digamma: 'ו',
+    zayin: 'ז',
+    heth: 'ח',
+    teth: 'ט',
+    yodh: 'י',
+    kaph: 'כ',
+    lamedh: 'ל',
+    mem: 'מ',
+    nun: 'נ',
+    samekh: 'ס',
+    ayin: 'ע',
+    pe: 'פ',
+    sadhe: 'צ',
+    qoph: 'ק',
+    resh: 'ר',
+    shin: 'ש',
+    taw: 'ת',
+  },
+
+  // 叙利亚字母：22 个字母与阿拉米一一对应；这里取孤立形（词首、词中、词尾
+  // 还有各自的连写形，那是同一字母的变体，不进对照表）
+  syriac: {
+    aleph: 'ܐ',
+    beth: 'ܒ',
+    gimel: 'ܓ',
+    daleth: 'ܕ',
+    he: 'ܗ',
+    waw: 'ܘ',
+    digamma: 'ܘ',
+    zayin: 'ܙ',
+    heth: 'ܚ',
+    teth: 'ܛ',
+    yodh: 'ܝ',
+    kaph: 'ܟ',
+    lamedh: 'ܠ',
+    mem: 'ܡ',
+    nun: 'ܢ',
+    samekh: 'ܣ',
+    ayin: 'ܥ',
+    pe: 'ܦ',
+    sadhe: 'ܨ',
+    qoph: 'ܩ',
+    resh: 'ܪ',
+    shin: 'ܫ',
+    taw: 'ܬ',
+  },
+
+  // 撒玛利亚字母：古希伯来字母在撒玛利亚社群里的延续，至今用于《撒玛利亚五经》。
+  // 字母名（alaf、bit、gaman、dalat、iy、baa…）与希伯来传统一一对应
+  samaritan: {
+    aleph: 'ࠀ',
+    beth: 'ࠁ',
+    gimel: 'ࠂ',
+    daleth: 'ࠃ',
+    he: 'ࠄ',
+    waw: 'ࠅ',
+    digamma: 'ࠅ',
+    zayin: 'ࠆ',
+    heth: 'ࠇ',
+    teth: 'ࠈ',
+    yodh: 'ࠉ',
+    kaph: 'ࠊ',
+    lamedh: 'ࠋ',
+    mem: 'ࠌ',
+    nun: 'ࠍ',
+    samekh: 'ࠎ',
+    ayin: 'ࠏ',
+    pe: 'ࠐ',
+    sadhe: 'ࠑ',
+    qoph: 'ࠒ',
+    resh: 'ࠓ',
+    shin: 'ࠔ',
+    taw: 'ࠕ',
+  },
+
+  // 曼达字母：名称为 halqa、ab、ag、ad、ah、ushenna、az、it、att、aksa、ak…
+  // 编码提案把它们按字母表顺序排列，也就是西闪米特 abjad 的常规顺序
+  mandaic: {
+    aleph: 'ࡀ',
+    beth: 'ࡁ',
+    gimel: 'ࡂ',
+    daleth: 'ࡃ',
+    he: 'ࡄ',
+    waw: 'ࡅ',
+    digamma: 'ࡅ',
+    zayin: 'ࡆ',
+    heth: 'ࡇ',
+    teth: 'ࡈ',
+    yodh: 'ࡉ',
+    kaph: 'ࡊ',
+    lamedh: 'ࡋ',
+    mem: 'ࡌ',
+    nun: 'ࡍ',
+    samekh: 'ࡎ',
+    ayin: 'ࡏ',
+    pe: 'ࡐ',
+    sadhe: 'ࡑ',
+    qoph: 'ࡒ',
+    resh: 'ࡓ',
+    shin: 'ࡔ',
+    taw: 'ࡕ',
+  },
+
+  // 帕尔米拉字母：Unicode 把词尾 nun 单列一个码位，对照表只取基本形 𐡮
+  palmyrene: {
+    aleph: '𐡠',
+    beth: '𐡡',
+    gimel: '𐡢',
+    daleth: '𐡣',
+    he: '𐡤',
+    waw: '𐡥',
+    digamma: '𐡥',
+    zayin: '𐡦',
+    heth: '𐡧',
+    teth: '𐡨',
+    yodh: '𐡩',
+    kaph: '𐡪',
+    lamedh: '𐡫',
+    mem: '𐡬',
+    nun: '𐡮',
+    samekh: '𐡯',
+    ayin: '𐡰',
+    pe: '𐡱',
+    sadhe: '𐡲',
+    qoph: '𐡳',
+    resh: '𐡴',
+    shin: '𐡵',
+    taw: '𐡶',
+  },
+
+  // 哈特拉字母：d 与 r 在石碑上已经合流，Unicode 也只有一个字符 DALETH-RESH
+  // (U+108E3)。所以 d、r 两个槽位放同一个字符——字形合并也是演变的一种。
+  hatran: {
+    aleph: '𐣠',
+    beth: '𐣡',
+    gimel: '𐣢',
+    daleth: '𐣣',
+    he: '𐣤',
+    waw: '𐣥',
+    digamma: '𐣥',
+    zayin: '𐣦',
+    heth: '𐣧',
+    teth: '𐣨',
+    yodh: '𐣩',
+    kaph: '𐣪',
+    lamedh: '𐣫',
+    mem: '𐣬',
+    nun: '𐣭',
+    samekh: '𐣮',
+    ayin: '𐣯',
+    pe: '𐣰',
+    sadhe: '𐣱',
+    qoph: '𐣲',
+    resh: '𐣣',
+    shin: '𐣴',
+    taw: '𐣵',
   },
 
   // 阿拉伯字母：22 个承自阿拉米，另加 6 个用加点分出来的新字母
