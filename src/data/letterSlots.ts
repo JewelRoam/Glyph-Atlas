@@ -44,6 +44,8 @@
  *    马拉雅拉姆、僧伽罗、藏文、爪哇、巴厘、高棉、泰文、老挝文、缅文。
  *  · 夏拉达支系：夏拉达、塔克里、马哈贾尼、霍杰基、穆尔塔尼、胡达瓦迪、多格拉
  *    ——同一个梵语音位表，外加信德内爆音与几个地方卷舌音、古写 kha。
+ *  · 尼瓦尔文：梵语音位表 33 格，外加尼泊尔巴沙语的六个浊送音
+ *    （ṅha ñha nha mha rha lha，见 varga- 末尾那五格与其后的映射）。
  *  · 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇——按音位
  *    位次与上面各表对齐，多出来的音位另立一格（见 per 系与 perm 系槽位）。
  *  · 假名：汉字借字、平假名、片假名三套——一个音节一格（见 kana-* 槽位），
@@ -522,6 +524,14 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-rha', label: 'ṛha ढ़（卷舌送气闪音）' },
   { id: 'varga-qa', label: 'qa क़（借自波斯语的外来音）' },
   { id: 'varga-khaa', label: 'kha 古体（塔克里的古写 kha）' },
+  // 尼瓦尔文为尼泊尔巴沙语留的浊送音（murmured）：nga、nya、na、ma、la
+  // 各自分出一个带气声的字面，另外五个槽位。带气声的卷舌闪音 rha 用的
+  // 就是上面那个 varga-rha，不再另立。
+  { id: 'varga-ngha', label: 'ṅha（尼瓦尔语的浊送鼻音）' },
+  { id: 'varga-nyha', label: 'ñha（尼瓦尔语的浊送鼻音）' },
+  { id: 'varga-nha', label: 'nha（尼瓦尔语的浊送鼻音）' },
+  { id: 'varga-mha', label: 'mha（尼瓦尔语的浊送鼻音）' },
+  { id: 'varga-lha', label: 'lha（尼瓦尔语的浊送边音）' },
 
   // ── 假名（五十音）：汉字借字 → 平假名 → 片假名 ───────────────────
   // 格子的身份是"音节"而不是字源：一个音占一格，三种写法在同一格里换。
@@ -2791,6 +2801,53 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'varga-ha': '𑠪',
     'varga-rra': '𑠫',
   },  // 多格拉文：34/34（33 个梵语音位 + ṛa）
+
+  // ── 尼瓦尔文（尼泊尔巴沙语） ────────────────────────────────────
+  // 尼瓦尔文排在梵语字音表的 33 个辅音位上，外加它自己的六个"浊送音"
+  // （murmured）：ṅha、ñha、nha、mha 是带气声的鼻音，lha 是带气声的边音，
+  // rha 是带气声的卷舌闪音——最后这个音与夏拉达支系的 ṛha（Devanagari ढ़）
+  // 是同一个槽位，所以它接回既有的 varga-rha，另外五个各立一格。
+  newa: {
+    'varga-ka': '𑐎',
+    'varga-kha': '𑐏',
+    'varga-ga': '𑐐',
+    'varga-gha': '𑐑',
+    'varga-nga': '𑐒',
+    'varga-ngha': '𑐓',
+    'varga-ca': '𑐔',
+    'varga-cha': '𑐕',
+    'varga-ja': '𑐖',
+    'varga-jha': '𑐗',
+    'varga-nya': '𑐘',
+    'varga-nyha': '𑐙',
+    'varga-tta': '𑐚',
+    'varga-ttha': '𑐛',
+    'varga-dda': '𑐜',
+    'varga-ddha': '𑐝',
+    'varga-nna': '𑐞',
+    'varga-ta': '𑐟',
+    'varga-tha': '𑐠',
+    'varga-da': '𑐡',
+    'varga-dha': '𑐢',
+    'varga-na': '𑐣',
+    'varga-nha': '𑐤',
+    'varga-pa': '𑐥',
+    'varga-pha': '𑐦',
+    'varga-ba': '𑐧',
+    'varga-bha': '𑐨',
+    'varga-ma': '𑐩',
+    'varga-mha': '𑐪',
+    'varga-ya': '𑐫',
+    'varga-ra': '𑐬',
+    'varga-rha': '𑐭',
+    'varga-la': '𑐮',
+    'varga-lha': '𑐯',
+    'varga-va': '𑐰',
+    'varga-sha': '𑐱',
+    'varga-ssa': '𑐲',
+    'varga-sa': '𑐳',
+    'varga-ha': '𑐴',
+  },  // 尼瓦尔文：39/39（33 个梵语音位 + 6 个浊送音）
 
   // ── 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇 ─────────
   // 四套字母的音值分别照 N4131（高加索阿尔巴尼亚，Sinai 重写本转写表）、

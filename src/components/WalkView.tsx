@@ -20,6 +20,9 @@ function resolveGlyphPath(stop: GlyphStop): string | null {
   return glyphPaths[`${stop.script}:${stop.char}`] ?? null;
 }
 
+/** 换轨道的交叉淡变时长：与轨道内的补间同量级，切换不会显得突兀 */
+const SWAP_MS = 420;
+
 /**
  * 微观维度：沿一条血统轨道"往前走 / 往后走"。
  *
@@ -27,16 +30,55 @@ function resolveGlyphPath(stop: GlyphStop): string | null {
  *  - 两端都有矢量路径时 → 真·路径形变（点对点弧长插值）
  *  - 否则 → 平滑淡变 + 缩放平移（对任意文字可用）
  * 两侧按距离排布相邻站点，形成"街道"纵深感。
+ *
+ * 顶部标签切换轨道时两条街交叉淡变；key 让新轨道整条街重新挂载：
+ * 位置与播放状态自然归零，不需要在 effect 里手动重置状态。
  */
 export function WalkView() {
   const [lineageId, setLineageId] = useState(lineages[0].id);
+  // 换轨道时保留上一条街一小会儿，两条叠着交叉淡变；直接换 key 会让整块
+  // 内容硬切，所以这里自己管一份"正在离开的轨道"。
+  const [leaving, setLeaving] = useState<{ id: string; dir: 1 | -1 } | null>(null);
+  const [arriving, setArriving] = useState(false);
+  const swapTimer = useRef<number | null>(null);
+
   const lineage = lineages.find((l) => l.id === lineageId) ?? lineages[0];
+  const leavingLineage = leaving ? lineages.find((l) => l.id === leaving.id) : undefined;
+  const dir = leaving?.dir ?? 1;
 
   // 进 MICRO 先把闪米特—希腊那条线（core 包）拉起来，别等字母场挂载才请求；
   // 鼠标移到某条轨道标签上时，再顺手预取那条轨道要用的包（婆罗米系在另一包里）
   useEffect(() => {
     preloadAlphabetGroup('core');
   }, []);
+
+  useEffect(() => () => {
+    if (swapTimer.current !== null) window.clearTimeout(swapTimer.current);
+  }, []);
+
+  /** 切轨道：旧轨道滑出、新轨道滑入，交错进行 */
+  const selectLineage = useCallback(
+    (nextId: string) => {
+      if (nextId === lineageId) return;
+      const from = lineages.findIndex((l) => l.id === lineageId);
+      const to = lineages.findIndex((l) => l.id === nextId);
+      if (swapTimer.current !== null) window.clearTimeout(swapTimer.current);
+      setLeaving((prev) => ({
+        // 上一次的交叉淡变还没跑完就又点了一下：沿用最初那条正在离开的街，
+        // 免得中间态一闪而过
+        id: prev ? prev.id : lineageId,
+        dir: to >= from ? 1 : -1,
+      }));
+      setArriving(true);
+      setLineageId(nextId);
+      swapTimer.current = window.setTimeout(() => {
+        setLeaving(null);
+        setArriving(false);
+        swapTimer.current = null;
+      }, SWAP_MS);
+    },
+    [lineageId],
+  );
 
   return (
     <div className="walk">
@@ -48,21 +90,33 @@ export function WalkView() {
             aria-pressed={l.id === lineageId}
             onMouseEnter={() => preloadAlphabetPaths(l.stops.map((s) => s.script))}
             onFocus={() => preloadAlphabetPaths(l.stops.map((s) => s.script))}
-            onClick={() => setLineageId(l.id)}
+            onClick={() => selectLineage(l.id)}
           >
             {l.nameZh}
           </button>
         ))}
       </div>
-      {/* key 让切轨道时整条街重新挂载：位置与播放状态自然归零，
-          不需要在 effect 里手动重置状态。 */}
-      <WalkTrack key={lineage.id} lineage={lineage} />
+      <div
+        className="walk-swap"
+        data-swapping={arriving ? 'on' : 'off'}
+        data-dir={dir === 1 ? 'right' : 'left'}
+      >
+        {leavingLineage && (
+          <div className="walk-layer walk-layer-leaving" aria-hidden="true">
+            <WalkTrack lineage={leavingLineage} interactive={false} />
+          </div>
+        )}
+        <div className="walk-layer walk-layer-arriving" key={lineage.id}>
+          <WalkTrack lineage={lineage} />
+        </div>
+      </div>
     </div>
   );
 }
 
-/** 一条轨道 = 一条街 */
-function WalkTrack({ lineage }: { lineage: Lineage }) {
+/** 一条轨道 = 一条街。interactive=false 用于正在淡出的旧街：只保留画面，
+ *  不再抢方向键。 */
+function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interactive?: boolean }) {
   const stops = lineage.stops;
 
   const [p, setP] = useState(0);
@@ -164,6 +218,7 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
 
   // 键盘左右：同样走补间，走一步就是一整套形变
   useEffect(() => {
+    if (!interactive) return;
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       // 焦点在滑杆/输入框里时不抢方向键
@@ -176,7 +231,7 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [glideTo]);
+  }, [glideTo, interactive]);
 
   const i0 = Math.max(0, Math.min(stops.length - 1, Math.floor(p)));
   const i1 = Math.min(stops.length - 1, i0 + 1);

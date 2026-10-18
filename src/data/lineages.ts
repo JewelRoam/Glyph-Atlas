@@ -147,13 +147,14 @@ export const lineages: Lineage[] = [
     mode: 'cognate',
     description:
       '同一个辅音音节 ka，从公元前三世纪的婆罗米文出发，' +
-      '散落到天城文、泰米尔文、藏文、高棉文、泰文、缅文……' +
+      '散落到天城文、尼瓦尔文、泰米尔文、藏文、高棉文、泰文、缅文……' +
       '两千三百年后，它们仍共享同一个音值和一个隐约可辨的骨架。',
     stops: [
       { script: 'brahmi', char: '𑀓', label: '婆罗米文', phonetic: 'ka' },
       { script: 'siddham', char: '𑖎', label: '悉昙文', phonetic: 'ka' },
       { script: 'grantha', char: '𑌕', label: '格兰塔文', phonetic: 'ka' },
       { script: 'devanagari', char: 'क', label: '天城文', phonetic: 'ka' },
+      { script: 'newa', char: '𑐎', label: '尼瓦尔文', phonetic: 'ka' },
       { script: 'bengali', char: 'ক', label: '孟加拉文', phonetic: 'ka' },
       { script: 'gujarati', char: 'ક', label: '古吉拉特文', phonetic: 'ka' },
       { script: 'gurmukhi', char: 'ਕ', label: '果鲁穆奇文', phonetic: 'ka' },

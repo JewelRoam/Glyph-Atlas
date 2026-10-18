@@ -611,6 +611,87 @@ main {
   max-width: 1180px;
 }
 
+/* 换轨道：旧街保留到淡出结束，与新街交叉淡变，避免整块硬切 */
+.walk-swap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.walk-layer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 0;
+}
+.walk-layer > * {
+  width: 100%;
+  max-width: 1180px;
+}
+.walk-layer-arriving {
+  flex: 1;
+}
+.walk-layer-leaving {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+@keyframes walk-layer-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(34px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes walk-layer-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-34px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes walk-layer-out-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-26px);
+  }
+}
+@keyframes walk-layer-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(26px);
+  }
+}
+.walk-swap[data-swapping='on'][data-dir='right'] .walk-layer-arriving {
+  animation: walk-layer-in-right 420ms cubic-bezier(0.22, 0.68, 0.28, 1);
+}
+.walk-swap[data-swapping='on'][data-dir='left'] .walk-layer-arriving {
+  animation: walk-layer-in-left 420ms cubic-bezier(0.22, 0.68, 0.28, 1);
+}
+.walk-swap[data-dir='right'] .walk-layer-leaving {
+  animation: walk-layer-out-left 420ms cubic-bezier(0.22, 0.68, 0.28, 1) forwards;
+}
+.walk-swap[data-dir='left'] .walk-layer-leaving {
+  animation: walk-layer-out-right 420ms cubic-bezier(0.22, 0.68, 0.28, 1) forwards;
+}
+
 .walk-tabs {
   display: flex;
   flex-wrap: wrap;
@@ -826,7 +907,18 @@ main {
 }
 
 /* ── 字母场：一整套字母表在两种文字之间的形变对照 ── */
+@keyframes alpha-field-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .alpha-field {
+  animation: alpha-field-in 260ms ease both;
   flex-shrink: 0;
   margin: 2px 0 10px;
   padding: 9px 0 6px;
