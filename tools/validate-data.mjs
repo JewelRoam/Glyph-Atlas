@@ -107,6 +107,7 @@ for (const l of lineages) {
 // 统计信息，顺便作为 README 的数字来源
 const independent = writingSystems.filter((s) => s.origin === 'independent');
 const graph = writingSystems.filter((s) => s.type !== 'nonscript');
+const graphIndependent = graph.filter((s) => s.origin === 'independent');
 const living = graph.filter((s) => s.status === 'living' || s.status === 'revived');
 
 if (warnings.length) {
@@ -119,7 +120,7 @@ if (errors.length) {
   process.exit(1);
 }
 console.log(
-  `✔ 数据校验通过：${writingSystems.length} 个书写体系（图谱 ${graph.length}），` +
-    `${independent.length} 个独立起源，${living.length} 个今仍使用，` +
-    `${lineages.length} 条血统轨道`,
+  `✔ 数据校验通过：${graph.length} 个书写体系进入图谱，` +
+    `${graphIndependent.length} 个独立起源（另有 ${independent.length - graphIndependent.length} 条非文字记录），` +
+    `${living.length} 个今仍使用，${lineages.length} 条血统轨道`,
 );

@@ -245,6 +245,16 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Palmyrene U+10860', sample: '𐡠',
     fontFamily: 'Noto Sans Palmyrene',
   },
+
+  {
+    id: 'hatran', nameZh: '哈特拉字母', nameEn: 'Hatran',
+    origin: 'derived', parents: ['aramaic'], dateFrom: -100, dateTo: 300,
+    family: 'levant', region: '美索不达米亚北部', countries: ['伊拉克'],
+    type: 'abjad', status: 'extinct', direction: 'rtl',
+    unicodeBlock: 'Hatran U+108E0', sample: '𐣠',
+    fontFamily: 'Noto Sans Hatran',
+    note: '哈特拉城的阿拉米字母支系，见于公元前后至萨珊早期的铭文。',
+  },
   {
     id: 'pahlavi', nameZh: '巴列维字母', nameEn: 'Pahlavi (Middle Persian)',
     origin: 'derived', parents: ['aramaic'], dateFrom: -200, dateTo: 900,
@@ -269,16 +279,26 @@ export const writingSystems: WritingSystem[] = [
     note: '与婆罗米并列的印度两大古文字，用阿拉米字母改造而成，书写方向右到左。',
   },
   {
-    id: 'mandaic-nyt', nameZh: '古南阿拉伯字母', nameEn: 'Old South Arabian',
+    id: 'old-south-arabian', nameZh: '古南阿拉伯字母', nameEn: 'Old South Arabian',
     origin: 'derived', parents: ['proto-sinaitic'], dateFrom: -800, dateTo: 600,
     family: 'africa', region: '阿拉伯半岛南部', countries: ['也门'],
     type: 'abjad', status: 'extinct', direction: 'boustrophedon',
     unicodeBlock: 'Old South Arabian U+10A60', sample: '𐩠',
     fontFamily: 'Noto Sans Old South Arabian',
   },
+
+  {
+    id: 'old-north-arabian', nameZh: '古北阿拉伯字母', nameEn: 'Old North Arabian',
+    origin: 'influence', parents: ['old-south-arabian'], dateFrom: -800, dateTo: 400,
+    family: 'levant', region: '阿拉伯半岛北部', countries: ['沙特阿拉伯', '约旦', '叙利亚'],
+    type: 'abjad', status: 'extinct', direction: 'rtl',
+    unicodeBlock: 'Old North Arabian U+10A80', sample: '𐪀',
+    fontFamily: 'Noto Sans Old North Arabian',
+    note: '达丹、萨法伊、希斯迈等古代北阿拉伯铭文的总称，与古南阿拉伯字母同源或受其影响，具体祖形仍有争议。',
+  },
   {
     id: 'geez', nameZh: '吉兹字母', nameEn: 'Geʽez',
-    origin: 'derived', parents: ['mandaic-nyt'], dateFrom: -800, dateTo: null,
+    origin: 'derived', parents: ['old-south-arabian'], dateFrom: -800, dateTo: null,
     family: 'africa', region: '非洲之角', countries: ['埃塞俄比亚', '厄立特里亚'],
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Ethiopic U+1200', sample: 'ሀ',
@@ -436,6 +456,15 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Devanagari U+0900', sample: 'क',
     note: '印地语、梵语、尼泊尔语等的官方文字，也是当今使用人数最多的元音附标文字之一。',
+  },
+
+  {
+    id: 'newa', nameZh: '尼瓦尔文', nameEn: 'Newa',
+    origin: 'derived', parents: ['nagari'], dateFrom: 1000, dateTo: null,
+    family: 'indic', region: '喜马拉雅南麓', countries: ['尼泊尔', '印度'],
+    type: 'abugida', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Newa U+11400', sample: '𑐀', fontFamily: 'Noto Sans Newa',
+    note: '尼瓦尔语传统文字，源自早期城文，今仍用于宗教、手抄与文化活动。',
   },
   {
     id: 'bengali', nameZh: '孟加拉文', nameEn: 'Bengali-Assamese',
@@ -684,6 +713,16 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Soyombo U+11A50', sample: '𑩂',
     fontFamily: 'Noto Sans Soyombo',
   },
+
+  {
+    id: 'zanabazar', nameZh: '扎纳巴扎尔文', nameEn: 'Zanabazar Square',
+    origin: 'derived', parents: ['tibetan'], dateFrom: 1686, dateTo: 1900,
+    family: 'centralasia', region: '蒙古高原', countries: ['蒙古', '中国（内蒙古）'],
+    type: 'abugida', status: 'historical', direction: 'ltr',
+    unicodeBlock: 'Zanabazar Square U+11A00', sample: '𑨀',
+    fontFamily: 'Noto Sans Zanabazar Square',
+    note: '1686 年由第一世哲布尊丹巴扎纳巴扎尔据藏文创制，用于蒙古语、藏语与梵语。',
+  },
   {
     id: 'marchen', nameZh: '玛钦文', nameEn: 'Marchen',
     origin: 'derived', parents: ['tibetan'], dateFrom: 700, dateTo: 1000,
@@ -830,6 +869,36 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Manichaean U+10AC0', sample: '𐫀',
     fontFamily: 'Noto Sans Manichaean',
   },
+
+  {
+    id: 'parthian', nameZh: '帕提亚字母', nameEn: 'Inscriptional Parthian',
+    origin: 'derived', parents: ['aramaic'], dateFrom: -250, dateTo: 300,
+    family: 'centralasia', region: '伊朗高原', countries: ['伊朗', '伊拉克', '土库曼斯坦'],
+    type: 'abjad', status: 'extinct', direction: 'rtl',
+    unicodeBlock: 'Inscriptional Parthian U+10B40', sample: '𐭀',
+    fontFamily: 'Noto Sans Inscriptional Parthian',
+    note: '安息帝国官方铭文使用的阿拉米字母支系，与巴列维字母有亲缘关系。',
+  },
+
+  {
+    id: 'elymaic', nameZh: '埃利迈字母', nameEn: 'Elymaic',
+    origin: 'derived', parents: ['aramaic'], dateFrom: -200, dateTo: 300,
+    family: 'centralasia', region: '伊朗西南部', countries: ['伊朗'],
+    type: 'abjad', status: 'extinct', direction: 'rtl',
+    unicodeBlock: 'Elymaic U+10FE0', sample: '𐿠',
+    fontFamily: 'Noto Sans Elymaic',
+    note: '埃利迈斯王国使用的阿拉米字母支系，主要见于钱币与铭文。',
+  },
+
+  {
+    id: 'chorasmian', nameZh: '花剌子模文', nameEn: 'Chorasmian',
+    origin: 'derived', parents: ['aramaic'], dateFrom: -200, dateTo: 800,
+    family: 'centralasia', region: '阿姆河下游', countries: ['乌兹别克斯坦', '土库曼斯坦', '哈萨克斯坦'],
+    type: 'abjad', status: 'extinct', direction: 'rtl',
+    unicodeBlock: 'Chorasmian U+10FB0', sample: '𐾰',
+    fontFamily: 'Noto Sans Chorasmian',
+    note: '花剌子模绿洲的阿拉米字母支系，随伊斯兰化逐渐退出通用。',
+  },
   {
     id: 'old-uyghur', nameZh: '回鹘字母', nameEn: 'Old Uyghur',
     origin: 'derived', parents: ['sogdian'], dateFrom: 700, dateTo: 1300,
@@ -846,6 +915,24 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Mongolian U+1800', sample: 'ᠠ',
     fontFamily: 'Noto Sans Mongolian',
     note: '回鹘字母后裔，纵向连写；2025 年起蒙古国推动与西里尔文并用。',
+  },
+
+  {
+    id: 'todo-bichig', nameZh: '托忒蒙古文', nameEn: 'Todo Bichig',
+    origin: 'derived', parents: ['mongolian'], dateFrom: 1648, dateTo: null,
+    family: 'centralasia', region: '西蒙古', countries: ['中国（新疆）', '蒙古'],
+    type: 'alphabet', status: 'living', direction: 'ttb',
+    unicodeBlock: 'Mongolian U+1840', sample: 'ᡏ', fontFamily: 'Noto Sans Mongolian',
+    note: '1648 年由咱雅班第达在蒙古字母基础上为卫拉特语创制，今新疆卫拉特蒙古族仍在使用。',
+  },
+
+  {
+    id: 'manchu', nameZh: '满文', nameEn: 'Manchu',
+    origin: 'derived', parents: ['mongolian'], dateFrom: 1599, dateTo: null,
+    family: 'centralasia', region: '中国东北', countries: ['中国'],
+    type: 'alphabet', status: 'living', direction: 'ttb',
+    unicodeBlock: 'Mongolian U+1820', sample: 'ᠮ', fontFamily: 'Noto Sans Mongolian',
+    note: '1599 年据蒙古字母创制，1632 年加圈点；清代官方文字，今与锡伯文并存于新疆。',
   },
   {
     id: 'old-turkic', nameZh: '古突厥文（鄂尔浑）', nameEn: 'Old Turkic',
@@ -875,6 +962,16 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Linear A U+10600', sample: '𐘀',
     fontFamily: 'Noto Sans Linear A',
     note: '米诺斯文明的文字，尚未破译。',
+  },
+
+  {
+    id: 'cypro-minoan', nameZh: '塞浦路斯-米诺斯音节文字', nameEn: 'Cypro-Minoan',
+    origin: 'derived', parents: ['linear-a'], dateFrom: -1550, dateTo: -1050,
+    family: 'other', region: '塞浦路斯', countries: ['塞浦路斯'],
+    type: 'undeciphered', status: 'undeciphered', direction: 'ltr',
+    unicodeBlock: 'Cypro-Minoan U+12F90', sample: '𒾐',
+    fontFamily: 'Noto Sans Cypro Minoan',
+    note: '青铜时代塞浦路斯的音节文字，由线形文字 A 演变而来，至今未破译。',
   },
   {
     id: 'linear-b', nameZh: '线形文字 B', nameEn: 'Linear B',
