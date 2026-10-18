@@ -32,6 +32,8 @@
  *  · 日耳曼的北支：卢恩字母（futhark，从古意大利—拉丁一类的字母长出来，
  *    老弗萨克的 24 个里 19 个能接回拉丁槽位，其余各代添的字见 run-* 槽位）；
  *  · 阿拉米东支：粟特、回鹘、碑铭巴列维、诗篇巴列维；
+ *  · 阿拉米西支的延伸：摩尼字母（叙利亚字母的后身，多出 14 个分音字面）；
+ *  · 北非：提非纳文（布匿字母的后身，中经利比亚—古提非纳文）；
  *  · 回鹘的下游：蒙古字母；
  *  · 阿维斯陀：巴列维的经书后身，字母从 22 个扩到 54 个（见 av-* 槽位）；
  *  · 安纳托利亚两支：吕基亚、吕底亚（希腊字母的地方化分支；卡里亚的音值
@@ -314,6 +316,25 @@ export const SLOTS: LetterSlot[] = [
   { id: 'tif-ye', label: 'ⵦ ye（e）' },
   { id: 'tif-yo', label: 'ⵧ yo（o）' },
   { id: 'tif-labialization', label: 'ⵯ 唇化符号（ⴳⵯ gʷ、ⴽⵯ kʷ）' },
+  // ── 摩尼字母自己添的字母 ────────────────────────────────────────────
+  // 摩尼字母是摩尼教为抄写中古伊朗语与回鹘语造的书体，骨架承自叙利亚字母：
+  // 阿拉米的 22 个字母都能对上号（见下面的对照表）。它又多造了 14 个字面，
+  // 用来区分叙利亚字母里不分的音——b 与 β、g 与 ɣ、z 与 ʒ、j 与 dʒ、k 与 x、
+  // d 与 ð、p 与 f、q 与 x、š 与 ɕ。这些在摩尼字母一站从下方飞入。
+  { id: 'mani-bheth', label: '𐫂 bheth（β）' },
+  { id: 'mani-ghimel', label: '𐫄 ghimel（ɣ）' },
+  { id: 'mani-zhayin', label: '𐫊 zhayin（ʒ）' },
+  { id: 'mani-jayin', label: '𐫋 jayin（dʒ）' },
+  { id: 'mani-jhayin', label: '𐫌 jhayin（dʒʰ）' },
+  { id: 'mani-xaph', label: '𐫑 xaph（x）' },
+  { id: 'mani-khaph', label: '𐫒 khaph（x，与 xaph 分工）' },
+  { id: 'mani-dhamedh', label: '𐫔 dhamedh（ð）' },
+  { id: 'mani-thamedh', label: '𐫕 thamedh（θ）' },
+  { id: 'mani-aayin', label: '𐫚 aayin（ʕ 的另一种字面）' },
+  { id: 'mani-fe', label: '𐫜 fe（f）' },
+  { id: 'mani-xoph', label: '𐫟 xoph（x）' },
+  { id: 'mani-qhoph', label: '𐫠 qhoph（qʰ）' },
+  { id: 'mani-sshin', label: '𐫣 sshin（ɕ）' },
   // ── 阿维斯陀字母自己新造的字母 ──────────────────────────────────────
   // 阿维斯陀字母是为逐音记录《阿维斯陀》经文造的，3—4 世纪成书时把字母表
   // 从巴列维的 22 个扩到了 54 个。能接回巴列维的 17 格写在下面的对照表里，
@@ -696,6 +717,49 @@ export const letterMaps: Record<string, Record<string, string>> = {
     resh: 'ܪ',
     shin: 'ܫ',
     taw: 'ܬ',
+  },
+
+  // 摩尼字母：摩尼教为抄写中古伊朗语、回鹘语造的书体，骨架承自叙利亚字母。
+  // 22 个阿拉米字母都能对上叙利亚，只是摩尼把它们分写得更细，另造 14 个
+  // 字面（见 mani-* 槽位）。Unicode 的 Manichaean 区块一共 36 个字母。
+  manichaean: {
+    aleph: '𐫀',
+    beth: '𐫁',
+    gimel: '𐫃',
+    daleth: '𐫅',
+    he: '𐫆',
+    waw: '𐫇',
+    digamma: '𐫇',
+    zayin: '𐫉',
+    heth: '𐫍',
+    teth: '𐫎',
+    yodh: '𐫏',
+    kaph: '𐫐',
+    lamedh: '𐫓',
+    mem: '𐫖',
+    nun: '𐫗',
+    samekh: '𐫘',
+    ayin: '𐫙',
+    pe: '𐫛',
+    sadhe: '𐫝',
+    qoph: '𐫞',
+    resh: '𐫡',
+    shin: '𐫢',
+    taw: '𐫤',
+    'mani-bheth': '𐫂',
+    'mani-ghimel': '𐫄',
+    'mani-zhayin': '𐫊',
+    'mani-jayin': '𐫋',
+    'mani-jhayin': '𐫌',
+    'mani-xaph': '𐫑',
+    'mani-khaph': '𐫒',
+    'mani-dhamedh': '𐫔',
+    'mani-thamedh': '𐫕',
+    'mani-aayin': '𐫚',
+    'mani-fe': '𐫜',
+    'mani-xoph': '𐫟',
+    'mani-qhoph': '𐫠',
+    'mani-sshin': '𐫣',
   },
 
   // 撒玛利亚字母：古希伯来字母在撒玛利亚社群里的延续，至今用于《撒玛利亚五经》。

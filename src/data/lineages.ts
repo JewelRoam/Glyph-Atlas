@@ -301,14 +301,16 @@ export const lineages: Lineage[] = [
     nameEn: 'Aramaic ʾālep → western branches',
     mode: 'cognate',
     description:
-      '阿拉米字母西传后，帕尔米拉、哈特拉和叙利亚各自发展出地方字母。' +
-      '四站都以 ʾālep 为祖形，却分别收束成不同骨架：帕尔米拉与哈特拉留下石刻的棱角，' +
-      '叙利亚字母则长出连写与变体传统。',
+      '阿拉米字母西传后，帕尔米拉、哈特拉和叙利亚各自发展出地方字母，' +
+      '叙利亚字母又长出了摩尼字母。五站都以 ʾālep 为祖形，却分别收束成不同骨架：' +
+      '帕尔米拉与哈特拉留下石刻的棱角，叙利亚字母生出连写与变体传统，' +
+      '摩尼字母为记录中古伊朗语的辅音，在叙利亚的 22 个字母之外另造了 14 个分音字面。',
     stops: [
       { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
       { script: 'palmyrene', char: '𐡠', label: '帕尔米拉 ʾālep', phonetic: 'ʔ' },
       { script: 'hatran', char: '𐣠', label: '哈特拉 ʾālep', phonetic: 'ʔ' },
       { script: 'syriac', char: 'ܐ', label: '叙利亚 ʾālep', phonetic: 'ʔ' },
+      { script: 'manichaean', char: '𐫀', label: '摩尼 ʾālep', phonetic: 'ʔ' },
     ],
   },
 
