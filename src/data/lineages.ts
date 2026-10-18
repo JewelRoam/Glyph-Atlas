@@ -168,6 +168,25 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'iranian-aramaic',
+    nameZh: '阿拉米 ʾālep → 中古伊朗与中亚诸字母',
+    nameEn: 'Aramaic ʾālep → Middle Iranian & Central Asian alphabets',
+    mode: 'cognate',
+    description:
+      '阿拉米字母东传之后，帕提亚、埃利迈、花剌子模与粟特各自把这套字母搬进本地语言，' +
+      '字母名从 aleph 一路排到 taw 都没改。格子按字母名对齐：' +
+      '花剌子模丢了 teth、sadhe、qoph 三个，粟特丢了 teth 和 qoph，' +
+      '走到那两站时对应的格子会把字母送出去，其余的原地变形。',
+    stops: [
+      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'parthian', char: '𐭀', label: '帕提亚 aleph', phonetic: 'ʔ' },
+      { script: 'elymaic', char: '𐿠', label: '埃利迈 aleph', phonetic: 'ʔ' },
+      { script: 'chorasmian', char: '𐾰', label: '花剌子模 aleph', phonetic: 'ʔ' },
+      { script: 'old-sogdian', char: '𐼀', label: '古粟特 aleph', phonetic: 'ʔ' },
+    ],
+  },
+
+  {
     id: 'greek-diaspora',
     nameZh: '希腊 Α → 各地的 a',
     nameEn: 'Greek Α → regional a',

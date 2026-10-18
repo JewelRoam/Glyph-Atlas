@@ -2404,6 +2404,103 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'kana-pe': 'ペ', // へ 加浊点
     'kana-po': 'ポ', // ほ 加浊点
   },  // 片假名：48 + 25
+
+  // ── 阿拉米东支的中古伊朗与中亚字母 ────────────────────────────
+  // 这四套都是阿拉米字母的地方后身，字母名和 22 个字母的次序照旧（Unicode 的
+  // 字名直接写的就是 aleph … taw），所以整表接在闪米特那 22 个槽位上。
+  // 花剌子模字母丢了 teth、sadhe、qoph 三个字母，粟特字母丢了 teth 和 qoph：
+  // 走到那两站时，对应的格子会把字母送出去。词尾形是同一个字母的位置变体，
+  // 不另占格子。
+  parthian: {
+    aleph: '𐭀',
+    beth: '𐭁',
+    gimel: '𐭂',
+    daleth: '𐭃',
+    he: '𐭄',
+    waw: '𐭅',
+    zayin: '𐭆',
+    heth: '𐭇',
+    teth: '𐭈',
+    yodh: '𐭉',
+    kaph: '𐭊',
+    lamedh: '𐭋',
+    mem: '𐭌',
+    nun: '𐭍',
+    samekh: '𐭎',
+    ayin: '𐭏',
+    pe: '𐭐',
+    sadhe: '𐭑',
+    qoph: '𐭒',
+    resh: '𐭓',
+    shin: '𐭔',
+    taw: '𐭕',
+  },  // 帕提亚字母：22/22
+  elymaic: {
+    aleph: '𐿠',
+    beth: '𐿡',
+    gimel: '𐿢',
+    daleth: '𐿣',
+    he: '𐿤',
+    waw: '𐿥',
+    zayin: '𐿦',
+    heth: '𐿧',
+    teth: '𐿨',
+    yodh: '𐿩',
+    kaph: '𐿪',
+    lamedh: '𐿫',
+    mem: '𐿬',
+    nun: '𐿭',
+    samekh: '𐿮',
+    ayin: '𐿯',
+    pe: '𐿰',
+    sadhe: '𐿱',
+    qoph: '𐿲',
+    resh: '𐿳',
+    shin: '𐿴',
+    taw: '𐿵',
+  },  // 埃利迈字母：22/22
+  chorasmian: {
+    aleph: '𐾰',
+    beth: '𐾲',
+    gimel: '𐾳',
+    daleth: '𐾴',
+    he: '𐾵',
+    waw: '𐾶',
+    zayin: '𐾸',
+    heth: '𐾹',
+    yodh: '𐾺',
+    kaph: '𐾻',
+    lamedh: '𐾼',
+    mem: '𐾽',
+    nun: '𐾾',
+    samekh: '𐾿',
+    ayin: '𐿀',
+    pe: '𐿁',
+    resh: '𐿂',
+    shin: '𐿃',
+    taw: '𐿄',
+  },  // 花剌子模字母：22 个字母里少了 teth / sadhe / qoph
+  'old-sogdian': {
+    aleph: '𐼀',
+    beth: '𐼂',
+    gimel: '𐼄',
+    he: '𐼅',
+    waw: '𐼇',
+    zayin: '𐼈',
+    heth: '𐼉',
+    yodh: '𐼊',
+    kaph: '𐼋',
+    lamedh: '𐼌',
+    mem: '𐼍',
+    nun: '𐼎',
+    samekh: '𐼑',
+    ayin: '𐼒',
+    pe: '𐼔',
+    sadhe: '𐼕',
+    resh: '𐼘',
+    shin: '𐼙',
+    taw: '𐼚',
+  },  // 粟特字母（早期）：少了 teth 与 qoph，resh 一格用的是 resh-ayin-daleth 合文
 };
 
 /** 槽位在字母场格子里的固定次序 */
