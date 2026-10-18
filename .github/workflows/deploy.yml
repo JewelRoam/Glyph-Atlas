@@ -5,10 +5,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# 发布方式：构建产物推送到 gh-pages 分支，由 GitHub Pages 从该分支提供静态文件。
-# 仓库的 Pages 源已指向 gh-pages 分支，因此这里只需要写分支的权限。
+# 发布方式：仓库 Settings → Pages 的 Source 设为 GitHub Actions，
+# 工作流构建后把 dist/ 作为 Pages artifact 交给 deploy-pages 发布。
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 # 同一时间只跑一个部署；新的提交取消排队中的旧任务，但不打断正在进行的发布
 concurrency:
@@ -18,6 +20,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,18 +40,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cd dist
-          # 关掉 Jekyll：站点是纯静态产物，不需要再处理一遍
-          touch .nojekyll
-          git init -q -b gh-pages
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -q -m "Deploy ${GITHUB_SHA::7} to GitHub Pages"
-          git push --force \
-            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
-            gh-pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
