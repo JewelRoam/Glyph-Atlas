@@ -200,6 +200,11 @@ if (uncoveredSets.length)
 const slotIds = new Set(SLOTS.map((x) => x.id));
 if (slotIds.size !== SLOTS.length) err('[slots] SLOTS 里有重复的槽位 id');
 const unmappedLetters = [];
+const unexpandedLetters = [];
+/** 自动补位里混进"纯组合记号"是最容易出的错：单独一格只剩一个小点，像缺字 */
+const autoMarkLetters = [];
+/** 与 src/data/letterSlots.ts 的 ALPHABETIC_TYPES 保持一致 */
+const ALPHABETIC_TYPES = new Set(['alphabet', 'abjad', 'abugida', 'syllabary', 'featural']);
 for (const [scriptId, slots] of Object.entries(letterMaps)) {
   const system = scriptById[scriptId];
   if (!system) {
@@ -222,13 +227,39 @@ for (const [scriptId, slots] of Object.entries(letterMaps)) {
   const norm = (c) => c.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
   const known = new Set([...Object.values(slots)].map(norm));
   const rest = chars.filter((c) => !known.has(norm(c))).length;
-  if (rest) unmappedLetters.push(`${scriptId} ${mappedCount}/${chars.length}`);
+  if (!rest) continue;
+  for (const c of chars) {
+    if (known.has(norm(c))) continue;
+    // 组合记号 / 装饰记号单独成格没有意义：要么它其实是这一家的字母（进手工表），
+    // 要么它只是加在别的字母上的记号（进 letterSlots.ts 的 NON_LETTER_MARKS）
+    if (/^[\p{Mn}\p{Mc}\p{Me}]$/u.test(c))
+      autoMarkLetters.push(`${scriptId} ${c} U+${c.codePointAt(0).toString(16).toUpperCase()}`);
+  }
+  // 只有字母表性质的体系会走 rosterFor() 的自动补位；语素文字根本没有字母表，
+  // 不进字母场，这里分开记，免得提示读起来像"汉字也该整表铺开"。
+  // 这里只报"手工表覆盖了几个 / 样本集里一共有几个"。真正进字母场的格数由
+  // rosterFor() 按字母身份折叠（大小写、附加符号）后决定，和这个分母不等，
+  // 所以不在这里替它算一个会误导人的数字。
+  const line = `${scriptId} 手工 ${mappedCount} / 样本 ${chars.length}`;
+  if (ALPHABETIC_TYPES.has(system.type)) unmappedLetters.push(line);
+  else unexpandedLetters.push(`${scriptId} ${mappedCount}/${chars.length}`);
 }
 if (unmappedLetters.length)
   warn(
-    `[slots] ${unmappedLetters.length} 个体系的对照表尚未覆盖全部字形（分母是 Unicode 字形表，` +
-      `含词尾形、大小写与为其他语言增补的字母；未进表的字母暂不参与字母场）：` +
+    `[slots] ${unmappedLetters.length} 个体系的手工同源位还没覆盖全部字形样本（样本里含词尾形、` +
+      `大小写与为其他语言增补的字母）。没进手工表的部分由 rosterFor() 自动补位进字母场，` +
+      `按字母表的增删飞入 / 飞出，但不参与形变：` +
       unmappedLetters.join('，'),
+  );
+if (autoMarkLetters.length)
+  warn(
+    `[slots] ${autoMarkLetters.length} 个自动补位的字面是纯组合记号，单独成格只剩一个小点：` +
+      autoMarkLetters.join('，'),
+  );
+if (unexpandedLetters.length)
+  warn(
+    `[slots] ${unexpandedLetters.length} 个语素文字/非字母体系的手工表只取代表字形，不做整表铺开：` +
+      unexpandedLetters.join('，'),
   );
 
 // 统计信息，顺便作为 README 的数字来源
