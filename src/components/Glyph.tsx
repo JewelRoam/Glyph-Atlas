@@ -1,21 +1,18 @@
 import { useEffect, useState } from 'react';
-import {
-  fontStack,
-  formatCodePoint,
-  isPrivateUse,
-  loadFont,
-  verifyFont,
-} from '../lib/fonts';
+import { coverageOf } from '../lib/coverage';
+import { fontStack, formatCodePoint, isPrivateUse, isLocalFamily, loadFont, verifyFont } from '../lib/fonts';
 
 /**
  * 用字体渲染的字形。
  *
- * 三种结果：
- *  - ready   → 正常显示字符
- *  - missing → 该文字没有可用的 Web 字体（或码位落在私有区），
- *              改为渲染一枚"码位名片"，明确告诉读者这里缺字体，
- *              而不是让它变成一个豆腐块。
- *  - checking→ 探测期间隐藏，避免豆腐块一闪而过。
+ * 判定顺序（宁可空着，也不画错）：
+ *  1. 覆盖表（lib/coverage.ts）说"字库里没有这个字形" → 直接留空；
+ *  2. 覆盖表说"有" → 立刻渲染，不再等待；
+ *  3. 覆盖表里没有这个字族（老数据 / 新字族）→ 退回 document.fonts 探测，
+ *     探测失败仍然留空。自托管字体的覆盖表由构建脚本生成，正常不会走到这里。
+ *
+ * 留空时渲染一枚写着码位的小名片，明确告诉读者"这里缺字形"，
+ * 而不是让浏览器悄悄换成宋体或豆腐块。
  */
 export function FontGlyph({
   char,
@@ -33,24 +30,32 @@ export function FontGlyph({
   const key = `${fontFamily ?? ''}\u0000${char ?? ''}`;
   const [probed, setProbed] = useState<{ key: string; ok: boolean } | null>(null);
 
+  const coverage = coverageOf(fontFamily, char);
   const privateUse = char ? isPrivateUse(char) : true;
+  const needsProbe = Boolean(char) && !privateUse && coverage === 'unknown';
 
   useEffect(() => {
     if (!char || privateUse) return;
+    // 自托管字体的 @font-face 要显式注入；Google Fonts 只在真正要渲染时才拉样式表
+    if (coverage === 'yes' || isLocalFamily(fontFamily)) {
+      loadFont(fontFamily);
+      return;
+    }
+    if (!needsProbe) return;
     let alive = true;
-    loadFont(fontFamily);
     verifyFont(fontFamily, char).then((ok) => {
       if (alive) setProbed({ key, ok });
     });
     return () => {
       alive = false;
     };
-  }, [char, fontFamily, key, privateUse]);
+  }, [char, coverage, fontFamily, key, needsProbe, privateUse]);
 
   if (!char) return <GlyphTile char="?" size={size} />;
   if (privateUse) return <GlyphTile char={char} size={size} />;
+  if (coverage === 'no') return <GlyphTile char={char} size={size} />;
 
-  const settled = probed?.key === key ? probed.ok : null;
+  const settled = needsProbe ? (probed?.key === key ? probed.ok : null) : true;
   if (settled === false) return <GlyphTile char={char} size={size} />;
 
   return (
@@ -70,7 +75,7 @@ export function FontGlyph({
   );
 }
 
-/** 没有字体时的替代展示：一张写着码位的小名片 */
+/** 没有字形时的替代展示：一张写着码位的小名片 */
 function GlyphTile({ char, size }: { char: string; size: number }) {
   const code = formatCodePoint(char).split(' ')[0].replace('U+', '');
   const showLabel = size >= 52;
@@ -78,7 +83,7 @@ function GlyphTile({ char, size }: { char: string; size: number }) {
     <span
       className="glyph-tile"
       style={{ width: size, height: size }}
-      title={`${formatCodePoint(char)} · 暂无可用字体`}
+      title={`${formatCodePoint(char)} · 字库未收这个字形`}
     >
       <span
         className="glyph-tile-code"
@@ -87,7 +92,7 @@ function GlyphTile({ char, size }: { char: string; size: number }) {
         {/* 没有样本字符的记录（比如奇普）不显示码位，只留一个破折号 */}
         {char === '?' ? '—' : code}
       </span>
-      {showLabel && <span className="glyph-tile-label">无字形样本</span>}
+      {showLabel && <span className="glyph-tile-label">字库未收</span>}
     </span>
   );
 }

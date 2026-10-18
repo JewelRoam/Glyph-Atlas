@@ -1,49 +1,27 @@
 import { writingSystems } from '../data';
-import { FontGlyph } from './Glyph';
-import {
-  FAMILY_COLOR,
-  FAMILY_LABEL,
-  ORIGIN_LABEL,
-  STATUS_LABEL,
-  TYPE_LABEL,
-  formatSpan,
-} from '../lib/time';
+import type { WritingSystem } from '../data/types';
+import { FAMILY_COLOR, FAMILY_LABEL, ORIGIN_LABEL, STATUS_LABEL, TYPE_LABEL, formatSpan } from '../lib/time';
+import { GlyphBoard } from './GlyphBoard';
 
 interface Props {
-  id: string | null;
+  system: WritingSystem;
   onSelect: (id: string | null) => void;
 }
 
-/** 文字详情面板（宏观图右侧） */
-export function DetailPanel({ id, onSelect }: Props) {
-  if (!id) {
-    return (
-      <aside className="detail empty">
-        <p>点击图谱中的任一节点，查看该书写体系的详情与亲缘关系。</p>
-      </aside>
-    );
-  }
-
-  const s = writingSystems.find((x) => x.id === id);
-  if (!s) return null;
-
-  const parents = s.parents
-    .map((p) => writingSystems.find((x) => x.id === p))
-    .filter(Boolean);
+/**
+ * 书写体系详情 —— MACRO 的图谱节点与 INDEX 的表格行共用这一套内容。
+ * 面板壳子（定位、关闭、动画）交给 DetailDrawer，这里只管内容。
+ */
+export function ScriptDetail({ system: s, onSelect }: Props) {
+  const parents = s.parents.map((p) => writingSystems.find((x) => x.id === p)).filter(Boolean);
   const children = writingSystems.filter((x) => x.parents.includes(s.id));
 
   return (
-    <aside className="detail">
-      <button className="detail-close" onClick={() => onSelect(null)}>
-        ✕
-      </button>
-
-      <div className="detail-glyph">
-        <FontGlyph char={s.sample} fontFamily={s.fontFamily} size={76} />
+    <>
+      <div className="detail-head">
+        <h2>{s.nameZh}</h2>
+        <div className="detail-en">{s.nameEn}</div>
       </div>
-
-      <h2>{s.nameZh}</h2>
-      <div className="detail-en">{s.nameEn}</div>
 
       <div className="detail-tags">
         <span style={{ background: FAMILY_COLOR[s.family], color: '#0d1018' }}>
@@ -56,6 +34,8 @@ export function DetailPanel({ id, onSelect }: Props) {
 
       {s.note && <p className="detail-note">{s.note}</p>}
 
+      <GlyphBoard system={s} />
+
       <dl className="detail-list">
         <dt>年代</dt>
         <dd>{formatSpan(s.dateFrom, s.dateTo)}</dd>
@@ -63,6 +43,8 @@ export function DetailPanel({ id, onSelect }: Props) {
         <dd>{s.region}</dd>
         <dt>使用国家 / 地区</dt>
         <dd>{s.countries.join('、')}</dd>
+        <dt>书写方向</dt>
+        <dd>{DIRECTION_LABEL[s.direction ?? 'ltr']}</dd>
         {s.unicodeBlock && (
           <>
             <dt>Unicode</dt>
@@ -94,6 +76,14 @@ export function DetailPanel({ id, onSelect }: Props) {
           </div>
         </div>
       )}
-    </aside>
+    </>
   );
 }
+
+const DIRECTION_LABEL: Record<string, string> = {
+  ltr: '从左到右',
+  rtl: '从右到左',
+  ttb: '自上而下',
+  boustrophedon: '牛耕式（逐行反向）',
+  mixed: '多向并用',
+};

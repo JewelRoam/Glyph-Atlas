@@ -12,8 +12,13 @@ import {
 } from '../lib/time';
 import { FAMILY_ORDER } from '../lib/layout';
 
-/** 对照表：可按谱系筛选、按年代排序地纵览全部文字 */
-export function TableView() {
+interface Props {
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+}
+
+/** 对照表：可按谱系筛选、按年代排序地纵览全部文字；点一行打开与 MACRO 相同的详情 */
+export function TableView({ selected, onSelect }: Props) {
   const [family, setFamily] = useState<Family | 'all'>('all');
   const [sortKey, setSortKey] = useState<'date' | 'name'>('date');
   const [query, setQuery] = useState('');
@@ -88,6 +93,7 @@ export function TableView() {
         <table>
           <thead>
             <tr>
+              <th style={{ width: 22 }} aria-label="详情" />
               <th style={{ width: 76 }}>字形</th>
               {th('name', '名称')}
               <th>谱系</th>
@@ -100,7 +106,24 @@ export function TableView() {
           </thead>
           <tbody>
             {rows.map((s: WritingSystem) => (
-              <tr key={s.id}>
+              <tr
+                key={s.id}
+                className={selected === s.id ? 'selected' : ''}
+                aria-selected={selected === s.id}
+                tabIndex={0}
+                onClick={() => onSelect(selected === s.id ? null : s.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelect(selected === s.id ? null : s.id);
+                  }
+                }}
+              >
+                <td className="cell-detail">
+                  <span className="cell-detail-hint" aria-hidden="true">
+                    ›
+                  </span>
+                </td>
                 <td>
                   <div className="cell-glyph">
                     <FontGlyph

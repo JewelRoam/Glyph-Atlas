@@ -115,6 +115,7 @@
 }
 
 main {
+  position: relative;
   flex: 1;
   min-height: 0;
   min-width: 0;
@@ -272,28 +273,41 @@ main {
   letter-spacing: 0.04em;
 }
 
-/* ─────────────── 一（右）：详情 ─────────────── */
-.detail {
-  position: relative;
-  width: 336px;
-  flex-shrink: 0;
-  border-left: 1px solid var(--line-mid);
-  background: var(--bg-1);
-  padding: 26px 22px 40px;
-  overflow-y: auto;
+/* ─────────────── 一（右）：详情浮层 ───────────────
+   只有点开某个书写体系时才出现，MACRO 与 INDEX 共用。面板浮在内容之上，
+   不遮罩、不挤占画布，因此可以"点一个看一个"。 */
+.detail-layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+  z-index: 20;
 }
 
-.detail.empty {
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 46px 30px;
+.detail {
+  pointer-events: auto;
+  width: 392px;
+  max-width: 100%;
+  border-left: 1px solid var(--line-mid);
+  background: var(--bg-1);
+  box-shadow: -24px 0 48px rgba(0, 0, 0, 0.45);
+  padding: 24px 22px 40px;
+  overflow-y: auto;
+  animation: detail-in 0.22s cubic-bezier(0.22, 0.8, 0.3, 1);
 }
-.detail.empty p {
-  font-size: 12.5px;
-  line-height: 2;
-  color: var(--ink-faint);
-  max-width: 200px;
+
+@keyframes detail-in {
+  from {
+    transform: translateX(18px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .detail-close {
@@ -312,19 +326,9 @@ main {
   color: var(--ink-strong);
 }
 
-.detail-glyph {
-  width: 112px;
-  height: 112px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 18px;
-  border: 1px solid var(--line-mid);
-  border-radius: 3px;
-  background: var(--bg-2);
-  /* 展柜射灯 */
-  box-shadow: inset 0 0 40px rgba(211, 161, 63, 0.08);
+.detail-head {
+  padding-right: 30px;
 }
-
 .detail h2 {
   font-family: var(--display);
   font-size: 23px;
@@ -341,14 +345,14 @@ main {
   font-style: italic;
   color: var(--ink-faint);
   letter-spacing: 0.02em;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .detail-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 .detail-tags span {
   font-size: 10.5px;
@@ -366,7 +370,127 @@ main {
   color: var(--ink);
   border-left: 2px solid var(--cinnabar-line);
   padding-left: 12px;
-  margin: 0 0 22px;
+  margin: 0 0 20px;
+}
+
+/* —— 字形样本板：一张字表，而不是一枚放大的示例字 —— */
+.detail-board {
+  margin-bottom: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.board-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.board-head h3,
+.detail-rel h3 {
+  font-family: var(--antique);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0;
+  font-weight: 400;
+}
+.board-count {
+  font-size: 10.5px;
+  color: var(--ink-dim);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.glyph-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--cell, 36px), 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: var(--bg-2);
+}
+.glyph-cell {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+  color: var(--ink-strong);
+  transition: background 0.12s ease;
+}
+.glyph-cell:hover {
+  background: rgba(211, 161, 63, 0.08);
+}
+.glyph-cell .glyph-tile {
+  border: none;
+  background: none;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.board-more {
+  width: 100%;
+  margin-top: 9px;
+  padding: 7px 0;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  transition: 0.15s ease;
+}
+.board-more:hover {
+  color: var(--ink-strong);
+  border-color: var(--cinnabar-line);
+  background: var(--cinnabar-soft);
+}
+
+.board-empty {
+  padding: 14px 0 4px;
+}
+.board-empty p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--ink-faint);
+}
+
+.board-note {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  line-height: 1.85;
+  color: var(--ink-faint);
+}
+
+.board-font {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line);
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+}
+.board-font a {
+  color: var(--ink-dim);
+  border-bottom: 1px solid var(--line-mid);
+  white-space: nowrap;
+}
+.board-font a:hover {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar-line);
+}
+.board-font.missing {
+  color: var(--cinnabar);
+}
+.board-font.missing a {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar-line);
 }
 
 .detail-list {
@@ -397,13 +521,7 @@ main {
   margin-bottom: 20px;
 }
 .detail-rel h3 {
-  font-family: var(--antique);
-  font-size: 10px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin: 0 0 9px;
-  font-weight: 400;
+  margin-bottom: 9px;
 }
 .detail-rel .rel-wrap {
   display: flex;
@@ -660,6 +778,93 @@ main {
   letter-spacing: 0.04em;
 }
 
+/* ── 字母场：一整套字母表在两种文字之间的形变对照 ── */
+.alpha-field {
+  flex-shrink: 0;
+  margin: 2px 0 10px;
+  padding: 9px 0 6px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.alpha-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 7px;
+}
+.alpha-title {
+  font-family: var(--antique);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.alpha-title em {
+  font-style: normal;
+  margin-left: 10px;
+  font-family: var(--display);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--ink);
+}
+.alpha-legend {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.alpha-legend b {
+  font-weight: 400;
+  margin-left: 7px;
+}
+.alpha-legend b.in {
+  color: var(--cinnabar);
+}
+.alpha-legend b.out {
+  color: var(--line-strong);
+}
+/* 外层高度由 AlphabetField 按内容量出，格子增减时整块一起收放 */
+.alpha-scroll {
+  height: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  transition: height 0.32s cubic-bezier(0.22, 0.68, 0.28, 1);
+}
+.alpha-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+  gap: 2px;
+  align-content: start;
+}
+.alpha-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  aspect-ratio: 1 / 1;
+  border-radius: 2px;
+  transition: background 0.16s ease;
+}
+.alpha-cell:hover {
+  background: var(--bg-1);
+}
+.alpha-glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  will-change: transform, opacity;
+}
+.alpha-note {
+  margin: 7px 0 0;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+  opacity: 0.82;
+}
+
 .walk-controls {
   display: flex;
   justify-content: center;
@@ -866,9 +1071,33 @@ main {
 }
 .table-scroll tbody tr {
   transition: background 0.12s ease;
+  cursor: pointer;
 }
 .table-scroll tbody tr:hover {
   background: rgba(239, 230, 214, 0.035);
+}
+.table-scroll tbody tr:focus-visible {
+  outline: 1px solid var(--cinnabar-line);
+  outline-offset: -1px;
+}
+.table-scroll tbody tr.selected {
+  background: var(--cinnabar-soft);
+  box-shadow: inset 2px 0 0 var(--cinnabar);
+}
+.cell-detail {
+  padding: 9px 4px 9px 10px !important;
+  width: 22px;
+}
+.cell-detail-hint {
+  color: var(--ink-faint);
+  font-size: 13px;
+  opacity: 0.5;
+  transition: 0.15s ease;
+}
+.table-scroll tbody tr:hover .cell-detail-hint,
+.table-scroll tbody tr.selected .cell-detail-hint {
+  color: var(--cinnabar);
+  opacity: 1;
 }
 .cell-glyph {
   width: 44px;
@@ -994,7 +1223,7 @@ main {
     padding: 0 11px;
   }
   .detail {
-    width: 290px;
+    width: 340px;
   }
 }
 
@@ -1025,21 +1254,31 @@ main {
   .atlas-layout {
     flex-direction: column;
   }
-  /* 窄屏上没选中时别整块占地方：压成一条提示即可 */
-  .detail.empty {
-    max-height: none;
-    padding: 14px 18px;
-    border-top: 1px solid var(--line);
-  }
-  .detail.empty p {
-    max-width: none;
-    line-height: 1.6;
+  /* 窄屏：详情从右侧抽屉改成下半屏的卡片 */
+  .detail-layer {
+    top: auto;
+    left: 0;
+    max-height: 72%;
+    align-items: stretch;
   }
   .detail {
-    width: auto;
-    max-height: 46%;
+    width: 100%;
+    max-height: 72vh;
+    padding: 20px 16px 32px;
     border-left: none;
     border-top: 1px solid var(--line-mid);
+    box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.5);
+    animation-name: detail-up;
+  }
+  @keyframes detail-up {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
   .walk {
     padding: 14px 14px 12px;

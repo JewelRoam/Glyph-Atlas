@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AtlasGraph } from './components/AtlasGraph';
 import { WalkView } from './components/WalkView';
 import { TableView } from './components/TableView';
-import { DetailPanel } from './components/DetailPanel';
+import { DetailDrawer } from './components/DetailDrawer';
 import {
   graphSystems,
   independentSystems,
@@ -66,11 +66,12 @@ export default function App() {
         {tab === 'atlas' && (
           <div className="atlas-layout">
             <AtlasGraph selected={selected} onSelect={setSelected} />
-            <DetailPanel id={selected} onSelect={setSelected} />
           </div>
         )}
         {tab === 'walk' && <WalkView />}
-        {tab === 'table' && <TableView />}
+        {tab === 'table' && <TableView selected={selected} onSelect={setSelected} />}
+        {/* MACRO 与 INDEX 共用同一个详情浮层：点击之前不占位置 */}
+        {tab !== 'walk' && <DetailDrawer id={selected} onSelect={setSelected} />}
       </main>
     </div>
   );

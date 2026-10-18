@@ -4,6 +4,7 @@
 //   node --experimental-strip-types tools/dump-lineage-stops.mjs
 import { lineages } from '../src/data/lineages.ts';
 import { writingSystems } from '../src/data/writingSystems.ts';
+import { fontFallback } from '../src/data/fontFallback.ts';
 
 const byId = new Map(writingSystems.map((w) => [w.id, w]));
 const stops = [];
@@ -17,6 +18,7 @@ for (const lineage of lineages) {
       char: stop.char ?? null,
       handPath: Boolean(stop.path),
       fontFamily: system?.fontFamily ?? null,
+      family: system?.fontFamily ?? fontFallback[stop.script] ?? null,
     });
   }
 }
