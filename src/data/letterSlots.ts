@@ -59,7 +59,12 @@
  *    （ṅha ñha nha mha rha lha，见 varga- 末尾那五格与其后的映射）。
  *  · 东南亚本语字母：泰、老两文把 ข ค ผ พ ห 加一笔分出的 /f/ /h/ 一系，加上
  *    从印度 ḍ/d、b 一系来的 ฎ ด บ，以及泰、老、高棉三家都有的元音载体 อ/ອ/អ，
- *    另占一格（见 varga- 末尾那十一格）；泰文的 ฤ ฦ 落在 svara 的 r̥ / l̥ 两格。
+ *    另占一格（见 varga- 的最后一批）；泰文的 ฤ ฦ 落在 svara 的 r̥ / l̥ 两格。
+ *  · 缅文区块的邻语字母：Unicode 的 Myanmar 区块还收了孟文、掸文（傣耶）、
+ *    斯高克伦文、东西波克伦文、勃欧文（儒玛瑞）自己的字母。它们不是一个字形
+ *    的异体，而是各语言按本语音位另造的字；孟文 5 个、斯高克伦文 1 个、西波
+ *    克伦文 2 个、东波克伦文 3 个、掸文 15 个、勃欧文 1 个，共 27 格（见
+ *    varga-mran-* 槽位），只在缅甸字母表这一站出现并成组飞入。
  *  · 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇——按音位
  *    位次与上面各表对齐，多出来的音位另立一格（见 per 系与 perm 系槽位）。
  *  · 假名：汉字借字、平假名、片假名三套——一个音节一格（见 kana-* 槽位），
@@ -636,6 +641,40 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-o-ang', label: 'อ o ang（泰文）· ອ o（老挝文）· អ QA（高棉文）——婆罗米独立元音 a 的后身，兼作声门塞音与元音载体' },
   { id: 'varga-ho-nokhuk', label: 'ฮ ho nokhuk（泰文低调 /h/，由 ห 派生）· ຮ ho tam（老挝文）' },
   { id: 'varga-nyo', label: 'ຍ nyo（老挝文的 /ɲ/）· ည nnya（缅文）——与巴利系列的 ຎ / ဉ 分工' },
+
+  // ── 缅文字母系统为其他语言添的字 ────────────────────────────────
+  // 缅文用的是 Unicode 的 Myanmar 区块，同一区块里还收了孟语、掸语（傣耶）、
+  // 斯高克伦语、西波与东波克伦语、勃欧语（儒玛瑞）自己的字母——它们不是
+  // 缅文的词形变体，而是各语言按本语音位另造的字。这些格子只在缅文这一站
+  // 出现，走到它时一并飞入。
+  { id: 'varga-mran-mon-nga', label: 'ၚ mon nga（孟语的 ŋa，与缅文的 င 分工）' },
+  { id: 'varga-mran-mon-jha', label: 'ၛ mon jha（孟语读巴利语借词用的 jha）' },
+  { id: 'varga-mran-mon-bba', label: 'ၜ mon bba（孟语的 bba）' },
+  { id: 'varga-mran-mon-bbe', label: 'ၝ mon bbe（孟语的 bbe）' },
+  { id: 'varga-mran-mon-e', label: 'ဨ mon e（孟语的 e）' },
+  { id: 'varga-mran-great-sa', label: 'ဿ great sa（孟语与古缅语合写的 ssa）' },
+  { id: 'varga-mran-karen-sha', label: 'ၡ sgaw karen sha（斯高克伦语的 sha）' },
+  { id: 'varga-mran-karen-tha', label: 'ၥ western pwo karen tha（西波克伦语的 tha）' },
+  { id: 'varga-mran-karen-pwa', label: 'ၦ western pwo karen pwa（西波克伦语的 pwa）' },
+  { id: 'varga-mran-pwo-nna', label: 'ၮ eastern pwo karen nna（东波克伦语的 nna）' },
+  { id: 'varga-mran-pwo-ywa', label: 'ၯ eastern pwo karen ywa（东波克伦语的 ywa）' },
+  { id: 'varga-mran-pwo-ghwa', label: 'ၰ eastern pwo karen ghwa（东波克伦语的 ghwa）' },
+  { id: 'varga-mran-shan-a', label: 'ဢ shan a（掸语的 a，兼作声门塞音与元音载体）' },
+  { id: 'varga-mran-shan-ka', label: 'ၵ shan ka（掸语的 ka）' },
+  { id: 'varga-mran-shan-kha', label: 'ၶ shan kha（掸语的 kha）' },
+  { id: 'varga-mran-shan-ga', label: 'ၷ shan ga（掸语的 ga）' },
+  { id: 'varga-mran-shan-ca', label: 'ၸ shan ca（掸语的 ca）' },
+  { id: 'varga-mran-shan-za', label: 'ၹ shan za（掸语的 za）' },
+  { id: 'varga-mran-shan-nya', label: 'ၺ shan nya（掸语的 nya）' },
+  { id: 'varga-mran-shan-da', label: 'ၻ shan da（掸语的 da）' },
+  { id: 'varga-mran-shan-na', label: 'ၼ shan na（掸语的 na）' },
+  { id: 'varga-mran-shan-pha', label: 'ၽ shan pha（掸语的 pha）' },
+  { id: 'varga-mran-shan-fa', label: 'ၾ shan fa（掸语的 fa）' },
+  { id: 'varga-mran-shan-ba', label: 'ၿ shan ba（掸语的 ba）' },
+  { id: 'varga-mran-shan-tha', label: 'ႀ shan tha（掸语的 tha）' },
+  { id: 'varga-mran-shan-ha', label: 'ႁ shan ha（掸语的 ha）' },
+  { id: 'varga-mran-palaung-fa', label: 'ႎ rumai palaung fa（勃欧语的 fa）' },
+
 
   // ── 假名（五十音）：汉字借字 → 平假名 → 片假名 ───────────────────
   // 格子的身份是"音节"而不是字源：一个音占一格，三种写法在同一格里换。
@@ -2758,7 +2797,35 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-lla': 'ဠ',
     // 缅文与巴利系列的 ဉ 分工：日常的 ñ 写作 ည，ဉ 只用于巴利梵语转写
     'varga-nyo': 'ည',
-  },  // 缅文：35/35（梵语字音表 33 音 + ဠ + ည）
+    // 缅文字母系统里为孟语、掸语、克伦语、勃欧语添的字（Myanmar 区块中段）
+    'varga-mran-mon-nga': 'ၚ',
+    'varga-mran-mon-jha': 'ၛ',
+    'varga-mran-mon-bba': 'ၜ',
+    'varga-mran-mon-bbe': 'ၝ',
+    'varga-mran-mon-e': 'ဨ',
+    'varga-mran-great-sa': 'ဿ',
+    'varga-mran-karen-sha': 'ၡ',
+    'varga-mran-karen-tha': 'ၥ',
+    'varga-mran-karen-pwa': 'ၦ',
+    'varga-mran-pwo-nna': 'ၮ',
+    'varga-mran-pwo-ywa': 'ၯ',
+    'varga-mran-pwo-ghwa': 'ၰ',
+    'varga-mran-shan-a': 'ဢ',
+    'varga-mran-shan-ka': 'ၵ',
+    'varga-mran-shan-kha': 'ၶ',
+    'varga-mran-shan-ga': 'ၷ',
+    'varga-mran-shan-ca': 'ၸ',
+    'varga-mran-shan-za': 'ၹ',
+    'varga-mran-shan-nya': 'ၺ',
+    'varga-mran-shan-da': 'ၻ',
+    'varga-mran-shan-na': 'ၼ',
+    'varga-mran-shan-pha': 'ၽ',
+    'varga-mran-shan-fa': 'ၾ',
+    'varga-mran-shan-ba': 'ၿ',
+    'varga-mran-shan-tha': 'ႀ',
+    'varga-mran-shan-ha': 'ႁ',
+    'varga-mran-palaung-fa': 'ႎ',
+  },  // 缅文：62/62（梵语字音表 33 音 + 本语与邻语字母 29 格）
 
   // ── 夏拉达支系：夏拉达 → 塔克里 → 马哈贾尼 → 霍杰基 → 穆尔塔尼 →
   //    胡达瓦迪 → 多格拉 ─────────────────────────────────────────────
