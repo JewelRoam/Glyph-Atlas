@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { lineages } from '../data';
+import { glyphPaths } from '../data/glyphPaths';
 import { scriptById } from '../data/writingSystems';
 import type { GlyphStop, Lineage } from '../data/types';
 import { FontGlyph, PathGlyph } from './Glyph';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { loadFont } from '../lib/fonts';
 import { LINEAGE_MODE_HINT, LINEAGE_MODE_LABEL, formatSpan } from '../lib/time';
+
+/** 站点轮廓：优先用轨道里的手绘 path，否则查字体生成的轮廓表。 */
+function resolveGlyphPath(stop: GlyphStop): string | null {
+  if (stop.path) return stop.path;
+  if (!stop.char) return null;
+  return glyphPaths[`${stop.script}:${stop.char}`] ?? null;
+}
 
 /**
  * 微观维度：沿一条血统轨道"往前走 / 往后走"。
@@ -55,7 +63,11 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
   }, [stops]);
 
   const prepared = useMemo<(PreparedGlyph | null)[]>(
-    () => stops.map((s) => (s.path ? prepare(s.path, 96) : null)),
+    () =>
+      stops.map((s) => {
+        const d = resolveGlyphPath(s);
+        return d ? prepare(d, 96) : null;
+      }),
     [stops],
   );
 
@@ -114,7 +126,8 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
    */
   const ghostStop = t < 0.5 ? b : a;
   const ghostOpacity = Math.sin(Math.PI * Math.min(Math.max(t, 0), 1)) * 0.2;
-  const showGhost = ghostOpacity > 0.004 && (ghostStop.path || ghostStop.char);
+  const ghostPath = resolveGlyphPath(ghostStop);
+  const showGhost = ghostOpacity > 0.004 && (ghostPath || ghostStop.char);
 
   const onWheel = (e: React.WheelEvent) => {
     e.preventDefault();
@@ -180,7 +193,7 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
 
         {showGhost && (
           <div
-            className={`walk-ghost ${ghostStop.path ? '' : 'font-ghost'}`}
+            className={`walk-ghost ${ghostPath ? '' : 'font-ghost'}`}
             style={{ opacity: ghostOpacity }}
           >
             <StopGlyph stop={ghostStop} size={260} />
@@ -276,7 +289,8 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
 /** 单个站点字形：有条路径用路径，否则用字体 */
 function StopGlyph({ stop, size }: { stop: GlyphStop; size: number }) {
   const script = scriptById[stop.script];
-  if (stop.path) return <PathGlyph d={stop.path} size={size} color="var(--ink-strong)" />;
+  const d = resolveGlyphPath(stop);
+  if (d) return <PathGlyph d={d} size={size} color="var(--ink-strong)" />;
   return (
     <FontGlyph
       char={stop.char ?? script?.sample}

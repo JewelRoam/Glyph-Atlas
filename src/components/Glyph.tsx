@@ -92,7 +92,7 @@ function GlyphTile({ char, size }: { char: string; size: number }) {
   );
 }
 
-/** 用矢量路径渲染的字形（带 path 的古字形走这条路） */
+/** 用矢量路径渲染的字形（手绘轮廓与字体提取轮廓都走这条路） */
 export function PathGlyph({
   d,
   size = 120,
@@ -104,7 +104,7 @@ export function PathGlyph({
 }) {
   return (
     <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden="true">
-      <path d={d} fill={color} fillRule="evenodd" />
+      <path d={d} fill={color} fillRule="nonzero" />
     </svg>
   );
 }

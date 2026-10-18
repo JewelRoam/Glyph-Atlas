@@ -77,7 +77,9 @@ Glyph-Atlas/
 ├── tools/
 │   ├── validate-data.mjs       数据校验器（构建前置检查）
 │   ├── unicode-block-ranges.json  Unicode 18.0 区块索引（校验名称与码位）
-│   └── screenshot.mjs          视觉校对：拍下每一屏（Playwright 按需装，不进依赖）
+│   ├── screenshot.mjs          视觉校对：拍下每一屏（Playwright 按需装，不进依赖）
+│   ├── dump-lineage-stops.mjs  导出所有血统站点的 script / char 元数据
+│   └── build-glyph-paths.py    从 Google Fonts 子集提取字形轮廓（生成 glyphPaths.ts）
 └── src/
     ├── main.tsx                挂载
     ├── App.tsx                 顶栏 / 三个标签页
@@ -87,6 +89,7 @@ Glyph-Atlas/
     │   ├── types.ts            类型定义：WritingSystem / GlyphStop / Lineage
     │   ├── writingSystems.ts   书写体系主数据
     │   ├── lineages.ts         血统轨道（字形演变路径）
+    │   ├── glyphPaths.ts       轨道站点的 100×100 矢量轮廓（生成物）
     │   └── index.ts            派生集合：graphSystems / independentSystems …
     ├── lib/                    ── 逻辑层
     │   ├── layout.ts           图谱泳道布局、贪心避让、亲缘计算
@@ -283,7 +286,7 @@ npm run validate
 
 在 `src/data/lineages.ts` 里追加一条 `Lineage`。站点有两种写法：
 
-**A. 矢量形变（推荐，真·几何过渡）**——给 `path`，
+**A. 手工矢量路径**——给 `path`，
 坐标统一使用 `viewBox="0 0 100 100"`，可以含多个子路径
 （例如字母 A 的三角形内孔就是第二条子路径）：
 
@@ -291,12 +294,17 @@ npm run validate
 { script: 'greek', label: 'alpha（早期）', phonetic: 'a', path: 'M50 8 L94 94 L72 94 …' },
 ```
 
-**B. 字体淡变（任何文字都能用）**——给 `char`，
+**B. 字符 + 自动提取轮廓**——给 `char`，
 字体从 `scriptById[stop.script].fontFamily` 取，也可以用 `fontFamily` 单独覆盖：
 
 ```ts
 { script: 'tibetan', char: 'ཀ', label: '藏文', phonetic: 'ka' },
 ```
+
+如果该字体在 Google Fonts 上有可用的 css2 子集，运行
+`work/.venv/bin/python tools/build-glyph-paths.py`，脚本会把实际字形轮廓
+缩放、居中、翻转 Y 轴后写入 `src/data/glyphPaths.ts`。轨道渲染时会自动使用
+`${scriptId}:${char}` 对应的轮廓。没有轮廓的字符仍走淡变、缩放与平移的兜底方案。
 
 编写时的两个约定：
 
@@ -307,8 +315,8 @@ npm run validate
 
 `path` 模式下还有一些细节值得知道：
 
-- 两个站点子路径数量不一致时，少的一方会用**从质心长出的退化子路径**补齐，
-  配合 `fill-rule: evenodd`，表现为一个洞从无到有地张开；
+- 两个站点子路径数量不一致时，落单的子路径会**原地收缩成点或从点长开**，
+  配合 `fill-rule: nonzero`，表现为一笔消失或出现；
 - 起笔点不同不会出错（弧长采样会把每段路径重新参数化），
   但**笔画走向合理**的路径会得到更自然的过渡。
 
@@ -323,7 +331,9 @@ npm run validate
 path A ─→ splitSubpaths ─→ 每条子路径沿弧长采样 N+1 个点 ─→ PreparedGlyph
 path B ─→ splitSubpaths ─→ 每条子路径沿弧长采样 N+1 个点 ─→ PreparedGlyph
                                 │
-                                ├─ 子路径数量不等？用质心退化子路径补齐
+                                ├─ 按重心 / 面积 / 包围盒配对子路径
+                                ├─ 闭环起点做最佳错位对齐
+                                ├─ 落单轮廓原地收缩成点 / 从点长开
                                 ↓
        interpolatePath(A, B, t) → 逐点线性插值 → 生成中间 path（M…L…Z）
 ```
@@ -332,16 +342,22 @@ path B ─→ splitSubpaths ─→ 每条子路径沿弧长采样 N+1 个点 ─
 
 - **弧长采样**而不是按控制点配对。两端 path 的命令结构可以完全不同
   （一条是 `C` 曲线，一条是 `L` 直线），插值时只认几何。
-- **子路径补齐**解决"洞的出现与消失"。A 没有内孔、B 有内孔时，
-  给 A 补一条收缩在质心的退化子路径，于是孔是"张开"的而不是"跳出来"的。
+- **子路径按几何配对**，而不是按数组下标。字形常由许多互不相连的笔画和
+  内孔组成；按重心、面积与包围盒匹配，能让局部笔画就近变形，
+  不至于让顶部的小点去追逐整条大弧。
+- **闭环起点对齐**。每条轮廓都尝试所有整数错位，选择采样点总距离最短的起点，
+  减少形变途中的自旋与打结。
+- **落单轮廓原地收放**。A 多出的笔画收缩到自身重心，B 多出的笔画从自身重心
+  长开；配合 `fill-rule: nonzero`，表现为一笔消失或出现，而不是跨字拉线。
 - **不用第三方形变库**。`flubber` 一类库能做同样的事，但自己实现才能完全
   控制采样密度、子路径配对与异常输入——而且这个引擎本身是这个项目
   最想让别人复用的部分。
 - **有兜底**。拿不到 SVG 几何接口（无 DOM 环境、病态路径）时，退回到
   "读出所有坐标数字当折线均匀采样"，精度下降但不会白屏。
 
-只有字符、没有轮廓的现役文字走另一条路：**淡变 + 缩放平移 + 下一站残影**，
-于是任何文字都能有"沿街往前走"的连续感，哪怕它永远不会有矢量轮廓。
+目前七条血统轨道上的字符站点都已从 Noto 字体提取轮廓，因此中心舞台会走真·几何
+形变。没有轮廓的站点仍保留 **淡变 + 缩放平移 + 下一站残影** 作为兜底，
+于是任何文字都能有"沿街往前走"的连续感。
 
 ---
 
@@ -481,6 +497,12 @@ npm run build && ls dist/
   每次推送 `main` 由 `.github/workflows/deploy.yml` 构建 `dist/` 并部署；
   构建产物改用 `/Glyph-Atlas/` 作为资源前缀，
   并在本地用等效的静态服务验证过子路径下的加载。
+- **2026-10-18 · 时间街景真实矢量轮廓**：新增 `tools/build-glyph-paths.py`，
+  从 Google Fonts 的 Noto 子集提取 43 个轨道站点的实际字形轮廓，缩放居中到
+  100×100 坐标盒后写入 `src/data/glyphPaths.ts`；形变引擎改为按重心、面积与
+  包围盒配对子路径，并做闭环起点对齐。除手绘的古文字轮廓外，字符站点现在也走
+  真·几何形变；轮廓渲染改用 `fill-rule: nonzero`，避免汉字、假名与南亚文字的
+  内孔被错误挖掉。
 
 ---
 
