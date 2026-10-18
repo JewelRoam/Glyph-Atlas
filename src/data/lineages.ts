@@ -346,6 +346,24 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'ethiopic-line',
+    nameZh: '古南阿拉伯 alef → 吉兹 hä',
+    nameEn: 'Old South Arabian alef → Ethiopic hä',
+    mode: 'chain',
+    description:
+      '古南阿拉伯字母随商路越过红海，在阿克苏姆长成了吉兹字母。字形还能认出南阿拉伯的来路，' +
+      '写法却换了一种思路：它不再只记辅音，而是把辅音与元音配成一个音节矩阵——' +
+      '一个辅音配上八种元音式，各占一个码位。走到吉兹这一站，字母场只取 26 个辅音的' +
+      '第一式（辅音 + ä）：h l ḥ m r s q b t ḫ n ʾ k w ʿ z y d g ṭ ṣ ḍ 接回南阿拉伯的同音格，' +
+      'p 在吉兹里擦化成 f；南阿拉伯的 ġ ḏ ṯ ẓ 与 š 没有留下后代，走到这里飞出，' +
+      '边音 ś、强音 p̣ 与为外来词添的 p 三个新字母飞入。',
+    stops: [
+      { script: 'old-south-arabian', char: '𐩱', label: '古南阿拉伯 alef', phonetic: 'ʔ' },
+      { script: 'geez', char: 'ሀ', label: '吉兹 hä', phonetic: 'h' },
+    ],
+  },
+
+  {
     id: 'hebrew-squared',
     nameZh: '阿拉米 ʾālep → 希伯来 alef',
     nameEn: 'Aramaic ʾālep → Hebrew alef',
