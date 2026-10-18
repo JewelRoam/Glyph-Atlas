@@ -71,13 +71,15 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek alpha → Anatolian a',
     mode: 'cognate',
     description:
-      '希腊字母向安纳托利亚传播后，卡里亚、吕底亚和吕基亚各自改造出一套地方字母。' +
-      '三个字母都沿用 alpha 的 /a/ 音值，却在笔画收束与书写方向上分道扬镳。',
+      '希腊字母向安纳托利亚传播后，吕底亚、吕基亚和卡里亚各自改造出一套地方字母。' +
+      '三家的 alpha 都还读 /a/，笔画收束与书写方向却分道扬镳：吕底亚一行从右到左，' +
+      '吕基亚与卡里亚另有自己的取舍。吕底亚、吕基亚两站能接出整套字母表的对照，' +
+      '卡里亚与希腊的音值对应至今没有定论，所以最后一站只做单字形展示。',
     stops: [
       { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'carian', char: '𐊠', label: '卡里亚 a', phonetic: 'a' },
       { script: 'lydian', char: '𐤠', label: '吕底亚 a', phonetic: 'a' },
       { script: 'lycian', char: '𐊀', label: '吕基亚 a', phonetic: 'a' },
+      { script: 'carian', char: '𐊠', label: '卡里亚 a', phonetic: 'a' },
     ],
   },
 
