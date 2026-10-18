@@ -95,8 +95,7 @@ try {
   await shoot('01-atlas');
   await shoot('02-walk', { steps: [tab('时间街景')] });
   await shoot('03-table', { steps: [tab('文字总表')] });
-  await shoot('04-about', { steps: [tab('关于')] });
-  await shoot('05-detail', {
+  await shoot('04-detail', {
     steps: [
       async (page) => {
         await page.locator('.node').nth(6).click({ force: true });
@@ -104,7 +103,7 @@ try {
       },
     ],
   });
-  await shoot('06-mobile', { width: 420, height: 860 });
+  await shoot('05-mobile', { width: 420, height: 860 });
 } finally {
   await browser.close();
   server.kill();

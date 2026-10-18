@@ -1,12 +1,7 @@
 import type { WritingSystem } from './types';
 
 /**
- * 世界书写体系种子数据。
- *
- * 收录原则：
- *  - 独立起源：全部收录（苏美尔、埃及、中国、印度河、中美洲等）。
- *  - 字母/音节/元音附标文字：尽量穷举主要成员。
- *  - 汉字系：收录代表阶段与衍生系统，内部变体从略。
+ * 世界书写体系数据。
  *
  * 年代为约数，学界多有分歧；负数表示公元前，null 表示至今仍在使用。
  * 该文件是项目的核心资产，可持续扩充。
@@ -476,7 +471,7 @@ export const writingSystems: WritingSystem[] = [
   },
 
   // ─────────────────────────────────────────────
-  // 六、婆罗米系：南亚与东南亚（字母表，尽量穷举）
+  // 六、婆罗米系：南亚与东南亚
   // ─────────────────────────────────────────────
   {
     id: 'brahmi', nameZh: '婆罗米文', nameEn: 'Brahmi',
@@ -521,6 +516,15 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Devanagari U+0900', sample: 'क',
     note: '印地语、梵语、尼泊尔语等的官方文字，也是当今使用人数最多的元音附标文字之一。',
+  },
+  {
+    id: 'nandinagari', nameZh: '南迪纳加里文', nameEn: 'Nandinagari',
+    origin: 'derived', parents: ['nagari'], dateFrom: 700, dateTo: 1900,
+    family: 'indic', region: '南印度', countries: ['印度'],
+    type: 'abugida', status: 'historical', direction: 'ltr',
+    unicodeBlock: 'Nandinagari U+119A0', sample: '𑦮',
+    fontFamily: 'Noto Sans Nandinagari',
+    note: '8 至 19 世纪用于南印度梵语手稿与碑铭，与天城文关系密切，字形和字汇高度接近。',
   },
 
   {
@@ -737,6 +741,33 @@ export const writingSystems: WritingSystem[] = [
     note: '20 世纪中叶由拉科·博德拉为霍语整理并推广，字母按发音部位排列。',
   },
   {
+    id: 'sora-sompeng', nameZh: '索拉·松彭文', nameEn: 'Sora Sompeng',
+    origin: 'invented', parents: [], dateFrom: 1936, dateTo: null,
+    family: 'indic', region: '奥迪沙与安得拉邦', countries: ['印度'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Sora Sompeng U+110D0', sample: '𑃐',
+    fontFamily: 'Noto Sans Sora Sompeng',
+    note: '1936 年由曼盖·戈曼戈为索拉语创制，今主要使用于奥迪沙与安得拉邦的索拉社群。',
+  },
+  {
+    id: 'masaram-gondi', nameZh: '马萨拉姆·贡迪文', nameEn: 'Masaram Gondi',
+    origin: 'invented', parents: [], dateFrom: 1928, dateTo: null,
+    family: 'indic', region: '印度中部', countries: ['印度'],
+    type: 'abugida', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Masaram Gondi U+11D00', sample: '𑴌',
+    fontFamily: 'Noto Sans Masaram Gondi',
+    note: '1928 年由芒希·曼加尔·辛格·马萨拉姆为贡迪语设计，字母含固有元音，并配有元音符号与连字。',
+  },
+  {
+    id: 'gunjala-gondi', nameZh: '贡贾拉·贡迪文', nameEn: 'Gunjala Gondi',
+    origin: 'invented', parents: [], dateFrom: 1750, dateTo: null,
+    family: 'indic', region: '特伦甘纳与安得拉邦', countries: ['印度'],
+    type: 'abugida', status: 'revived', direction: 'ltr',
+    unicodeBlock: 'Gunjala Gondi U+11D60', sample: '𑵠',
+    fontFamily: 'Noto Sans Gunjala Gondi',
+    note: '贡迪语的另一套传统文字；现存手稿可追溯至约 1750 年，近年重新整理并在特伦甘纳等地推广。',
+  },
+  {
     id: 'mro', nameZh: '姆鲁文', nameEn: 'Mro',
     alias: ['姆罗文', 'Mru'],
     origin: 'invented', parents: [], dateFrom: 1980, dateTo: null,
@@ -752,6 +783,24 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Khojki U+11200', sample: '𑈀', fontFamily: 'Noto Sans Khojki',
     note: '源自夏拉达文，曾是霍加社群书写信德语、旁遮普语等语言的重要文字。',
+  },
+  {
+    id: 'khudawadi', nameZh: '胡达瓦迪文', nameEn: 'Khudawadi',
+    origin: 'derived', parents: ['sharada'], dateFrom: 1800, dateTo: 1950,
+    family: 'indic', region: '信德', countries: ['巴基斯坦', '印度'],
+    type: 'abugida', status: 'historical', direction: 'ltr',
+    unicodeBlock: 'Khudawadi U+112B0', sample: '𑊺',
+    fontFamily: 'Noto Sans Khudawadi',
+    note: '信德地区的兰达系文字，主要用于信德语；1868 年被孟买当局定为官方文字，20 世纪后逐渐停用。',
+  },
+  {
+    id: 'multani', nameZh: '穆尔塔尼文', nameEn: 'Multani',
+    origin: 'derived', parents: ['sharada'], dateFrom: 1700, dateTo: 1950,
+    family: 'indic', region: '旁遮普与北信德', countries: ['巴基斯坦', '印度'],
+    type: 'abjad', status: 'historical', direction: 'ltr',
+    unicodeBlock: 'Multani U+11280', sample: '𑊄',
+    fontFamily: 'Noto Sans Multani',
+    note: '18 世纪至 20 世纪初用于萨拉基语的商业文字，主要通行于旁遮普与北信德；书写时常省略元音。',
   },
   {
     id: 'mahajani', nameZh: '马哈贾尼文', nameEn: 'Mahajani',

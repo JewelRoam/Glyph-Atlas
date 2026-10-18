@@ -8,8 +8,7 @@ export { lineages } from './lineages';
 /**
  * 演化图使用的节点集合。
  *
- * 收录口径是"书写体系"，因此像奇普（结绳）这类记录系统虽然保留在
- * 总表里，但不会被画进演化图，也不会被算作一次独立发明。
+ * 总表还包含奇普（结绳）等非文字记录系统；图谱节点只取书写体系。
  */
 export const graphSystems: WritingSystem[] = writingSystems.filter(
   (s) => s.type !== 'nonscript',
