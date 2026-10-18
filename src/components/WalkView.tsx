@@ -4,6 +4,8 @@ import { glyphPaths } from '../data/glyphPaths';
 import { scriptById } from '../data/writingSystems';
 import type { GlyphStop, Lineage } from '../data/types';
 import { FontGlyph, PathGlyph } from './Glyph';
+import { AlphabetField } from './AlphabetField';
+import { hasLetterMap } from '../data/letterSlots';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { loadFont } from '../lib/fonts';
 import { LINEAGE_MODE_HINT, LINEAGE_MODE_LABEL, formatSpan } from '../lib/time';
@@ -56,6 +58,13 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
   const [playing, setPlaying] = useState(false);
   const dragRef = useRef<{ x: number; p: number } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  /** 位置的最新值：动画与手势互相打断时都要读它 */
+  const pRef = useRef(p);
+  const animRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    pRef.current = p;
+  }, [p]);
 
   // 预加载这条轨道上所有站点用到的字体
   useEffect(() => {
@@ -76,6 +85,54 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
     [stops.length],
   );
 
+  /** 停掉正在跑的补间 */
+  const stopGlide = useCallback(() => {
+    if (animRef.current !== null) {
+      cancelAnimationFrame(animRef.current);
+      animRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => stopGlide, [stopGlide]);
+
+  /**
+   * 平滑滑到某一站。
+   *
+   * 左右箭头、侧边站点、底部刻度都用它，这样"前进一站"和拖动滚轮是同一套
+   * 形变过程：中间态一直在算，而不是瞬间跳到下一格。
+   */
+  const glideTo = useCallback(
+    (target: number) => {
+      stopGlide();
+      const from = pRef.current;
+      const to = clamp(target);
+      const dist = Math.abs(to - from);
+      if (dist < 0.001) {
+        setP(to);
+        return;
+      }
+      const ms = Math.min(1100, 300 + dist * 320);
+      const start = performance.now();
+      const step = (now: number) => {
+        const u = Math.min(1, (now - start) / ms);
+        const e = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+        setP(from + (to - from) * e);
+        animRef.current = u < 1 ? requestAnimationFrame(step) : null;
+      };
+      animRef.current = requestAnimationFrame(step);
+    },
+    [clamp, stopGlide],
+  );
+
+  /** 手势与滑杆：立刻跟手，同时取消补间 */
+  const setDirect = useCallback(
+    (next: number | ((v: number) => number)) => {
+      stopGlide();
+      setP((prev) => clamp(typeof next === 'function' ? next(prev) : next));
+    },
+    [clamp, stopGlide],
+  );
+
   // 播放
   useEffect(() => {
     if (!playing) return;
@@ -94,15 +151,21 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
     return () => cancelAnimationFrame(raf);
   }, [playing, stops.length]);
 
-  // 键盘左右
+  // 键盘左右：同样走补间，走一步就是一整套形变
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') setP((v) => clamp(Math.round(v) + 1));
-      if (e.key === 'ArrowLeft') setP((v) => clamp(Math.round(v) - 1));
+      const target = e.target as HTMLElement | null;
+      // 焦点在滑杆/输入框里时不抢方向键
+      if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setPlaying(false);
+        glideTo(Math.round(pRef.current) + (e.key === 'ArrowRight' ? 1 : -1));
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [clamp]);
+  }, [glideTo]);
 
   const i0 = Math.max(0, Math.min(stops.length - 1, Math.floor(p)));
   const i1 = Math.min(stops.length - 1, i0 + 1);
@@ -129,13 +192,27 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
   const ghostPath = resolveGlyphPath(ghostStop);
   const showGhost = ghostOpacity > 0.004 && (ghostPath || ghostStop.char);
 
+  /**
+   * 这一段轨道能不能铺字母场：两站的书写体系都得有字母槽位表（见
+   * data/letterSlots.ts）。没有对照表的文字仍然只显示单字形的街景。
+   */
+  const alphabetPair = useMemo(() => {
+    const sa = a.script;
+    const sb = b.script;
+    if (sa === sb) return hasLetterMap(sa) ? { a: sa, b: sb, t: 0 } : null;
+    if (!hasLetterMap(sa) || !hasLetterMap(sb)) return null;
+    return { a: sa, b: sb, t };
+  }, [a.script, b.script, t]);
+
   const onWheel = (e: React.WheelEvent) => {
     e.preventDefault();
-    setP((v) => clamp(v + Math.sign(e.deltaY) * 0.35));
+    setPlaying(false);
+    setDirect((v) => v + Math.sign(e.deltaY) * 0.35);
   };
 
   const onPointerDown = (e: React.PointerEvent) => {
-    dragRef.current = { x: e.clientX, p };
+    stopGlide();
+    dragRef.current = { x: e.clientX, p: pRef.current };
     setPlaying(false);
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
@@ -164,7 +241,10 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
           transform: `translate(calc(-50% + ${offset * 200}px), -50%) scale(${size / 116})`,
           opacity,
         }}
-        onClick={() => setP(idx)}
+        onClick={() => {
+          setPlaying(false);
+          glideTo(idx);
+        }}
       >
         <StopGlyph stop={s} size={116} />
       </div>
@@ -237,18 +317,36 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
         </div>
       </div>
 
+      {/* 两边都是字母表性质的文字时，铺开一整套字母做形变对照 */}
+      {alphabetPair && <AlphabetField a={alphabetPair.a} b={alphabetPair.b} t={alphabetPair.t} />}
+
       <div className="walk-controls">
-        <button onClick={() => setP((v) => clamp(Math.round(v) - 1))} aria-label="上一个">
+        <button
+          onClick={() => {
+            setPlaying(false);
+            glideTo(Math.round(pRef.current) - 1);
+          }}
+          aria-label="上一个"
+        >
           ←
         </button>
         <button
           className={`play ${playing ? 'on' : ''}`}
-          onClick={() => setPlaying((v) => !v)}
+          onClick={() => {
+            stopGlide();
+            setPlaying((v) => !v);
+          }}
           aria-pressed={playing}
         >
           {playing ? '暂停' : '播放演进'}
         </button>
-        <button onClick={() => setP((v) => clamp(Math.round(v) + 1))} aria-label="下一个">
+        <button
+          onClick={() => {
+            setPlaying(false);
+            glideTo(Math.round(pRef.current) + 1);
+          }}
+          aria-label="下一个"
+        >
           →
         </button>
       </div>
@@ -262,7 +360,7 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
           value={p}
           onChange={(e) => {
             setPlaying(false);
-            setP(Number(e.target.value));
+            setDirect(Number(e.target.value));
           }}
         />
         <div className="walk-markers">
@@ -274,7 +372,7 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
               title={s.label ?? scriptById[s.script]?.nameZh}
               onClick={() => {
                 setPlaying(false);
-                setP(i);
+                glideTo(i);
               }}
             >
               <StopGlyph stop={s} size={34} />

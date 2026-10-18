@@ -14,6 +14,7 @@
  *  7. 轨道站点至少两站，path 站点使用 0–100 的 viewBox
  *  8. 中国 / 汉字圈的样本、国家的字段不为空
  *  9. 声明了 Unicode 区块的条目，样例码位确实落在该区块内
+ * 10. 字形来源覆盖：声明的字族确实收了这些字符，覆盖不到的就该留空
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -27,23 +28,49 @@ function loadData() {
   const strip = (code) =>
     code
       .replace(/^import[^;]*;$/gm, '')
-      .replace(/export const/g, 'const')
+      .replace(/^export interface[\s\S]*?\n\}\n/gm, '')
       .replace(/export type[\s\S]*?;\n/g, '')
-      .replace(/:\s*WritingSystem\[\]/g, '')
-      .replace(/:\s*Lineage\[\]/g, '')
-      .replace(/:\s*Record<string, WritingSystem>/g, '');
+      .replace(/^export const/gm, 'const')
+      .replace(/:\s*(WritingSystem|Lineage|GlyphSet|LetterSlot)\[\]/g, '')
+      .replace(/:\s*Record<[^=]*?>(?=\s*=)/g, '');
 
   const wsSrc = strip(read('src/data/writingSystems.ts'));
   const lnSrc = strip(read('src/data/lineages.ts'));
+  // glyphSets.ts 末尾还有一个查表函数，这里只要数据本身
+  const gsSrc = strip(read('src/data/glyphSets.ts')).replace(/export function[\s\S]*$/, '');
+  const fcSrc = strip(read('src/data/fontCoverage.ts'));
+  const lsSrc = strip(read('src/data/letterSlots.ts')).replace(/export function[\s\S]*$/, '');
+  const ffSrc = strip(read('src/data/fontFallback.ts')).replace(/export function[\s\S]*$/, '');
   const factory = new Function(`
     ${wsSrc}
     ${lnSrc}
-    return { writingSystems, scriptById, lineages };
+    ${gsSrc}
+    ${fcSrc}
+    ${lsSrc}
+    ${ffSrc}
+    return { writingSystems, scriptById, lineages, glyphSets, fontCoverage, letterMaps, SLOTS, fontFallback };
   `);
   return factory();
 }
 
-const { writingSystems, scriptById, lineages } = loadData();
+const { writingSystems, scriptById, lineages, glyphSets, fontCoverage, letterMaps, SLOTS, fontFallback } =
+  loadData();
+
+/** 码位是否落在某个字族的覆盖区间里（区间是扁平的 [起, 止, …]） */
+function familyCovers(family, char) {
+  const flat = fontCoverage[family];
+  if (!flat) return null; // 覆盖表里没有这个字族
+  const cp = char.codePointAt(0);
+  let lo = 0;
+  let hi = flat.length / 2 - 1;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (cp < flat[mid * 2]) hi = mid - 1;
+    else if (cp > flat[mid * 2 + 1]) lo = mid + 1;
+    else return true;
+  }
+  return false;
+}
 const unicodeBlocks = JSON.parse(read('tools/unicode-block-ranges.json'));
 const blockByName = new Map(unicodeBlocks.blocks.map((b) => [b.name, b]));
 
@@ -137,6 +164,68 @@ for (const l of lineages) {
       err(`[lineage] ${l.id}[${i}] path 含有可疑字符`);
   });
 }
+
+// ── 10. 字形来源覆盖 ────────────────────────────────────────────
+// 声明了字族，但字库里根本没有这个字形时，页面上会留空；如果连样例字都
+// 覆盖不到，说明这条记录挑错了字体。覆盖表由 tools/build-font-coverage.py 生成。
+const uncoveredSets = [];
+for (const s of writingSystems) {
+  if (!s.fontFamily) continue;
+  const known = Boolean(fontCoverage[s.fontFamily]);
+  if (!known && glyphSets[s.id]?.chars.length) {
+    warn(`[coverage] ${s.id} 的字族「${s.fontFamily}」不在覆盖表里，需重跑 tools/build-font-coverage.py`);
+    continue;
+  }
+  if (s.sample) {
+    const hit = familyCovers(s.fontFamily, s.sample);
+    if (hit === false) err(`[coverage] ${s.id} 的样例字「${s.sample}」不在字族「${s.fontFamily}」里，页面会留空`);
+  }
+  const chars = glyphSets[s.id]?.chars ?? [];
+  if (!chars.length) continue;
+  const covered = chars.filter((c) => familyCovers(s.fontFamily, c) === true).length;
+  if (covered === 0) err(`[coverage] ${s.id} 的字形表在字族「${s.fontFamily}」里一个都盖不到`);
+  else if (covered < chars.length) uncoveredSets.push(`${s.id} ${covered}/${chars.length}`);
+}
+if (uncoveredSets.length)
+  warn(`[coverage] ${uncoveredSets.length} 个体系有字形未被字库收录（页面留空）：${uncoveredSets.slice(0, 8).join('，')}${uncoveredSets.length > 8 ? ' …' : ''}`);
+
+// ── 11. 字母槽位表 ────────────────────────────────────────────
+// MICRO 的字母场按"同源槽位"把两套字母表对上号（见 src/data/letterSlots.ts）。
+// 槽位错一个字，页面就会把两个不相干的字母画成一条演化链，所以这里逐条核对：
+// 槽位有没有定义、字符是不是单字符、字库里有没有这个字形。
+const slotIds = new Set(SLOTS.map((x) => x.id));
+if (slotIds.size !== SLOTS.length) err('[slots] SLOTS 里有重复的槽位 id');
+const unmappedLetters = [];
+for (const [scriptId, slots] of Object.entries(letterMaps)) {
+  const system = scriptById[scriptId];
+  if (!system) {
+    err(`[slots] 字母槽位表里的「${scriptId}」不是已收录的书写体系`);
+    continue;
+  }
+  const family = system.fontFamily ?? fontFallback[scriptId];
+  if (!family) warn(`[slots] ${scriptId} 有字母槽位表，却没有可用字体`);
+  const chars = glyphSets[scriptId]?.chars ?? [];
+  const mappedCount = new Set(Object.values(slots)).size;
+  for (const [slot, char] of Object.entries(slots)) {
+    if (!slotIds.has(slot)) err(`[slots] ${scriptId} 用了未定义的槽位「${slot}」`);
+    if (Array.from(char).length !== 1) err(`[slots] ${scriptId}.${slot} 不是单个字符`);
+    if (chars.length && !chars.includes(char))
+      warn(`[slots] ${scriptId}.${slot} 的「${char}」不在该体系的字形样本集里`);
+    if (family && familyCovers(family, char) === false)
+      warn(`[slots] ${scriptId}.${slot} 的「${char}」在字族「${family}」里没有字形`);
+  }
+  // 大小写、附加符号的变体不算"还没进对照表"的字母
+  const norm = (c) => c.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+  const known = new Set([...Object.values(slots)].map(norm));
+  const rest = chars.filter((c) => !known.has(norm(c))).length;
+  if (rest) unmappedLetters.push(`${scriptId} ${mappedCount}/${chars.length}`);
+}
+if (unmappedLetters.length)
+  warn(
+    `[slots] ${unmappedLetters.length} 个体系的对照表尚未覆盖全部字形（分母是 Unicode 字形表，` +
+      `含词尾形、大小写与为其他语言增补的字母；未进表的字母暂不参与字母场）：` +
+      unmappedLetters.join('，'),
+  );
 
 // 统计信息，顺便作为 README 的数字来源
 const independent = writingSystems.filter((s) => s.origin === 'independent');

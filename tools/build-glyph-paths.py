@@ -32,6 +32,7 @@ from fontTools.ttLib import TTFont
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / 'work' / 'glyph-outline-cache'
 OUT = ROOT / 'src' / 'data' / 'glyphPaths.ts'
+OUT_ALPHA = ROOT / 'src' / 'data' / 'glyphAlphabets.ts'
 UA = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36')
 
@@ -56,7 +57,7 @@ FALLBACK_FAMILY = {
   'lao': 'Noto Sans Lao',
   'burmese': 'Noto Sans Myanmar',
   'arabic': 'Noto Sans Arabic',
-  'chinese-regular': 'Noto Serif SC',
+  'chinese-regular': 'LXGW WenKai TC',
   'hiragana': 'Noto Serif JP',
   'katakana': 'Noto Serif JP',
 }
@@ -155,9 +156,24 @@ def transform(path_data: str, scale: float, cx: float, cy: float) -> str:
     return ''.join(out)
 
 
+# 站点自托管的历史书体字体：直接从 public/fonts/ 取轮廓，
+# 不去 Google Fonts 找同名（同名字族在那边并不存在）。
+LOCAL_FONTS = {
+    'Glyph Atlas Oracle Bone': ROOT / 'public/fonts/glyph-atlas-oracle-bone.woff2',
+    'Glyph Atlas Small Seal': ROOT / 'public/fonts/glyph-atlas-small-seal.woff2',
+}
+
+
+def open_font(family: str, codepoint: int) -> TTFont:
+    local = LOCAL_FONTS.get(family)
+    if local is not None:
+        return TTFont(local, fontNumber=0, lazy=True)
+    return TTFont(download(subset_url(family, codepoint)), fontNumber=0, lazy=True)
+
+
 def outline(family: str, char: str) -> str:
     codepoint = ord(char)
-    font = TTFont(download(subset_url(family, codepoint)), fontNumber=0, lazy=True)
+    font = open_font(family, codepoint)
     glyph_name = font.getBestCmap().get(codepoint)
     if not glyph_name:
         raise LookupError(f'{family} 的子集里没有 U+{codepoint:X}')
@@ -172,12 +188,74 @@ def outline(family: str, char: str) -> str:
     return transform(pen.getCommands(), scale, (x0 + x1) / 2, (y0 + y1) / 2)
 
 
-def stops() -> list[dict]:
+def dump(script_name: str) -> list[dict]:
     raw = subprocess.run(
-        ['node', '--experimental-strip-types', 'tools/dump-lineage-stops.mjs'],
+        ['node', '--experimental-strip-types', f'tools/{script_name}'],
         cwd=ROOT, check=True, capture_output=True, text=True,
     ).stdout
     return json.loads(raw)
+
+
+def stops() -> list[dict]:
+    return dump('dump-lineage-stops.mjs')
+
+
+def letter_slots() -> list[dict]:
+    return dump('dump-letter-slots.mjs')
+
+
+def write_alphabets() -> int:
+    """字母槽位表里每个字符的轮廓，供 MICRO 字母场做整套字母表的形变。"""
+    entries: dict[str, str] = {}
+    sources: dict[str, str] = {}
+    failures: list[str] = []
+
+    for item in letter_slots():
+        family = item.get('family')
+        if not family:
+            failures.append(f"{item['script']}/{item['slot']} 没有可用字体")
+            continue
+        key = f"{item['script']}:{item['char']}"
+        if key in entries:
+            continue
+        try:
+            entries[key] = outline(family, item['char'])
+            sources[key] = family
+        except Exception as error:  # noqa: BLE001
+            failures.append(f"{item['script']} {item['slot']} {item['char']} ({family}): {error}")
+
+    lines = [
+        '/**',
+        ' * 字母槽位的矢量轮廓 —— 由 tools/build-glyph-paths.py 生成，请勿手工编辑。',
+        ' *',
+        ' * MICRO 的字母场要把一整套字母表从一种文字形变到另一种文字，所以每个',
+        ' * 参与对照的字母都需要自己的轮廓。字形取自各书写体系声明的字体',
+        ' * （见 src/data/fontFallback.ts），缩放居中到 100x100 坐标盒。',
+        ' *',
+        ' * 键为 `${scriptId}:${char}`。',
+        ' *',
+        ' * 字形来源（Noto 系列，SIL OFL 1.1）：',
+    ]
+    for key in sorted(entries):
+        lines.append(f' *   {key} → {sources[key]}')
+    lines += [
+        ' *',
+        ' * 重新生成：',
+        ' *   work/.venv/bin/python tools/build-glyph-paths.py',
+        ' */',
+    ]
+    lines.append('export const alphabetPaths: Record<string, string> = {')
+    for key in sorted(entries):
+        lines.append(f"  {json.dumps(key, ensure_ascii=False)}: {json.dumps(entries[key])},")
+    lines.append('};')
+    lines.append('')
+    OUT_ALPHA.write_text('\n'.join(lines))
+
+    size = OUT_ALPHA.stat().st_size
+    print(f'写入 {OUT_ALPHA.relative_to(ROOT)}：{len(entries)} 个字母轮廓，{size / 1024:.1f} KB')
+    for message in failures:
+        print(f'  ✗ {message}')
+    return 1 if failures else 0
 
 
 def main() -> int:
@@ -189,7 +267,7 @@ def main() -> int:
         char = stop['char']
         if not char or stop['handPath']:
             continue
-        family = stop['fontFamily'] or FALLBACK_FAMILY.get(stop['script'])
+        family = stop.get('family') or stop['fontFamily'] or FALLBACK_FAMILY.get(stop['script'])
         if not family:
             failures.append(f"{stop['lineage']}/{stop['script']} 没有可用字体")
             continue
@@ -229,7 +307,9 @@ def main() -> int:
     print(f'写入 {OUT.relative_to(ROOT)}：{len(entries)} 个字形轮廓，{size / 1024:.1f} KB')
     for message in failures:
         print(f'  ✗ {message}')
-    return 1 if failures else 0
+
+    alphabet_status = write_alphabets()
+    return 1 if failures or alphabet_status else 0
 
 
 if __name__ == '__main__':
