@@ -50,19 +50,13 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 0 15px;
-  font-size: 13px;
+  padding: 0 16px;
+  font-family: var(--antique);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--ink-dim);
   transition: color 0.16s ease;
-}
-
-.topbar nav button em {
-  font-style: normal;
-  font-family: var(--antique);
-  font-size: 9.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  opacity: 0.55;
 }
 
 .topbar nav button::after {
@@ -262,45 +256,14 @@ main {
   background: var(--cinnabar-soft);
 }
 
-/* 页脚：图例靠左、操作提示靠右，同一条基线，永不互压 */
-.atlas-foot {
+/* 页脚小字：只在有标注被折叠时出现。
+   谱系配色已经由左侧泳道名承担，这里不再重复一份图例。 */
+.atlas-hint {
   position: absolute;
-  left: 92px;
   right: 16px;
   bottom: 12px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 18px;
   z-index: 5;
   pointer-events: none;
-}
-.atlas-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 15px;
-  min-width: 0;
-  padding: 8px 13px;
-  border: 1px solid var(--line);
-  border-radius: 3px;
-  background: rgba(16, 14, 12, 0.9);
-}
-.legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 10.5px;
-  color: var(--ink-dim);
-  letter-spacing: 0.04em;
-}
-.legend-item i {
-  width: 6px;
-  height: 6px;
-  border-radius: 1px;
-}
-
-.atlas-hint {
-  flex-shrink: 0;
   max-width: 42ch;
   text-align: right;
   font-size: 10.5px;
@@ -1020,23 +983,11 @@ main {
 }
 
 @media (max-width: 860px) {
-  /* 页脚改竖排：横排会把图例挤成一列竖字 */
-  .atlas-foot {
-    left: 14px;
-    right: 14px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
   .atlas-hint {
-    max-width: none;
-    text-align: left;
-  }
-  .atlas-legend {
-    gap: 4px 12px;
-  }
-  .legend-item {
-    font-size: 10px;
+    right: 14px;
+    bottom: 10px;
+    max-width: 46vw;
+    text-align: right;
   }
 
   .topbar {

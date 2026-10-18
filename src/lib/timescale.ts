@@ -1,82 +1,42 @@
-import type { WritingSystem } from '../data/types';
-import type { LabelWidth } from './layout';
-
 /**
- * 分段线性时间轴。
+ * 等比例线性时间轴。
  *
- * 如果按真实年代等比例画，公元前 1200 到公元 0 年这一小段会挤进十几个
- * 闪米特字母，而公元 1800 之后只有寥寥几种，却占掉同样多的横向空间。
- * 结果就是密集期被迫堆成十几行，整张图被撑得又高又窄，
- * 总览时缩小到看不清，只能把一半标签藏起来。
+ * 横轴就是年代本身：x = (年 − 域起点) × 每年占的图坐标宽度。
+ * 全站时间域 −3300 – 2030 共 5330 年，公元前因此拿到 62% 的横向空间，
+ * 任意两段年代的横向距离之比都等于真实年代之比——看图的人可以直接用
+ * 眼睛比较"隔了多久"。
  *
- * 所以横向宽度按"这一段里要放多少标签"分配：
- *   band_i = 保底宽度 + 剩余宽度 × (这一段标签总宽 / 全局标签总宽)
- * 时间仍然是单调的、可解释的（年代越大越靠右），只是不再等比例——
- * 和地质年表、地铁线路图压缩长距离段的做法是同一件事。
+ * 早先这里用的是"按标签密度分配宽度"的分段轴：把时间域切成九段，
+ * 每段宽度按这一段要放多少标签来分。那样确实能少占几行，但公元前
+ * 3300 年只剩下 34% 的宽度，读起来像是"公元前被压缩了"——年代轴一旦
+ * 不等比例，位置就不再是可靠的信息。所以改回等比例：
+ * 密集期不再靠拉伸时间轴解决，而是靠泳道内分行与缩放平移。
  */
+import { TIME_DOMAIN } from './time';
 
-/** 时间分段边界；与元数据的 TIME_DOMAIN 对齐 */
-export const TIME_BREAKS = [-3300, -2000, -1000, -500, 0, 500, 1000, 1500, 1800, 2030];
-
-/** 每一段的保底宽度（图坐标单位），保证再空的年代也看得出距离 */
-const MIN_BAND = 86;
+/** 全站时间域，与 lib/time.ts、tools/validate-data.mjs 共用同一个定义 */
+export { TIME_DOMAIN } from './time';
 
 export interface TimeScale {
   /** 年 → 横向坐标 */
   x: (year: number) => number;
-  /** 图形总宽度（含尾部留白） */
+  /** 每年占多少图坐标单位（调试与文档用） */
+  pxPerYear: number;
+  /** 时间域 */
+  domain: [number, number];
+  /** 时间域对应的横向总宽度（不含尾部留白） */
   total: number;
-  /** 每一段分到的宽度，便于调试与导出 */
-  bands: number[];
 }
 
 /**
- * @param systems     图上所有节点
- * @param labelWidth  标签占多宽（图坐标单位），与布局用的是同一个函数
- * @param totalWidth  图形横向总宽度
- * @param tail        右侧留给生命线尾巴与末代标签的空白
+ * @param totalWidth 时间域对应的横向总宽度（图坐标单位）
  */
-export function buildTimeScale(
-  systems: WritingSystem[],
-  labelWidth: LabelWidth,
-  totalWidth: number,
-  tail: number,
-): TimeScale {
-  const n = TIME_BREAKS.length - 1;
-  const demand = new Array<number>(n).fill(0);
-  for (const s of systems) {
-    demand[bandOf(s.dateFrom)] += labelWidth(s);
-  }
-  const sum = demand.reduce((a, b) => a + b, 0) || 1;
-  const free = Math.max(0, totalWidth - tail - MIN_BAND * n);
-  const bands = demand.map((d) => MIN_BAND + (free * d) / sum);
-
-  const range: number[] = [];
-  let cursor = 0;
-  for (const w of bands) {
-    range.push(cursor);
-    cursor += w;
-  }
-  range.push(cursor);
-
+export function buildTimeScale(totalWidth: number): TimeScale {
+  const [from, to] = TIME_DOMAIN;
+  const pxPerYear = totalWidth / (to - from);
   const x = (year: number): number => {
-    const clamped = Math.min(Math.max(year, TIME_BREAKS[0]), TIME_BREAKS[n]);
-    let i = n - 1;
-    while (i > 0 && TIME_BREAKS[i] > clamped) i--;
-    const span = TIME_BREAKS[i + 1] - TIME_BREAKS[i];
-    const t = span <= 0 ? 0 : (clamped - TIME_BREAKS[i]) / span;
-    return range[i] + t * bands[i];
+    const clamped = Math.min(Math.max(year, from), to);
+    return (clamped - from) * pxPerYear;
   };
-
-  return { x, total: cursor + tail, bands };
-}
-
-/** 某个年代落在第几段 */
-function bandOf(year: number): number {
-  const n = TIME_BREAKS.length - 1;
-  if (year <= TIME_BREAKS[0]) return 0;
-  for (let i = 0; i < n; i++) {
-    if (year < TIME_BREAKS[i + 1]) return i;
-  }
-  return n - 1;
+  return { x, pxPerYear, domain: TIME_DOMAIN, total: totalWidth };
 }

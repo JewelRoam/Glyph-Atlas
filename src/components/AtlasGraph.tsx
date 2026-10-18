@@ -22,15 +22,13 @@ import { buildTimeScale } from '../lib/timescale';
  */
 
 /**
- * 图形横向总宽度 = 可用宽度 × 这个倍率（再夹在上下限之间）。
- * 固定宽度会在宽屏上只用到左半边，在窄屏上又被压扁，
- * 所以让时间轴随容器伸缩：任何窗口下都填满画布、行距也稳定。
+ * 时间域（5330 年）对应的横向总宽度 = 可用宽度 × 这个倍率，
+ * 再夹在上下限之间。等比例时间轴下，这个值直接决定"每一年有多宽"
+ * （约 0.5–0.9 图单位），也就是整张图的横向疏密。
  */
 const AXIS_WIDTH_RATIO = 2.6;
 const AXIS_WIDTH_MIN = 2100;
 const AXIS_WIDTH_MAX = 4600;
-/** 右侧留给生命线尾巴与末代标签的空白 */
-const AXIS_TAIL = 200;
 
 /** 标签在屏幕上的目标字号（像素），不随缩放变化 */
 const NODE_LABEL_PX = 11.5;
@@ -56,11 +54,20 @@ const TICK_FONT = '"Cardo", "Iowan Old Style", "Palatino Linotype", "Songti SC",
 /** 刻度的字距（CSS letter-spacing: 0.08em），量宽度时要算进去 */
 const TICK_TRACKING = 0.08;
 /**
- * 布局按这个缩放比例预留标签宽度。
- * 取值 ≈ 桌面窗口下"总览"的实际比例，于是默认视图正好不撞车；
- * 窗口更窄时会有更多标签被取舍，但不会重叠。
+ * 布局按这个缩放比例预留标签宽度：labelWidth = 实测屏幕宽度 ÷ NOMINAL_K。
+ * 这是个偏乐观的值——比桌面实际的总览比例（0.20–0.37）大，于是布局不会为了
+ * "一行塞得下"把泳道撑得过高；真塞不下时交给标注取舍就地折叠，不会叠字。
+ * 调大 → 布局更紧凑、折叠更多；调小 → 图更高更空、折叠更少。
  */
 const NOMINAL_K = 0.48;
+/**
+ * 缩放上下限。等比例时间轴比过去的分段轴更高更宽，桌面总数览比例落在
+ * 0.20–0.37，下限 0.18 够用；窄屏要更小才放得下整张图，所以实际下限是
+ * min(ZOOM_MIN, fitK × 0.98)。若把下限钉死在 0.18，手机首屏的适配比例
+ * 会低于它，用户第一次滚轮就被拽回 0.18，画面突然一跳。
+ */
+const ZOOM_MIN = 0.18;
+const ZOOM_MAX = 6;
 /** 顶部留给年代刻度的空白（屏幕像素） */
 const TOP_PAD = 26;
 /** 左侧谱系名留白宽度（屏幕像素），由最长的谱系名撑开 */
@@ -104,8 +111,9 @@ export function AtlasGraph({ selected, onSelect }: Props) {
     Math.max(AXIS_WIDTH_MIN, Math.round(plotW * AXIS_WIDTH_RATIO)),
   );
 
-  // 标签要占多宽（图坐标单位）。布局、时间轴分配、取舍判定共用它，
-  // 三处必须一致，否则会出现"布局以为放得下、屏幕上却撞车"。
+  // 标签要占多宽（图坐标单位）。布局用它预留横向空间，取舍判定用同一个
+  // measureText 量屏幕宽度——两处同源，否则会出现"布局以为放得下、
+  // 屏幕上却撞车"。
   const labelWidth = useCallback(
     (s: WritingSystem) =>
       // 28 图单位 ≈ 两侧各 7px（NOMINAL_K 下）的呼吸，跟下面的取舍判定对齐
@@ -114,7 +122,7 @@ export function AtlasGraph({ selected, onSelect }: Props) {
   );
 
   const layout = useMemo(() => {
-    const axis = buildTimeScale(writingSystems, labelWidth, axisWidth, AXIS_TAIL);
+    const axis = buildTimeScale(axisWidth);
     return {
       ...computeLayout(writingSystems, axis.x, 2030, labelWidth),
       axis,
@@ -148,10 +156,23 @@ export function AtlasGraph({ selected, onSelect }: Props) {
     [plotW, layout.width, layout.height, size.h],
   );
 
-  /** 总览位置：缩放的同时把图往下推一点，给顶部刻度让出位置 */
+  /**
+   * 总览位置：给顶部刻度留出 TOP_PAD 之后，把整张图摆在视口正中。
+   *
+   * 之前这里只做了 translate(0, TOP_PAD)，于是整张图贴着左上角；
+   * 图比视口小的时候（总览通常如此）右边和下边会空出一大片，
+   * 看上去像是"图跑偏了"。现在横向、纵向都居中；
+   * 1:1 之类的放大视图本来就比视口大，取 max(0, …) 后仍是贴边。
+   */
   const overview = useCallback(
-    (scale: number) => d3.zoomIdentity.translate(0, TOP_PAD).scale(scale),
-    [],
+    (scale: number) =>
+      d3.zoomIdentity
+        .translate(
+          Math.max(0, (plotW - layout.width * scale) / 2),
+          TOP_PAD + Math.max(0, (size.h - TOP_PAD - layout.height * scale) / 2),
+        )
+        .scale(scale),
+    [layout.width, layout.height, plotW, size.h],
   );
 
   // 缩放与平移：只有变化到肉眼可见的程度才回写 state，避免每帧重渲染
@@ -161,7 +182,7 @@ export function AtlasGraph({ selected, onSelect }: Props) {
     const g = d3.select(gRef.current);
     const zoom = d3
       .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.28, 6])
+      .scaleExtent([ZOOM_MIN, ZOOM_MAX])
       .on('zoom', (event) => {
         const { x, y, k } = event.transform;
         g.attr('transform', event.transform.toString());
@@ -183,6 +204,11 @@ export function AtlasGraph({ selected, onSelect }: Props) {
     if (!svgRef.current || !zoomRef.current) return;
     d3.select(svgRef.current).call(zoomRef.current.transform, overview(fitK));
   }, [fitK, overview]);
+
+  // 缩放下限跟着适配比例走，理由见 ZOOM_MIN 的注释
+  useEffect(() => {
+    zoomRef.current?.scaleExtent([Math.min(ZOOM_MIN, fitK * 0.98), ZOOM_MAX]);
+  }, [fitK]);
 
   const reposition = useCallback(
     (anchor: 'fit' | 'origin') => {
@@ -473,23 +499,11 @@ export function AtlasGraph({ selected, onSelect }: Props) {
         <button onClick={() => reposition('origin')}>1:1</button>
       </div>
 
-      <div className="atlas-foot">
-        <div className="atlas-legend">
-          {FAMILY_ORDER.map((f) => (
-            <span key={f} className="legend-item">
-              <i style={{ background: FAMILY_COLOR[f] }} />
-              {FAMILY_LABEL[f]}
-            </span>
-          ))}
-        </div>
-
-        <div className="atlas-hint">
-          滚轮缩放 · 拖拽平移 · 点击节点看详情
-          {labelPlan.hidden.size > 0 && showLabels
-            ? ` · 另 ${labelPlan.hidden.size} 个重叠标注已折叠，悬停或放大即现`
-            : ''}
-        </div>
-      </div>
+      {/* 谱系配色看左侧泳道名就够了，不再另设图例；
+          只有真的折叠了标注时才留一行小字，免得页脚常驻一堆说明。 */}
+      {showLabels && labelPlan.hidden.size > 0 && (
+        <div className="atlas-hint">另 {labelPlan.hidden.size} 个重叠标注已折叠</div>
+      )}
     </div>
   );
 }
