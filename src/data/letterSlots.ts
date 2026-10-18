@@ -40,9 +40,10 @@
  *  · 安纳托利亚两支：吕基亚、吕底亚（希腊字母的地方化分支；卡里亚的音值
  *    对应没有定论，不建整表）；
  *  · 婆罗米系（独立元音 svara 的 18 个元音位 + 梵语字音表 varga 的 33 个
- *    辅音位）：婆罗米、悉昙、格兰塔、天城、孟加拉、古吉拉特、
- *    果鲁穆奇、奥里亚、泰米尔、泰卢固、卡纳达、马拉雅拉姆、僧伽罗、藏文、
- *    爪哇、巴厘、高棉、缅文。元音那一半的字面与取舍在 src/data/svaraSlots.ts。
+ *    辅音位，外加孩子们自己添的卷舌边音 ḷa/ḻa、闪音 ṟa、齿龈鼻音 ṉa）：
+ *    婆罗米、悉昙、格兰塔、天城、孟加拉、古吉拉特、果鲁穆奇、奥里亚、泰米尔、
+ *    泰卢固、卡纳达、马拉雅拉姆、僧伽罗、藏文、爪哇、巴厘、高棉、缅文、泰文、
+ *    老挝文。元音那一半的字面与取舍在 src/data/svaraSlots.ts。
  *  · 夏拉达支系：夏拉达、塔克里、马哈贾尼、霍杰基、穆尔塔尼、胡达瓦迪、多格拉
  *    ——同一套元音位与梵语音位表，外加信德内爆音与几个地方卷舌音、古写 kha；
  *    这几家丢掉的元音位同样按消失处理（例如穆尔塔尼只剩 a i u e 四个）。
@@ -523,11 +524,19 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-sa', label: 'sa स（齿咝音）' },
   { id: 'varga-ha', label: 'ha ह（浊喉擦音）' },
 
+  // 梵语 33 音之外的边音与 r 类音位：这是一格"各家自己添的音"。
+  // 南印诸文在这里放 ḷa（ள）、ḻa（ழ）、ṟa（ற）、ṉa（ன）；僧伽罗、高棉、
+  // 泰、老、缅放巴利的 ḷa（ළ ឡ ฬ ຬ ဠ）；天城、古吉拉特各补一个 ळ；信德诸支
+  // 放的是内爆音与地方卷舌音。婆罗米文本里这四格直接有编码，名字就叫
+  // Old Tamil LLA / LLLA / RRA / NNNA——所以从婆罗米一路走到南印、暹罗诸文，
+  // 有的格逐格变形，没有的格走增删动画。
+  { id: 'varga-lla', label: 'ḷa ळ（卷舌边音）' },
+  { id: 'varga-llla', label: 'ḻa ழ（卷舌边擦音，泰米尔—马拉雅拉姆的 ழ）' },
+  { id: 'varga-rra', label: 'ṛa / ṟa ड़（r 之外另立的闪音或颤音）' },
+  { id: 'varga-nnna', label: 'ṉa ன（齿龈鼻音，泰米尔的 ன）' },
   // 夏拉达—信德诸支自己添的字母位：夏拉达与它的后身（塔克里、多格拉、
   // 霍杰基、穆尔塔尼、胡达瓦迪、马哈贾尼）在梵语 33 音之外还留了几个字母，
   // 大多是信德语特有的内爆音（ɓ ɗ ɠ ʄ，写成在基字下加小钩）与地方卷舌音。
-  { id: 'varga-lla', label: 'ḷa ळ（卷舌边音）' },
-  { id: 'varga-rra', label: 'ṛa ड़（卷舌闪音）' },
   { id: 'varga-gga', label: 'ɠa（信德内爆音，g 加钩）' },
   { id: 'varga-jja', label: 'ʄa（信德内爆音，j 加钩）' },
   { id: 'varga-ddda', label: 'ɗa（信德内爆音，d 加钩）' },
@@ -1899,6 +1908,10 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': '𑀱',
     'varga-sa': '𑀲',
     'varga-ha': '𑀳',
+    'varga-lla': '𑀴',
+    'varga-llla': '𑀵',
+    'varga-rra': '𑀶',
+    'varga-nnna': '𑀷',
   },  // 婆罗米文：33/33
   siddham: {
     'varga-ka': '𑖎',
@@ -1969,6 +1982,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': '𑌷',
     'varga-sa': '𑌸',
     'varga-ha': '𑌹',
+    'varga-lla': '𑌳',
   },  // 格兰塔文：33/33
   devanagari: {
     'varga-ka': 'क',
@@ -2004,6 +2018,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ष',
     'varga-sa': 'स',
     'varga-ha': 'ह',
+    'varga-lla': 'ळ',
   },  // 天城文：33/33
   // 孟加拉文把 v 并进了 b（ব 一字两用），va 一格空着走"消失"
   bengali: {
@@ -2039,6 +2054,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ষ',
     'varga-sa': 'স',
     'varga-ha': 'হ',
+    'varga-rra': 'ড়',
   },  // 孟加拉文：32/33
   gujarati: {
     'varga-ka': 'ક',
@@ -2074,6 +2090,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ષ',
     'varga-sa': 'સ',
     'varga-ha': 'હ',
+    'varga-lla': 'ળ',
   },  // 古吉拉特文：33/33
   // 果鲁穆奇文没有卷舌咝音 ṣa（只有 ਸ਼），ssa 一格空着
   gurmukhi: {
@@ -2109,6 +2126,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sha': 'ਸ਼',
     'varga-sa': 'ਸ',
     'varga-ha': 'ਹ',
+    'varga-rra': 'ੜ',
   },  // 果鲁穆奇文：32/33
   odia: {
     'varga-ka': 'କ',
@@ -2144,6 +2162,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ଷ',
     'varga-sa': 'ସ',
     'varga-ha': 'ହ',
+    'varga-lla': 'ଳ',
+    'varga-rra': 'ଡ଼',
   },  // 奥里亚文：33/33
   // 泰米尔文不分送气/清浊，ச 系之后只留各发一个音的字，其余 14 格全空
   tamil: {
@@ -2166,6 +2186,10 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ஷ',
     'varga-sa': 'ஸ',
     'varga-ha': 'ஹ',
+    'varga-lla': 'ள',
+    'varga-llla': 'ழ',
+    'varga-rra': 'ற',
+    'varga-nnna': 'ன',
   },  // 泰米尔文：19/33
   telugu: {
     'varga-ka': 'క',
@@ -2201,6 +2225,9 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ష',
     'varga-sa': 'స',
     'varga-ha': 'హ',
+    'varga-lla': 'ళ',
+    'varga-llla': 'ఴ',
+    'varga-rra': 'ఱ',
   },  // 泰卢固文：33/33
   kannada: {
     'varga-ka': 'ಕ',
@@ -2236,6 +2263,9 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ಷ',
     'varga-sa': 'ಸ',
     'varga-ha': 'ಹ',
+    'varga-lla': 'ಳ',
+    'varga-llla': 'ೞ',  // Unicode 名字误写成 FA，实为 ḻa（见 NamesList）
+    'varga-rra': 'ಱ',
   },  // 卡纳达文：33/33
   malayalam: {
     'varga-ka': 'ക',
@@ -2271,6 +2301,10 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ഷ',
     'varga-sa': 'സ',
     'varga-ha': 'ഹ',
+    'varga-lla': 'ള',
+    'varga-llla': 'ഴ',
+    'varga-rra': 'റ',
+    'varga-nnna': 'ഩ',
   },  // 马拉雅拉姆文：33/33
   sinhala: {
     'varga-ka': 'ක',
@@ -2306,6 +2340,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ෂ',
     'varga-sa': 'ස',
     'varga-ha': 'හ',
+    'varga-lla': 'ළ',
   },  // 僧伽罗文：33/33
   // 藏文梵转写的 jha 写成 ཛྷ 组合字，Unicode 无单字，jha 一格空着
   tibetan: {
@@ -2446,6 +2481,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ឞ',
     'varga-sa': 'ស',
     'varga-ha': 'ហ',
+    'varga-lla': 'ឡ',
   },  // 高棉文：33/33
   thai: {
     'varga-ka': 'ก',
@@ -2481,6 +2517,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ษ',
     'varga-sa': 'ส',
     'varga-ha': 'ห',
+    'varga-lla': 'ฬ',
   },  // 泰文：33/33
   lao: {
     'varga-ka': 'ກ',
@@ -2516,6 +2553,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ຩ',
     'varga-sa': 'ສ',
     'varga-ha': 'ຫ',
+    'varga-lla': 'ຬ',
   },  // 老挝文：33/33
   burmese: {
     'varga-ka': 'က',
@@ -2551,6 +2589,7 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ssa': 'ၑ',
     'varga-sa': 'သ',
     'varga-ha': 'ဟ',
+    'varga-lla': 'ဠ',
   },  // 缅文：33/33
 
   // ── 夏拉达支系：夏拉达 → 塔克里 → 马哈贾尼 → 霍杰基 → 穆尔塔尼 →
