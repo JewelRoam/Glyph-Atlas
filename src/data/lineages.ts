@@ -84,6 +84,28 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'italy',
+    nameZh: '希腊 Α → 伊特鲁里亚 → 半岛各家 → 罗马',
+    nameEn: 'Greek Α → Etruscan → Old Italic → Latin',
+    mode: 'chain',
+    description:
+      '那不勒斯湾的优卑亚希腊字母北上，先被伊特鲁里亚人借去：希腊 Γ 在那边读 /k/，' +
+      '于是成了拉丁 C；希腊 Χ 与 Ψ 照西方希腊的读法给了伊特鲁里亚的 /ks/ 与 /kʰ/。' +
+      '罗马字母的整套骨架就是从伊特鲁里亚落下来的。半岛上其余各家又都从伊特鲁里亚' +
+      '字母出发，各自添字：伊特鲁里亚与法利希添 EF，翁布里亚添 ERS 与 CHE，' +
+      '奥斯坎添 II 与 UU，南皮切努姆添 ESS，北边的维内蒂与雷蒂亚添 YE 与两个 TSE；' +
+      'Unicode 把这些收成一节"古意大利字母"。伊特鲁里亚没有希腊 Ω 的位置，' +
+      '走到那一站时 omega 会消失。最后一站是罗马从南伊特鲁里亚一支定下来的拉丁' +
+      '字母表——半岛各家添的那些字，它又收了回去。',
+    stops: [
+      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'etruscan', char: '𐌀', label: '伊特鲁里亚 a', phonetic: 'a' },
+      { script: 'old-italic', char: '𐌀', label: '古意大利字母 a', phonetic: 'a' },
+      { script: 'latin', char: 'A', label: '拉丁 A', phonetic: 'a' },
+    ],
+  },
+
+  {
     id: 'peripheral-alpha',
     nameZh: '希腊 alpha → 高加索与巴尔干 a',
     nameEn: 'Greek alpha → Caucasian and Balkan a',
