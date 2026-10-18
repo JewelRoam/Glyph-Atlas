@@ -467,6 +467,41 @@ export const writingSystems: WritingSystem[] = [
   },
 
   {
+    id: 'modi', nameZh: '莫迪文', nameEn: 'Modi',
+    origin: 'derived', parents: ['devanagari'], dateFrom: 1600, dateTo: 1950,
+    family: 'indic', region: '马哈拉施特拉', countries: ['印度'],
+    type: 'abugida', status: 'historical', direction: 'ltr',
+    unicodeBlock: 'Modi U+11600', sample: '𑘀', fontFamily: 'Noto Sans Modi',
+    note: '17 世纪至 20 世纪中叶用于书写马拉地语，由天城文的草写形式发展而来。',
+  },
+  {
+    id: 'kaithi', nameZh: '凯提文', nameEn: 'Kaithi',
+    origin: 'derived', parents: ['brahmi'], dateFrom: 1550, dateTo: 1950,
+    family: 'indic', region: '比哈尔与北方邦', countries: ['印度', '尼泊尔'],
+    type: 'abugida', status: 'historical', direction: 'ltr',
+    unicodeBlock: 'Kaithi U+11080', sample: '𑂀', fontFamily: 'Noto Sans Kaithi',
+    note: '与天城文同出笈多婆罗米分支，16 世纪起广泛书写博杰普尔语、迈蒂利语等北印度语言。',
+  },
+  {
+    id: 'tirhuta', nameZh: '提尔胡塔文', nameEn: 'Tirhuta',
+    alias: ['弥梯罗文', '迈蒂利文'],
+    origin: 'derived', parents: ['siddham'], dateFrom: 1200, dateTo: null,
+    family: 'indic', region: '米蒂拉', countries: ['印度', '尼泊尔'],
+    type: 'abugida', status: 'liturgical', direction: 'ltr',
+    unicodeBlock: 'Tirhuta U+11480', sample: '𑒀', fontFamily: 'Noto Sans Tirhuta',
+    note: '迈蒂利语的传统文字，旧称弥梯罗文；今主要用于宗教文书，日常书写多由天城文承担。',
+  },
+  {
+    id: 'bhaiksuki', nameZh: '跋吉苏基文', nameEn: 'Bhaiksuki',
+    alias: ['箭头文'],
+    origin: 'influence', parents: ['siddham'], dateFrom: 1000, dateTo: 1200,
+    family: 'indic', region: '比哈尔', countries: ['印度'],
+    type: 'abugida', status: 'extinct', direction: 'ltr',
+    unicodeBlock: 'Bhaiksuki U+11C00', sample: '𑰀', fontFamily: 'Noto Sans Bhaiksuki',
+    note: '用于抄写佛教典籍的历史文字，因字首常见三角形“箭头”而又名箭头文。',
+  },
+
+  {
     id: 'newa', nameZh: '尼瓦尔文', nameEn: 'Newa',
     origin: 'derived', parents: ['nagari'], dateFrom: 1000, dateTo: null,
     family: 'indic', region: '喜马拉雅南麓', countries: ['尼泊尔', '印度'],
@@ -534,6 +569,15 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Tamil U+0B80', sample: 'க',
     note: '连续使用两千余年的南印度文字。',
+  },
+
+  {
+    id: 'saurashtra', nameZh: '索拉什特拉文', nameEn: 'Saurashtra',
+    origin: 'influence', parents: ['brahmi'], dateFrom: 1800, dateTo: null,
+    family: 'indic', region: '南印度', countries: ['印度'],
+    type: 'abugida', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Saurashtra U+A880', sample: 'ꢀ', fontFamily: 'Noto Sans Saurashtra',
+    note: '索拉什特拉语的传统元音附标文字；确切来源尚不明确，1880 年代进行过正字法整理。',
   },
   {
     id: 'telugu', nameZh: '泰卢固文', nameEn: 'Telugu',
@@ -624,6 +668,25 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'Ol Chiki U+1C50', sample: '᱐', fontFamily: 'Noto Sans Ol Chiki',
     note: '1925 年由拉古纳特·穆尔穆为桑塔利语创制，是印度宪法附表列明的官方文字之一。',
+  },
+
+  {
+    id: 'warang-citi', nameZh: '瓦朗齐提文', nameEn: 'Warang Citi',
+    alias: ['Varang Kshiti'],
+    origin: 'invented', parents: [], dateFrom: 1950, dateTo: null,
+    family: 'indic', region: '贾坎德', countries: ['印度'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Warang Citi U+118A0', sample: '𑢠', fontFamily: 'Noto Sans Warang Citi',
+    note: '20 世纪中叶由拉科·博德拉为霍语整理并推广，字母按发音部位排列。',
+  },
+  {
+    id: 'mro', nameZh: '姆鲁文', nameEn: 'Mro',
+    alias: ['姆罗文', 'Mru'],
+    origin: 'invented', parents: [], dateFrom: 1980, dateTo: null,
+    family: 'seasia', region: '吉大港山区', countries: ['孟加拉国'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Mro U+16A40', sample: '𖩀', fontFamily: 'Noto Sans Mro',
+    note: '1980 年代由门莱·穆朗为姆鲁语创制；与周边文字没有明确的谱系关系。',
   },
   {
     id: 'khojki', nameZh: '霍杰基文', nameEn: 'Khojki',
@@ -1207,6 +1270,16 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'living', direction: 'rtl',
     unicodeBlock: "NKo U+07C0", sample: 'ߊ', fontFamily: 'Noto Sans NKo',
     note: "1949 年由索洛马纳·坎特创制，用于书写曼德语支语言，是西非最具影响力的现代文字之一。",
+  },
+
+  {
+    id: 'medefaidrin', nameZh: '梅德法伊德林文', nameEn: 'Medefaidrin',
+    alias: ['奥贝里奥卡伊梅文'],
+    origin: 'invented', parents: [], dateFrom: 1930, dateTo: null,
+    family: 'africa', region: '十字河州', countries: ['尼日利亚'],
+    type: 'alphabet', status: 'liturgical', direction: 'ltr',
+    unicodeBlock: 'Medefaidrin U+16E40', sample: '𖹀', fontFamily: 'Noto Sans Medefaidrin',
+    note: '20 世纪 30 年代为奥贝里奥卡伊梅教会的人工语言创制，今仍用于该宗教社群。',
   },
   {
     id: 'adlam', nameZh: '阿德拉姆字母', nameEn: 'Adlam',
