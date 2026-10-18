@@ -374,6 +374,23 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'berber-tifinagh',
+    nameZh: '腓尼基 ʾālep → 提非纳 ya',
+    nameEn: 'Phoenician ʾālep → Tifinagh ya',
+    mode: 'chain',
+    description:
+      '腓尼基商人在迦太基一带留下的布匿字母，被北非的柏柏尔人借去写自己的语言，' +
+      '长成利比亚—古提非纳文。二十世纪，柏柏尔学院把它整理成一套规范字母，' +
+      'Unicode 收在 U+2D30 一节的 57 个字形里：第 1 个字母 ⴰ（ya）正接腓尼基的牛头，' +
+      'r / ɣ / ʕ 这些骨架也还认得出布匿的来路；而 ə / e / o 这类腓尼基没有的音，' +
+      '以及图阿雷格、阿哈加尔等地方字面，走到提非纳这一站时整批飞入。',
+    stops: [
+      { script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
+      { script: 'tifinagh', char: 'ⴰ', label: '提非纳 ya', phonetic: 'a' },
+    ],
+  },
+
+  {
     id: 'cyrillic-line',
     nameZh: '希腊 Α → 西里尔 А',
     nameEn: 'Greek Α → Cyrillic А',

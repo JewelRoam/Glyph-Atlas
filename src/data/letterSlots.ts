@@ -279,6 +279,41 @@ export const SLOTS: LetterSlot[] = [
   { id: 'run-fc-eh', label: 'ᛶ 弗兰克斯小箱 eh（单篇铭文专用）' },
   { id: 'run-fc-ac', label: 'ᛷ 弗兰克斯小箱 ac（单篇铭文专用）' },
   { id: 'run-fc-aesc', label: 'ᛸ 弗兰克斯小箱 aesc（单篇铭文专用）' },
+  // ── 提非纳文：柏柏尔人的字母 ────────────────────────────────────────
+  // Unicode 区块 U+2D30–U+2D7F 收 56 个字母加一个唇化符号。基本盘是摩洛哥
+  // 皇家阿马齐格文化学院（IRCAM）整理的新提非纳文，其余是柏柏尔学院、图阿
+  // 雷格、阿哈加尔、阿耶尔、塔韦莱梅特各家还在用的字面。新提非纳文把 u 与 w、
+  // z 与 ẓ 分写成两套字母，多出来的那一半和各家自己的变体一样各占一格，走到
+  // 提非纳文这一站时从下方飞入：
+  { id: 'tif-yabh', label: 'ⴲ yabh（β）' },
+  { id: 'tif-yaghh', label: 'ⴴ yaghh（ɣ 的一个字面）' },
+  { id: 'tif-yaj-acad', label: 'ⴵ 柏柏尔学院 yaj（dʒ）' },
+  { id: 'tif-yaj', label: 'ⴶ yaj（ʒ）' },
+  { id: 'tif-schwa', label: 'ⴻ yey（中性元音 ə）' },
+  { id: 'tif-yak-tuareg', label: 'ⴾ 图阿雷格 yak（k 的图阿雷格字面）' },
+  { id: 'tif-yakhh', label: 'ⴿ yakhh（χ）' },
+  { id: 'tif-yah-acad', label: 'ⵁ 柏柏尔学院 yah' },
+  { id: 'tif-yah-tuareg', label: 'ⵂ 图阿雷格 yah' },
+  { id: 'tif-yakh-tuareg', label: 'ⵆ 图阿雷格 yakh' },
+  { id: 'tif-yaq-tuareg', label: 'ⵈ 图阿雷格 yaq' },
+  { id: 'tif-yazh', label: 'ⵊ yazh（ʒ）' },
+  { id: 'tif-yazh-ahaggar', label: 'ⵋ 阿哈加尔 yazh' },
+  { id: 'tif-yazh-tuareg', label: 'ⵌ 图阿雷格 yazh' },
+  { id: 'tif-yagn', label: 'ⵐ 图阿雷格 yagn' },
+  { id: 'tif-yang', label: 'ⵑ 图阿雷格 yang' },
+  { id: 'tif-yap', label: 'ⵒ yap（p，借词用）' },
+  { id: 'tif-yarr', label: 'ⵕ yarr（咽化的 r）' },
+  { id: 'tif-yagh-tuareg', label: 'ⵗ 图阿雷格 yagh' },
+  { id: 'tif-yagh-ayer', label: 'ⵘ 阿耶尔 yagh' },
+  { id: 'tif-yach', label: 'ⵞ yach（tʃ）' },
+  { id: 'tif-yav', label: 'ⵠ yav（v）' },
+  { id: 'tif-yaw', label: 'ⵡ yaw（w）' },
+  { id: 'tif-yay', label: 'ⵢ yay（j）' },
+  { id: 'tif-yaz-tawellemet', label: 'ⵤ 塔韦莱梅特 yaz' },
+  { id: 'tif-yazz', label: 'ⵥ yazz（咽化的 z）' },
+  { id: 'tif-ye', label: 'ⵦ ye（e）' },
+  { id: 'tif-yo', label: 'ⵧ yo（o）' },
+  { id: 'tif-labialization', label: 'ⵯ 唇化符号（ⴳⵯ gʷ、ⴽⵯ kʷ）' },
   // ── 阿维斯陀字母自己新造的字母 ──────────────────────────────────────
   // 阿维斯陀字母是为逐音记录《阿维斯陀》经文造的，3—4 世纪成书时把字母表
   // 从巴列维的 22 个扩到了 54 个。能接回巴列维的 17 格写在下面的对照表里，
@@ -1176,6 +1211,72 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'run-fc-eh': 'ᛶ',
     'run-fc-ac': 'ᛷ',
     'run-fc-aesc': 'ᛸ',
+  },
+
+  // 提非纳文（柏柏尔语）：按新提非纳文（IRCAM 正字法）的实际音值接回腓尼基／
+  // 布匿那一套槽位——a b g d ḍ f k h ħ ʕ x q i l m n u r s ṣ š t θ ṭ z 逐格
+  // 对上；ⴸ /ð/ 与 ⴺ /ðˤ/ 接 dhal 与 zah，γ 接 ghayn。布匿的 p 在柏柏尔语里
+  // 擦化成 f，所以 yaf ⴼ 接 pe，与阿拉伯 ف 走的是同一步。剩下 29 格——新提
+  // 非纳文另外分出来的 w j 与咽化 z、图阿雷格等各家的自家字面、还有唇化符号
+  // ——各占一格，走到提非纳文这一站时飞入。
+  tifinagh: {
+    aleph: 'ⴰ', // a ya
+    beth: 'ⴱ', // b yab
+    gimel: 'ⴳ', // g yag
+    daleth: 'ⴷ', // d yad
+    dhal: 'ⴸ', // ð yadh
+    dad: 'ⴹ', // ḍ yadd
+    zah: 'ⴺ', // ðˤ yaddh
+    pe: 'ⴼ', // f yaf
+    kaph: 'ⴽ', // k yak
+    he: 'ⵀ', // h yah
+    heth: 'ⵃ', // ħ yahh
+    ayin: 'ⵄ', // ʕ yaa
+    kha: 'ⵅ', // x yakh
+    qoph: 'ⵇ', // q yaq
+    yodh: 'ⵉ', // i yi
+    lamedh: 'ⵍ', // l yal
+    mem: 'ⵎ', // m yam
+    nun: 'ⵏ', // n yan
+    waw: 'ⵓ', // u yu
+    resh: 'ⵔ', // r yar
+    ghayn: 'ⵖ', // ɣ yagh
+    samekh: 'ⵙ', // s yas
+    sadhe: 'ⵚ', // ṣ yass
+    shin: 'ⵛ', // š yash
+    taw: 'ⵜ', // t yat
+    tha: 'ⵝ', // θ yath
+    teth: 'ⵟ', // ṭ yatt
+    zayin: 'ⵣ', // z yaz
+    'tif-yabh': 'ⴲ',
+    'tif-yaghh': 'ⴴ',
+    'tif-yaj-acad': 'ⴵ',
+    'tif-yaj': 'ⴶ',
+    'tif-schwa': 'ⴻ',
+    'tif-yak-tuareg': 'ⴾ',
+    'tif-yakhh': 'ⴿ',
+    'tif-yah-acad': 'ⵁ',
+    'tif-yah-tuareg': 'ⵂ',
+    'tif-yakh-tuareg': 'ⵆ',
+    'tif-yaq-tuareg': 'ⵈ',
+    'tif-yazh': 'ⵊ',
+    'tif-yazh-ahaggar': 'ⵋ',
+    'tif-yazh-tuareg': 'ⵌ',
+    'tif-yagn': 'ⵐ',
+    'tif-yang': 'ⵑ',
+    'tif-yap': 'ⵒ',
+    'tif-yarr': 'ⵕ',
+    'tif-yagh-tuareg': 'ⵗ',
+    'tif-yagh-ayer': 'ⵘ',
+    'tif-yach': 'ⵞ',
+    'tif-yav': 'ⵠ',
+    'tif-yaw': 'ⵡ',
+    'tif-yay': 'ⵢ',
+    'tif-yaz-tawellemet': 'ⵤ',
+    'tif-yazz': 'ⵥ',
+    'tif-ye': 'ⵦ',
+    'tif-yo': 'ⵧ',
+    'tif-labialization': 'ⵯ',
   },
   latin: {
     aleph: 'A',

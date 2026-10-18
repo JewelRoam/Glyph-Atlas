@@ -1461,7 +1461,8 @@ export const writingSystems: WritingSystem[] = [
     type: 'abjad', status: 'living', direction: 'ltr',
     unicodeBlock: 'Tifinagh U+2D30', sample: 'ⴰ',
     fontFamily: 'Noto Sans Tifinagh',
-    note: '柏柏尔人的文字，源自腓尼基/布匿字母，今为新提非纳文。',
+    note: '柏柏尔／阿马齐格人的文字，源自腓尼基—布匿字母，经利比亚—古提非纳文一路演变；'
+      + '二十世纪由柏柏尔学院整理为新提非纳文，字母顺序以 IRCAM 为准，今最常见书写方向为从左到右。',
   },
   {
     id: 'nsibidi', nameZh: '恩西比迪', nameEn: 'Nsibidi',
