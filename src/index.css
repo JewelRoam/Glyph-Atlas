@@ -1,0 +1,141 @@
+/* ══════════════════════════════════════════════════════════════
+   字脉 Glyph Atlas —— 设计令牌
+   ─────────────────────────────────────────────────────────────
+   视觉方向：考古图录 × 星图。深墨底、朱砂点、青铜线。
+   取自所写之物本身的材质：墨、朱砂印、青铜锈、宣纸、藤黄。
+   刻意避开"深蓝底 + 紫色渐变 + 玻璃卡片"这套默认科技皮肤。
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── 底：暖墨，不是冷灰 ── */
+  --ink-black: #100e0c;
+  --bg: #100e0c;
+  --bg-1: #17140f;
+  --bg-2: #1e1a14;
+  --bg-3: #272119;
+  --bg-4: #332b20;
+
+  /* ── 字：宣纸偏暖 ── */
+  --paper: #efe6d6;
+  --ink: #cfc6b4;
+  --ink-strong: #f5eddf;
+  --ink-dim: #8d8272;
+  --ink-faint: #6a6155;
+
+  /* ── 线：细如发丝，暖调 ── */
+  --line: rgba(239, 230, 214, 0.1);
+  --line-mid: rgba(239, 230, 214, 0.17);
+  --line-strong: rgba(239, 230, 214, 0.3);
+
+  /* ── 朱砂：唯一的"响"色，只给当前状态 ── */
+  --cinnabar: #c8452f;
+  --cinnabar-soft: rgba(200, 69, 47, 0.16);
+  --cinnabar-line: rgba(200, 69, 47, 0.42);
+
+  /* ── 青铜锈：次级强调，用于"另一条路" ── */
+  --bronze: #5f9c8b;
+  --bronze-soft: rgba(95, 156, 139, 0.15);
+
+  /* ── 藤黄：年代与数字 ── */
+  --ochre: #d3a13f;
+
+  /* 兼容旧变量名（组件里还在用 --accent / --accent-2） */
+  --accent: var(--cinnabar);
+  --accent-2: var(--bronze);
+
+  /* ── 字体：三种角色，各有分工 ── */
+  /* 展示：宋体 / 明代刻本，用于标题与文字名 */
+  --display: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC",
+    "Times New Roman", serif;
+  /* 古希腊罗马：Cardo 起于古典学排印，字形带手抄本味，用于英文名、年代、码位 */
+  --antique: "Cardo", "Iowan Old Style", "Palatino Linotype", "Songti SC",
+    Georgia, serif;
+  /* 正文：无衬线，只负责读起来不费力 */
+  --body: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei",
+    system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+
+  color-scheme: dark;
+  font-family: var(--body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg);
+  /* 极淡的两团暖光：像展厅里打在展柜上的射灯，不是渐变背景板 */
+  background-image:
+    radial-gradient(900px 520px at 82% -12%, rgba(211, 161, 63, 0.055), transparent 62%),
+    radial-gradient(700px 460px at 6% 108%, rgba(95, 156, 139, 0.05), transparent 62%);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+}
+
+a {
+  color: var(--ochre);
+}
+
+::selection {
+  background: rgba(200, 69, 47, 0.34);
+  color: var(--paper);
+}
+
+/* 键盘焦点必须看得见（鼠标点击不触发） */
+:focus-visible {
+  outline: 2px solid var(--cinnabar);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* 细滚动条，免得灰白色滚动条破坏墨色 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-4) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--bg-4);
+  border-radius: 9px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* 动效降到最低：尊重系统设置 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,1224 @@
+/* ══════════════════════════════════════════════════════════════
+   字脉 Glyph Atlas —— 版式
+   阅读定位：一台"文字考古仪器"，不是落地页、不是营销站。
+   因此没有大标题英雄区、没有三张等宽卡片，
+   只有三样东西：图谱、街景、总表，以及围绕它们的克制注释。
+   ══════════════════════════════════════════════════════════════ */
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 纸纹：一层几乎看不见的噪点，让纯色底有印刷物的手感 */
+.app::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ─────────────── 顶栏：书脊 ─────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 0 26px;
+  height: 62px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line-mid);
+  background: linear-gradient(180deg, var(--bg-1), var(--bg));
+  z-index: 20;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  flex-shrink: 0;
+}
+
+/* 朱砂印：全站唯一的实心色块 */
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--cinnabar);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.brand h1 {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.22em;
+  color: var(--ink-strong);
+  line-height: 1.1;
+}
+
+.brand-sub {
+  font-family: var(--antique);
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+/* 章节标签：靠下划线分组，不用胶囊按钮 */
+.topbar nav {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+  align-self: stretch;
+}
+
+.topbar nav button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 15px;
+  font-size: 13px;
+  color: var(--ink-dim);
+  transition: color 0.16s ease;
+}
+
+.topbar nav button em {
+  font-style: normal;
+  font-family: var(--antique);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.topbar nav button::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--cinnabar);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.topbar nav button:hover {
+  color: var(--ink);
+}
+
+.topbar nav button.active {
+  color: var(--ink-strong);
+}
+
+.topbar nav button.active::after {
+  transform: scaleX(1);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-left: 22px;
+  border-left: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.stats b {
+  font-family: var(--antique);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ochre);
+  letter-spacing: 0.02em;
+}
+
+.stats span {
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+main {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+}
+
+/* ─────────────── 一、宏观演化图谱 ─────────────── */
+.atlas-layout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+}
+
+.atlas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.atlas-svg {
+  display: block;
+  max-width: 100%;
+  cursor: grab;
+}
+.atlas-svg:active {
+  cursor: grabbing;
+}
+
+/* 陈设层：谱系名与年代刻度。不参与缩放，字号恒定，
+   --u 是"一屏幕像素 = 多少图坐标单位"，由组件按当前缩放写入。 */
+.atlas-furniture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.atlas-furniture .gutter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, var(--bg) 82%, rgba(16, 14, 12, 0.72));
+  border-right: 1px solid var(--line-mid);
+}
+
+.lane-label {
+  position: absolute;
+  left: 0;
+  transform: translateY(-50%);
+  text-align: right;
+  font-family: var(--display);
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  opacity: 0.92;
+  white-space: nowrap;
+}
+
+.tick-label {
+  position: absolute;
+  transform: translateY(-50%);
+  font-family: var(--antique);
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.edge {
+  fill: none;
+  stroke: #4b4438;
+  stroke-width: calc(1.1px * var(--u, 1));
+  opacity: 0.6;
+  transition: stroke 0.2s ease, opacity 0.2s ease;
+}
+.edge.active {
+  stroke: var(--cinnabar);
+  stroke-width: calc(1.9px * var(--u, 1));
+  opacity: 1;
+}
+.edge.dim {
+  opacity: 0.07;
+}
+
+.node {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.node.dim {
+  opacity: 0.15;
+}
+.node line {
+  stroke-width: calc(1.5px * var(--u, 1));
+}
+.node-label {
+  font-family: var(--display);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  /* 一圈底线色描边，让名字压在连线与泳道底上依然清楚 */
+  paint-order: stroke fill;
+  stroke: var(--bg);
+  stroke-width: calc(2.6px * var(--u, 1));
+  stroke-linejoin: round;
+  transition: fill 0.2s ease;
+}
+.node:hover .node-label,
+.node.selected .node-label {
+  fill: var(--cinnabar);
+}
+
+.atlas-tools {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: flex;
+  gap: 0;
+  z-index: 5;
+  border: 1px solid var(--line-mid);
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(23, 20, 15, 0.9);
+}
+.atlas-tools button {
+  padding: 6px 14px;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+}
+.atlas-tools button + button {
+  border-left: 1px solid var(--line);
+}
+.atlas-tools button:hover {
+  color: var(--ink-strong);
+  background: rgba(239, 230, 214, 0.05);
+}
+.atlas-tools button.on {
+  color: var(--cinnabar);
+  background: var(--cinnabar-soft);
+}
+
+/* 页脚：图例靠左、操作提示靠右，同一条基线，永不互压 */
+.atlas-foot {
+  position: absolute;
+  left: 92px;
+  right: 16px;
+  bottom: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  z-index: 5;
+  pointer-events: none;
+}
+.atlas-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 15px;
+  min-width: 0;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: rgba(16, 14, 12, 0.9);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--ink-dim);
+  letter-spacing: 0.04em;
+}
+.legend-item i {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+}
+
+.atlas-hint {
+  flex-shrink: 0;
+  max-width: 42ch;
+  text-align: right;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+/* ─────────────── 一（右）：详情 ─────────────── */
+.detail {
+  position: relative;
+  width: 336px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--line-mid);
+  background: var(--bg-1);
+  padding: 26px 22px 40px;
+  overflow-y: auto;
+}
+
+.detail.empty {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 46px 30px;
+}
+.detail.empty p {
+  font-size: 12.5px;
+  line-height: 2;
+  color: var(--ink-faint);
+  max-width: 200px;
+}
+
+.detail-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 3px;
+  color: var(--ink-faint);
+  font-size: 12px;
+  transition: 0.15s ease;
+}
+.detail-close:hover {
+  background: rgba(239, 230, 214, 0.06);
+  color: var(--ink-strong);
+}
+
+.detail-glyph {
+  width: 112px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 1px solid var(--line-mid);
+  border-radius: 3px;
+  background: var(--bg-2);
+  /* 展柜射灯 */
+  box-shadow: inset 0 0 40px rgba(211, 161, 63, 0.08);
+}
+
+.detail h2 {
+  font-family: var(--display);
+  font-size: 23px;
+  font-weight: 600;
+  margin: 0 0 5px;
+  color: var(--ink-strong);
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+}
+
+.detail-en {
+  font-family: var(--antique);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 18px;
+}
+.detail-tags span {
+  font-size: 10.5px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+.detail-note {
+  font-size: 12.5px;
+  line-height: 1.95;
+  color: var(--ink);
+  border-left: 2px solid var(--cinnabar-line);
+  padding-left: 12px;
+  margin: 0 0 22px;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px 16px;
+  font-size: 12px;
+  margin: 0 0 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.detail-list dt {
+  color: var(--ink-faint);
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+}
+.detail-list dd {
+  margin: 0;
+  color: var(--ink-strong);
+}
+.detail-list .mono {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink);
+}
+
+.detail-rel {
+  margin-bottom: 20px;
+}
+.detail-rel h3 {
+  font-family: var(--antique);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 9px;
+  font-weight: 400;
+}
+.detail-rel .rel-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.detail-rel button {
+  font-family: var(--display);
+  font-size: 12.5px;
+  padding: 5px 11px;
+  border-radius: 2px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: 0.15s ease;
+}
+.detail-rel button:hover {
+  border-color: var(--cinnabar-line);
+  color: var(--ink-strong);
+  background: var(--cinnabar-soft);
+}
+.detail-rel > button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 5px;
+}
+
+/* ─────────────── 二、时间街景 ─────────────── */
+.walk {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 32px 16px;
+  overflow: hidden;
+}
+
+.walk > * {
+  width: 100%;
+  max-width: 1180px;
+}
+
+.walk-tabs {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line);
+}
+.walk-tabs button {
+  position: relative;
+  padding: 8px 16px;
+  font-family: var(--display);
+  font-size: 13.5px;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+  transition: color 0.16s ease;
+}
+.walk-tabs button::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--cinnabar);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+.walk-tabs button:hover {
+  color: var(--ink);
+}
+.walk-tabs button.active {
+  color: var(--ink-strong);
+}
+.walk-tabs button.active::after {
+  transform: scaleX(1);
+}
+
+/* 轨道说明 + 性质徽标 */
+.walk-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-top: 11px;
+  flex-shrink: 0;
+}
+.walk-mode {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--cinnabar);
+  border: 1px solid var(--cinnabar-line);
+  border-radius: 2px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.walk-desc {
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: var(--ink-dim);
+  margin: 0;
+}
+
+.walk-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 4px 0;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+}
+.walk-stage:active {
+  cursor: grabbing;
+}
+
+.walk-side-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.walk-side {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.09s linear, opacity 0.09s linear;
+  opacity: 0.4;
+}
+
+.walk-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.walk-fade {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: grid;
+  place-items: center;
+}
+.walk-fade > span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.05s linear;
+}
+
+/* 过去与未来形态的虚线残影：让"正在变形"这件事可见 */
+.walk-ghost {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0.16;
+  pointer-events: none;
+}
+.walk-ghost svg path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 4;
+}
+.walk-ghost.font-ghost > * {
+  font-size: 260px;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* 中央舞台的展柜光 */
+.walk-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 420px;
+  height: 420px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(211, 161, 63, 0.07) 0%,
+    rgba(211, 161, 63, 0.025) 42%,
+    transparent 68%
+  );
+}
+/* 舞台脚下的基线，像展签底边 */
+.walk-halo::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 74px;
+  width: 300px;
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--line-strong),
+    transparent
+  );
+}
+
+.walk-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  text-align: center;
+  pointer-events: none;
+}
+.walk-caption-title {
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--ink-strong);
+  letter-spacing: 0.1em;
+}
+.walk-caption-sub {
+  font-family: var(--antique);
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin-top: 4px;
+  letter-spacing: 0.06em;
+}
+.walk-caption-country {
+  font-size: 11.5px;
+  color: var(--ochre);
+  margin-top: 3px;
+  opacity: 0.9;
+  letter-spacing: 0.04em;
+}
+
+.walk-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 2px 0 12px;
+}
+.walk-controls button {
+  min-width: 42px;
+  height: 34px;
+  border: 1px solid var(--line-mid);
+  border-radius: 2px;
+  background: var(--bg-1);
+  color: var(--ink);
+  font-size: 14px;
+  transition: 0.15s ease;
+}
+.walk-controls button:hover {
+  border-color: var(--cinnabar-line);
+  background: var(--cinnabar-soft);
+  color: var(--ink-strong);
+}
+.walk-controls .play {
+  min-width: 108px;
+  font-family: var(--display);
+  font-size: 12.5px;
+  letter-spacing: 0.14em;
+}
+.walk-controls .play.on {
+  border-color: var(--cinnabar-line);
+  color: var(--cinnabar);
+  background: var(--cinnabar-soft);
+}
+
+/* 站点尺：像一根竹简上的刻度 */
+.walk-street {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0 26px;
+}
+.walk-street input[type='range'] {
+  width: 100%;
+  appearance: none;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--cinnabar-line),
+    rgba(95, 156, 139, 0.4)
+  );
+  outline: none;
+  margin: 0;
+}
+.walk-street input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 1px;
+  background: var(--cinnabar);
+  border: 1px solid var(--paper);
+  cursor: pointer;
+}
+.walk-street input[type='range']::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 1px;
+  background: var(--cinnabar);
+  border: 1px solid var(--paper);
+  cursor: pointer;
+}
+.walk-markers {
+  position: relative;
+  height: 44px;
+  margin-top: 3px;
+}
+.walk-markers button {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 38px;
+  opacity: 0.36;
+  border-radius: 2px;
+  transition: 0.16s ease;
+}
+.walk-markers button:hover {
+  opacity: 0.9;
+  background: rgba(239, 230, 214, 0.05);
+}
+.walk-markers button.active {
+  opacity: 1;
+  background: var(--cinnabar-soft);
+  box-shadow: inset 0 -2px 0 var(--cinnabar);
+}
+
+/* ─────────────── 三、文字总表 ─────────────── */
+.table-view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 26px 0;
+}
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 13px;
+  flex-shrink: 0;
+}
+.search {
+  width: 210px;
+  padding: 7px 12px;
+  border: 1px solid var(--line-mid);
+  border-radius: 2px;
+  background: var(--bg-1);
+  color: var(--ink-strong);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.search::placeholder {
+  color: var(--ink-faint);
+}
+.search:focus {
+  border-color: var(--cinnabar-line);
+}
+.chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.chips button {
+  padding: 4px 10px;
+  font-size: 11.5px;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  transition: 0.15s ease;
+}
+.chips button:hover {
+  color: var(--ink-strong);
+  border-color: var(--line-mid);
+}
+.chips button.active {
+  color: var(--bg);
+  border-color: transparent;
+}
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+.switch input {
+  accent-color: var(--cinnabar);
+}
+.count {
+  margin-left: auto;
+  font-family: var(--antique);
+  font-size: 12px;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+}
+
+.table-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border-top: 1px solid var(--line-mid);
+}
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align: left;
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--ink-faint);
+  padding: 10px 14px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line-mid);
+  white-space: nowrap;
+}
+.table-scroll thead th.sorted {
+  color: var(--cinnabar);
+}
+.table-scroll td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: middle;
+}
+.table-scroll tbody tr {
+  transition: background 0.12s ease;
+}
+.table-scroll tbody tr:hover {
+  background: rgba(239, 230, 214, 0.035);
+}
+.cell-glyph {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--bg-1);
+}
+.cell-name {
+  font-family: var(--display);
+  font-size: 14.5px;
+  color: var(--ink-strong);
+  letter-spacing: 0.04em;
+}
+.cell-en {
+  font-family: var(--antique);
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ink-faint);
+  margin-top: 1px;
+}
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  margin-right: 7px;
+}
+.nowrap {
+  white-space: nowrap;
+  font-family: var(--antique);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.countries {
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  max-width: 250px;
+  line-height: 1.5;
+}
+.status {
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 2px;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  color: var(--ink-dim);
+  letter-spacing: 0.04em;
+}
+.status-living {
+  color: #8fc9a0;
+  border-color: rgba(143, 201, 160, 0.28);
+}
+.status-liturgical {
+  color: #8fb6c9;
+  border-color: rgba(143, 182, 201, 0.28);
+}
+.status-historical {
+  color: var(--ink-faint);
+}
+.status-extinct {
+  color: #a3908b;
+}
+.status-undeciphered {
+  color: #c993ad;
+  border-color: rgba(201, 147, 173, 0.24);
+}
+.status-revived {
+  color: var(--ochre);
+  border-color: rgba(211, 161, 63, 0.28);
+}
+
+/* ─────────────── 字形渲染 ─────────────── */
+.font-glyph {
+  display: inline-block;
+}
+
+.glyph-missing {
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink-faint);
+  font-family: var(--antique);
+}
+
+/* 没有 Web 字体时：显示码位名片，而不是豆腐块 */
+.glyph-tile {
+  display: inline-grid;
+  place-items: center;
+  gap: 1px;
+  border: 1px dashed var(--line-mid);
+  border-radius: 2px;
+  background: rgba(239, 230, 214, 0.03);
+  color: var(--ink-faint);
+  line-height: 1.1;
+  text-align: center;
+}
+.glyph-tile-code {
+  font-family: var(--mono);
+  color: var(--ink-dim);
+  letter-spacing: -0.02em;
+}
+.glyph-tile-label {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+/* ─────────────── 四、关于 ─────────────── */
+.about {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 44px 32px 96px;
+}
+.about-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.about-eyebrow {
+  font-family: var(--antique);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--cinnabar);
+  margin-bottom: 12px;
+}
+.about h2 {
+  font-family: var(--display);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--ink-strong);
+  letter-spacing: 0.08em;
+  margin: 0 0 22px;
+  line-height: 1.35;
+}
+.about h3 {
+  font-family: var(--display);
+  font-size: 16px;
+  color: var(--ink-strong);
+  margin: 38px 0 12px;
+  letter-spacing: 0.1em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.about p,
+.about li {
+  font-size: 13.5px;
+  line-height: 2.05;
+  color: var(--ink);
+}
+.about p {
+  margin: 0 0 14px;
+}
+.about ul,
+.about ol {
+  padding-left: 20px;
+  margin: 0 0 14px;
+}
+.about li {
+  margin-bottom: 7px;
+}
+.about strong {
+  color: var(--ink-strong);
+  font-weight: 600;
+}
+.about code {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  background: var(--bg-2);
+  color: var(--ochre);
+}
+.about-note {
+  margin-top: 34px;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--cinnabar-line);
+  border-radius: 2px;
+  background: var(--bg-1);
+}
+.about-note p {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  margin: 0;
+}
+
+/* ─────────────── 自适应 ─────────────── */
+@media (max-width: 1240px) {
+  .stats div:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+@media (max-width: 1040px) {
+  .stats {
+    display: none;
+  }
+  .topbar nav button {
+    padding: 0 11px;
+  }
+  .detail {
+    width: 290px;
+  }
+}
+
+@media (max-width: 860px) {
+  /* 页脚改竖排：横排会把图例挤成一列竖字 */
+  .atlas-foot {
+    left: 14px;
+    right: 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .atlas-hint {
+    max-width: none;
+    text-align: left;
+  }
+  .atlas-legend {
+    gap: 4px 12px;
+  }
+  .legend-item {
+    font-size: 10px;
+  }
+
+  .topbar {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .topbar nav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .topbar nav button {
+    flex: 1;
+    justify-content: center;
+    padding: 9px 4px;
+  }
+  .topbar nav button em {
+    display: none;
+  }
+  .brand-sub {
+    display: none;
+  }
+  main {
+    flex-direction: column;
+  }
+  .atlas-layout {
+    flex-direction: column;
+  }
+  /* 窄屏上没选中时别整块占地方：压成一条提示即可 */
+  .detail.empty {
+    max-height: none;
+    padding: 14px 18px;
+    border-top: 1px solid var(--line);
+  }
+  .detail.empty p {
+    max-width: none;
+    line-height: 1.6;
+  }
+  .detail {
+    width: auto;
+    max-height: 46%;
+    border-left: none;
+    border-top: 1px solid var(--line-mid);
+  }
+  .walk {
+    padding: 14px 14px 12px;
+  }
+  .walk-side {
+    display: none;
+  }
+  .walk-fade {
+    width: 220px;
+    height: 220px;
+  }
+  .table-view {
+    padding: 14px 14px 0;
+  }
+}
