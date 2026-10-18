@@ -400,7 +400,12 @@ npm run build && ls dist/
 ```
 
 - **Vercel / Netlify / Cloudflare Pages**：构建命令 `npm run build`，输出目录 `dist`。
-- **GitHub Pages / 子路径部署**：在 `vite.config.ts` 里设置 `base: '/<仓库名>/'`。
+- **GitHub Pages**：已配置线上站点 <https://jewelroam.github.io/Glyph-Atlas/>，
+  由 `.github/workflows/deploy.yml` 在每次推送到 `main`（或手动触发）时构建并发布，
+  首次启用需在仓库 Settings → Pages 把 Source 设为 **GitHub Actions**。
+- **子路径部署**：项目站点不在域名根目录，因此 `vite.config.ts` 里
+  `base = '/Glyph-Atlas/'`，改名或改路径时要同步这个常量；
+  本地 `npm run dev` 仍从根路径提供服务。
 - 页面用 Google Fonts 作为字形来源，离线或内网部署时请自行镜像字体。
 
 ---
@@ -463,6 +468,9 @@ npm run build && ls dist/
   12 个独立起源，82 个今仍使用，7 条血统轨道。
 - **2026-10-18 · 界面精简**：移除顶栏品牌区与“关于”页，主导航保留
   演化图谱、时间街景、文字总表三个入口。
+- **2026-10-18 · 部署到 GitHub Pages**：加入 GitHub Actions 发布流程，
+  站点上线于 <https://jewelroam.github.io/Glyph-Atlas/>；构建产物改用
+  `/Glyph-Atlas/` 作为资源前缀，并在本地用等效的静态服务验证过子路径下的加载。
 
 ---
 
