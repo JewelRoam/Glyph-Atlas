@@ -151,6 +151,14 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Meroitic Hieroglyphs U+10980', sample: '𐦀', fontFamily: 'Noto Sans Meroitic',
   },
+  {
+    id: 'meroitic-cursive', nameZh: '麦罗埃草书体', nameEn: 'Meroitic Cursive',
+    origin: 'derived', parents: ['meroitic'], dateFrom: -300, dateTo: 400,
+    family: 'africa', region: '努比亚', countries: ['苏丹'],
+    type: 'abugida', status: 'extinct', direction: 'ltr',
+    unicodeBlock: 'Meroitic Cursive U+109A0', sample: '𐦠', fontFamily: 'Noto Sans Meroitic',
+    note: '麦罗埃文的日常手写体，与碑铭体并行使用，是库施王国的通用字体。',
+  },
 
   // ─────────────────────────────────────────────
   // 四、黎凡特：原始西奈 → 腓尼基 → 阿拉米
@@ -264,6 +272,24 @@ export const writingSystems: WritingSystem[] = [
     family: 'centralasia', region: '伊朗高原', countries: ['伊朗'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
     note: '用阿拉米字母书写中古波斯语，因保留大量阿拉米"异形字"而极难读。',
+  },
+  {
+    id: 'inscriptional-pahlavi', nameZh: '碑铭巴列维字母', nameEn: 'Inscriptional Pahlavi',
+    origin: 'derived', parents: ['pahlavi'], dateFrom: 200, dateTo: 400,
+    family: 'centralasia', region: '伊朗高原', countries: ['伊朗'],
+    type: 'abjad', status: 'extinct', direction: 'rtl',
+    unicodeBlock: 'Inscriptional Pahlavi U+10B60', sample: '𐭠',
+    fontFamily: 'Noto Sans Inscriptional Pahlavi',
+    note: '萨珊王朝碑铭所用的中古波斯语字体，字母连写，多个音位合用一个字形。',
+  },
+  {
+    id: 'psalter-pahlavi', nameZh: '诗篇巴列维字母', nameEn: 'Psalter Pahlavi',
+    origin: 'derived', parents: ['pahlavi'], dateFrom: 500, dateTo: 700,
+    family: 'centralasia', region: '伊朗高原', countries: ['伊朗'],
+    type: 'abjad', status: 'extinct', direction: 'rtl',
+    unicodeBlock: 'Psalter Pahlavi U+10B80', sample: '𐮀',
+    fontFamily: 'Noto Sans Psalter Pahlavi',
+    note: '中古波斯语的书籍体，见于新疆吐鲁番一带出土的《诗篇》写本。',
   },
   {
     id: 'avestan', nameZh: '阿维斯陀字母', nameEn: 'Avestan',
@@ -468,6 +494,14 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'IPA Extensions U+0250', sample: 'ə',
     note: '以拉丁字母为基础的语音标注系统。',
+  },
+  {
+    id: 'duployan', nameZh: '杜普洛伊速记', nameEn: 'Duployan shorthand',
+    origin: 'invented', parents: [], dateFrom: 1860, dateTo: null,
+    family: 'modern', region: '法国', countries: ['法国', '加拿大'],
+    type: 'shorthand', status: 'historical', direction: 'ltr',
+    unicodeBlock: 'Duployan U+1BC00', sample: '𛰀', fontFamily: 'Noto Sans Duployan',
+    note: '埃米尔·杜普洛伊 1860 年代设计的速记法，后来被改编去记录英语与奇努克行话。',
   },
 
   // ─────────────────────────────────────────────
@@ -827,10 +861,44 @@ export const writingSystems: WritingSystem[] = [
     note: '2001 年由班旺·洛苏为万乔语创制，今在印度东北部社区与学校中推广。',
   },
   {
+    id: 'tangsa', nameZh: '唐萨文', nameEn: 'Tangsa (Tase)',
+    origin: 'invented', parents: [], dateFrom: 1990, dateTo: null,
+    family: 'indic', region: '阿鲁纳恰尔', countries: ['印度', '缅甸'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Tangsa U+16A70', sample: '𖩰', fontFamily: 'Noto Sans Tangsa',
+    note: '1990 年由拉孔·莫桑为唐萨语创制，今在印度东北部与缅甸北部的唐萨社区使用。',
+  },
+  {
+    id: 'nag-mundari', nameZh: '纳格蒙达里文', nameEn: 'Nag Mundari',
+    origin: 'invented', parents: [], dateFrom: 1980, dateTo: null,
+    family: 'indic', region: '贾坎德', countries: ['印度'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Nag Mundari U+1E4D0', sample: '𞓐', fontFamily: 'Noto Sans Nag Mundari',
+    note: '1980 年代由罗希达斯·辛格·纳格为蒙达里语创制，字母形状取自当地器物与符号。',
+  },
+  {
+    id: 'sunuwar', nameZh: '苏努瓦尔文', nameEn: 'Sunuwar (Jenticha)',
+    origin: 'invented', parents: [], dateFrom: 1940, dateTo: null,
+    family: 'indic', region: '尼泊尔东部', countries: ['尼泊尔'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Sunuwar U+11BC0', sample: '𑯀', fontFamily: 'Noto Sans Sunuwar',
+    note: '尼泊尔苏努瓦尔语使用的文字，20 世纪由克里希纳·巴哈杜尔·延蒂查整理推广。',
+  },
+  {
+    id: 'pau-cin-hau', nameZh: '鲍钦豪文', nameEn: 'Pau Cin Hau',
+    origin: 'invented', parents: [], dateFrom: 1902, dateTo: null,
+    family: 'seasia', region: '钦邦', countries: ['缅甸'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Pau Cin Hau U+11AC0', sample: '𑫀', fontFamily: 'Noto Sans Pau Cin Hau',
+    note: '1902 年由鲍钦豪为钦族语言创制，最初是语素文字，后简化为字母表。',
+  },
+  {
     id: 'kawi', nameZh: '卡维文', nameEn: 'Kawi (Old Javanese)',
     origin: 'derived', parents: ['pallava'], dateFrom: 700, dateTo: 1500,
     family: 'seasia', region: '爪哇', countries: ['印度尼西亚'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
+    unicodeBlock: 'Kawi U+11F00', sample: '𑼄', fontFamily: 'Noto Sans Kawi',
+    note: '爪哇的古典文字，写在贝叶与铜版上；爪哇文、巴厘文都由它演变而来。',
   },
   {
     id: 'tagbanwa', nameZh: '塔格班瓦文', nameEn: 'Tagbanwa',
@@ -1159,6 +1227,22 @@ export const writingSystems: WritingSystem[] = [
     type: 'syllabary', status: 'living', direction: 'ltr',
     unicodeBlock: 'Yi Syllables U+A000', sample: 'ꀀ',
     note: '独立的音节文字，今规范为 1165 个音节符号。',
+  },
+  {
+    id: 'miao', nameZh: '苗文（柏格理字母）', nameEn: 'Miao (Pollard)',
+    origin: 'invented', parents: [], dateFrom: 1905, dateTo: null,
+    family: 'sinic', region: '云南与贵州', countries: ['中国（云南、贵州）'],
+    type: 'abugida', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Miao U+16F00', sample: '𖼀', fontFamily: 'Noto Sans Miao',
+    note: '1905 年由传教士柏格理为滇东北苗语设计，声母字母下方的小符号表示韵母。',
+  },
+  {
+    id: 'lisu', nameZh: '傈僳文（弗雷泽字母）', nameEn: 'Lisu (Fraser)',
+    origin: 'invented', parents: ['latin'], dateFrom: 1915, dateTo: null,
+    family: 'sinic', region: '云南与缅北', countries: ['中国（云南）', '缅甸', '泰国', '印度'],
+    type: 'alphabet', status: 'living', direction: 'ltr',
+    unicodeBlock: 'Lisu U+A4D0', sample: 'ꓐ', fontFamily: 'Noto Sans Lisu',
+    note: '传教士弗雷泽 1915 年设计，字母由拉丁大写字母倒置变形而来，用于傈僳语。',
   },
   {
     id: 'dongba', nameZh: '东巴文', nameEn: 'Dongba',

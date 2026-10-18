@@ -32,6 +32,7 @@ export const TYPE_LABEL: Record<string, string> = {
   abugida: '元音附标文字',
   alphabet: '全音素文字',
   featural: '特征文字',
+  shorthand: '速记文字',
   mixed: '混合系统',
   undeciphered: '未破译',
   nonscript: '非文字记录系统',

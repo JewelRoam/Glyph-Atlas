@@ -18,6 +18,7 @@ export type ScriptType =
   | 'abugida'          // 元音附标文字（天城文、泰文）
   | 'alphabet'         // 全音素文字（希腊、拉丁）
   | 'featural'         // 特征文字（谚文）
+  | 'shorthand'        // 速记文字（杜普洛伊）
   | 'mixed'            // 混合系统
   | 'undeciphered'     // 未破译
   | 'nonscript';       // 非文字记录系统（奇普）
