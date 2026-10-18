@@ -1,9 +1,9 @@
 import { useState, type CSSProperties } from 'react';
 import type { WritingSystem } from '../data/types';
 import { glyphSets } from '../data/glyphSets';
-import { glyphSourceFor } from '../data/glyphSources';
+import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { coverageOf, hasCoverage } from '../lib/coverage';
-import { FontGlyph } from './Glyph';
+import { FontGlyph, ImageGlyph } from './Glyph';
 
 /** 折叠状态下先铺这么多，够看出这款文字的骨架 */
 const PREVIEW = 48;
@@ -26,8 +26,11 @@ function searchLinks(system: WritingSystem, family?: string) {
  * 详情面板里只有一枚放大的示例字时，读不出这套文字长什么样；这里铺一张字表：
  * 字母表把 Unicode 收录的字母全铺出来（可展开），语素文字只给少量代表字。
  *
- * 每一格都经过覆盖表判定：字库里没有这个字形就留空，绝不回退到系统字体——
- * 甲骨文、小篆被画成宋体、楷体，就是这么来的。字形的来源与授权写在面板底部。
+ * 每一格都必须有据可查：
+ *  · 字体来源 —— 覆盖表说"字库里没有"就留空，绝不回退到系统字体；
+ *  · 图片来源 —— 只有登记过授权与出处的图片才画，其余留空。
+ * 甲骨文、小篆被画成宋体、楷体，隶书被画成黑体，都是"悄悄回退"造成的，
+ * 所以这里宁可空着。
  */
 export function GlyphBoard({ system }: { system: WritingSystem }) {
   const [expanded, setExpanded] = useState(false);
@@ -41,9 +44,12 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
   const missing = full.length - covered.length;
   const fontUsable = source.kind === 'font' && (!family || hasCoverage(family) || covered.length > 0);
 
+  // 图片字形：只有 images 里登记过的字才画
+  const plates = full.filter((c) => imageFor(source, c));
   const previewLimit =
     system.type === 'logographic' || system.type === 'logosyllabic' ? LOGOGRAPHIC_PREVIEW : PREVIEW;
   const shown = expanded ? covered : covered.slice(0, previewLimit);
+  const shownPlates = expanded ? plates : plates.slice(0, previewLimit);
   const { named, web } = searchLinks(system, family);
 
   const isSyllabic =
@@ -51,29 +57,63 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
   const cell = isSyllabic ? 42 : 36;
   const size = isSyllabic ? 28 : 24;
 
-  const countText = !covered.length
-    ? '暂无字形样本'
-    : set?.source === 'manual'
-      ? `${covered.length} 个示例${missing ? `（另有 ${missing} 个字形未收）` : ''}`
-      : `${covered.length} 个字符${
-          set && set.total > covered.length ? `（Unicode 共 ${set.total} 个）` : ''
-        }`;
+  const countText =
+    source.kind === 'image'
+      ? plates.length
+        ? `${plates.length} 个字形图${missing ? `（另有 ${missing} 个字形未收）` : ''}`
+        : '暂无字形样本'
+      : !covered.length
+        ? '暂无字形样本'
+        : set?.source === 'manual'
+          ? `${covered.length} 个示例${missing ? `（另有 ${missing} 个字形未收）` : ''}`
+          : `${covered.length} 个字符${
+              set && set.total > covered.length ? `（Unicode 共 ${set.total} 个）` : ''
+            }`;
 
   return (
     <section className="detail-board">
       <div className="board-head">
-        <h3>字形样本</h3>
+        <h3>{source.kind === 'image' ? '字形图版' : '字形样本'}</h3>
         <span className="board-count">{countText}</span>
       </div>
 
-      {covered.length > 0 && (
+      {source.kind === 'image' && plates.length > 0 && (
         <>
           <div className="glyph-grid" style={{ '--cell': `${cell}px` } as CSSProperties}>
-            {shown.map((c, i) => (
+            {shownPlates.map((c, i) => (
               <span className="glyph-cell" key={`${c}-${i}`} title={c}>
-                <FontGlyph char={c} fontFamily={family} size={size} />
+                <ImageGlyph
+                  src={imageFor(source, c)!}
+                  label={c}
+                  size={cell - 4}
+                  credit={source.credit}
+                />
               </span>
             ))}
+          </div>
+          {plates.length > previewLimit && !expanded && (
+            <button className="board-more" onClick={() => setExpanded(true)}>
+              展开全部 {plates.length} 个
+            </button>
+          )}
+        </>
+      )}
+
+      {source.kind === 'font' && covered.length > 0 && (
+        <>
+          <div className="glyph-grid" style={{ '--cell': `${cell}px` } as CSSProperties}>
+            {shown.map((c, i) => {
+              const plate = imageFor(source, c);
+              return (
+                <span className="glyph-cell" key={`${c}-${i}`} title={c}>
+                  {plate ? (
+                    <ImageGlyph src={plate} label={c} size={cell - 4} credit={source.credit} />
+                  ) : (
+                    <FontGlyph char={c} fontFamily={family} size={size} />
+                  )}
+                </span>
+              );
+            })}
           </div>
           {covered.length > previewLimit && !expanded && (
             <button className="board-more" onClick={() => setExpanded(true)}>
@@ -83,9 +123,15 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
         </>
       )}
 
+      {source.kind === 'image' && !plates.length && (
+        <div className="board-empty">
+          <p>{source.note ?? '这套文字的图片字形还在整理，字形位留空。'}</p>
+        </div>
+      )}
+
       {source.kind === 'none' && (
         <div className="board-empty">
-          <p>{source.note ?? '这套文字暂时没有可靠的 Web 字体，字形位留空。'}</p>
+          <p>{source.note ?? '这套文字暂时没有可靠的 Web 字体或授权明确的字形图，字形位留空。'}</p>
         </div>
       )}
 
@@ -97,9 +143,21 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
 
       {set?.note && covered.length > 0 && <p className="board-note">{set.note}</p>}
 
-      <div className={`board-font ${fontUsable ? '' : 'missing'}`}>
+      <div className={`board-font ${fontUsable || source.kind === 'image' ? '' : 'missing'}`}>
         {source.kind === 'none' ? (
           <span>暂无可靠字形来源，不以现代字体顶替</span>
+        ) : source.kind === 'image' ? (
+          <>
+            <span>
+              {source.credit ?? '字形图'}
+              {source.license ? ` · ${source.license}` : ''}
+            </span>
+            {source.home ? (
+              <a href={source.home} target="_blank" rel="noreferrer">
+                图版出处 ↗
+              </a>
+            ) : null}
+          </>
         ) : fontUsable ? (
           <>
             <span>

@@ -11,6 +11,11 @@ import { localFont } from './localFonts';
  *
  * 规则：字形渲染成什么样，只能由这里说了算。declared family 不覆盖某个字符时
  * 直接留空，绝不回退到系统字体——系统字体会把甲骨文画成楷体。
+ *
+ * kind === 'image' 的体系，逐字图片放在 public/glyphs/<scriptId>/ 下，键是字符
+ * 本身（组合字用码位十六进制）。图片的授权必须写进 credit / license / home，
+ * 并同步登记到 public/glyphs/CREDITS.md；来源不明或授权不清的图一律不进仓库。
+ * 只有出现在 images 里的字才会画出图，其余留空。
  */
 export interface GlyphSource {
   kind: 'font' | 'image' | 'none';
@@ -64,6 +69,21 @@ const OVERRIDES: Record<string, GlyphSource> = {
     note: '世俗体是僧侣体进一步草写的结果，Unicode 未单独编码，暂无可靠字形来源。留在空位，不拿圣书体符号顶替。',
   },
 };
+
+/**
+ * 某个字符的图片字形（kind === 'image' 或混排体系逐字覆盖时用）。
+ * 键优先按字符本身，其次按码位十六进制。
+ */
+export function imageFor(source: GlyphSource, char: string): string | undefined {
+  const images = source.images;
+  if (!images) return undefined;
+  return images[char] ?? images[char.codePointAt(0)?.toString(16) ?? ''] ?? undefined;
+}
+
+/** 这套文字是不是以图片为主 */
+export function isImageSource(source: GlyphSource): boolean {
+  return source.kind === 'image';
+}
 
 /** 某个书写体系在详情面板里的字形来源 */
 export function glyphSourceFor(system: WritingSystem): GlyphSource {

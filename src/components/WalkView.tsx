@@ -3,9 +3,12 @@ import { lineages } from '../data';
 import { glyphPaths } from '../data/glyphPaths';
 import { scriptById } from '../data/writingSystems';
 import type { GlyphStop, Lineage } from '../data/types';
-import { FontGlyph, PathGlyph } from './Glyph';
+import { FontGlyph, ImageGlyph, PathGlyph } from './Glyph';
 import { AlphabetField } from './AlphabetField';
+import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { hasLetterMap } from '../data/letterSlots';
+import { familyFor } from '../data/fontFallback';
+import { preloadAlphabetPaths } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { loadFont } from '../lib/fonts';
 import { LINEAGE_MODE_HINT, LINEAGE_MODE_LABEL, formatSpan } from '../lib/time';
@@ -28,6 +31,11 @@ function resolveGlyphPath(stop: GlyphStop): string | null {
 export function WalkView() {
   const [lineageId, setLineageId] = useState(lineages[0].id);
   const lineage = lineages.find((l) => l.id === lineageId) ?? lineages[0];
+
+  // 进 MICRO 就先把字母轮廓包拉起来：第一段有字母表的轨道不该先闪一次字体
+  useEffect(() => {
+    preloadAlphabetPaths();
+  }, []);
 
   return (
     <div className="walk">
@@ -384,15 +392,21 @@ function WalkTrack({ lineage }: { lineage: Lineage }) {
   );
 }
 
-/** 单个站点字形：有条路径用路径，否则用字体 */
+/**
+ * 单个站点字形：有条路径走路径 → 有图版走图版 → 最后才用字体。
+ * 历史书体（隶书、僧侣体、世俗体）没有正确字体，只能用图版或留空。
+ */
 function StopGlyph({ stop, size }: { stop: GlyphStop; size: number }) {
   const script = scriptById[stop.script];
   const d = resolveGlyphPath(stop);
   if (d) return <PathGlyph d={d} size={size} color="var(--ink-strong)" />;
+  const char = stop.char ?? script?.sample;
+  const plate = script ? imageFor(glyphSourceFor(script), char ?? '') : undefined;
+  if (plate) return <ImageGlyph src={plate} label={char} size={size} />;
   return (
     <FontGlyph
-      char={stop.char ?? script?.sample}
-      fontFamily={script?.fontFamily}
+      char={char}
+      fontFamily={familyFor(stop.script, script?.fontFamily)}
       size={size}
       color="var(--ink-strong)"
     />

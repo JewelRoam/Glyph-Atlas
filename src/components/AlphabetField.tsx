@@ -1,9 +1,11 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useLayoutEffect, useMemo, useRef, type CSSProperties } from 'react';
 import { letterMaps, sharedSlots, slotLabel } from '../data/letterSlots';
 import { scriptById } from '../data/writingSystems';
 import { familyFor } from '../data/fontFallback';
+import { glyphSourceFor, imageFor } from '../data/glyphSources';
+import { useAlphabetPaths } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
-import { FontGlyph, PathGlyph } from './Glyph';
+import { FontGlyph, ImageGlyph, PathGlyph } from './Glyph';
 
 /**
  * 字母场 —— 把一整套字母表从一种文字连续变形到另一种文字。
@@ -35,29 +37,12 @@ function preparedPath(key: string, d: string): PreparedGlyph {
   return p;
 }
 
-type AlphabetPaths = Record<string, string>;
-
-let loaded: AlphabetPaths | null = null;
-let loading: Promise<void> | null = null;
-
-/** 字母轮廓单独成包，进 MICRO 才按需拉取 */
-function useAlphabetPaths(): AlphabetPaths | null {
-  const [paths, setPaths] = useState<AlphabetPaths | null>(loaded);
-  useEffect(() => {
-    // 已经加载过：state 初始化时就已经拿到，不需要再 setState
-    if (loaded) return;
-    let alive = true;
-    loading ??= import('../data/glyphAlphabets').then((mod) => {
-      loaded = mod.alphabetPaths;
-    });
-    loading.then(() => {
-      if (alive && loaded) setPaths(loaded);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return paths;
+/** 某个字符的图片字形（没有可靠字体、改用图版的历史书体走这条） */
+function plateFor(scriptId: string, char?: string): string | undefined {
+  if (!char) return undefined;
+  const system = scriptById[scriptId];
+  if (!system) return undefined;
+  return imageFor(glyphSourceFor(system), char);
 }
 
 function fontOf(scriptId: string): string | undefined {
@@ -71,6 +56,8 @@ function LetterGlyph({
   char,
   size,
   d,
+  plate,
+  pending,
   opacity,
   style,
 }: {
@@ -78,18 +65,31 @@ function LetterGlyph({
   char: string;
   size: number;
   d?: string;
+  /** 该字符的图版（没有可靠字体时使用；图版之间只能交叉淡变，不能形变） */
+  plate?: string;
+  /** 轮廓包还没到位：宁可画骨架，也不拿字体顶替 */
+  pending?: boolean;
   opacity?: number;
   style?: CSSProperties;
 }) {
   return (
     <span className="alpha-glyph" style={{ opacity, ...style }}>
-      {d ? (
+      {plate ? (
+        <ImageGlyph src={plate} label={char} size={size} />
+      ) : d ? (
         <PathGlyph d={d} size={size} />
+      ) : pending ? (
+        <PendingGlyph size={size} />
       ) : (
         <FontGlyph char={char} fontFamily={fontOf(script)} size={Math.round(size * 0.92)} />
       )}
     </span>
   );
+}
+
+/** 轮廓包还没到位时的占位：一条静默的骨架，不画任何字形 */
+function PendingGlyph({ size }: { size: number }) {
+  return <span className="alpha-skeleton" style={{ width: size * 0.72, height: size * 0.18 }} />;
 }
 
 export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) {
@@ -216,11 +216,15 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
             const label = slotLabel[slot] ?? slot;
             const da = ca ? paths?.[`${a}:${ca}`] : undefined;
             const db = cb ? paths?.[`${b}:${cb}`] : undefined;
+            const plateA = plateFor(a, ca);
+            const plateB = plateFor(b, cb);
+            // 轮廓还没到位；有图版的字先画图版，其余画骨架
+            const pending = !paths;
 
             let body;
             if (ca && cb) {
               const morph =
-                da && db
+                da && db && !plateA && !plateB
                   ? interpolatePath(
                       preparedPath(`${a}:${ca}`, da),
                       preparedPath(`${b}:${cb}`, db),
@@ -232,11 +236,22 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
               } else {
                 body = (
                   <>
-                    <LetterGlyph script={a} char={ca} size={46} opacity={1 - local} />
+                    <LetterGlyph
+                      script={a}
+                      char={ca}
+                      size={46}
+                      d={da}
+                      plate={plateA}
+                      pending={pending}
+                      opacity={1 - local}
+                    />
                     <LetterGlyph
                       script={b}
                       char={cb}
                       size={46}
+                      d={db}
+                      plate={plateB}
+                      pending={pending}
                       opacity={local}
                       style={{ position: 'absolute', inset: 0 }}
                     />
@@ -252,6 +267,8 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
                   char={cb}
                   size={46}
                   d={db}
+                  plate={plateB}
+                  pending={pending}
                   opacity={p}
                   style={{
                     transform: `translateY(${(1 - p) * 22}px) scale(${0.55 + 0.45 * p})`,
@@ -267,6 +284,8 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
                   char={ca}
                   size={46}
                   d={da}
+                  plate={plateA}
+                  pending={pending}
                   opacity={q}
                   style={{
                     transform: `translateY(${-(1 - q) * 22}px) scale(${0.55 + 0.45 * q})`,

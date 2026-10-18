@@ -113,3 +113,29 @@ export function PathGlyph({
     </svg>
   );
 }
+
+/**
+ * 用图片渲染的字形 —— 没有可靠字体的历史书体（隶书、僧侣体、世俗体，
+ * 以及一批没有 Unicode 编码的古文字）走这条路。
+ *
+ * 图片来自碑帖、拓片、古籍扫描或专业摹本，逐字存放在 public/glyphs/ 下并
+ * 在 src/data/glyphSources.ts 里登记出处与授权。这里只负责画：
+ * 等比装入正方形容器，保留原图的墨色，不做任何重描或风格化。
+ */
+export function ImageGlyph({
+  src,
+  label,
+  size = 120,
+  credit,
+}: {
+  src: string;
+  label?: string;
+  size?: number;
+  credit?: string;
+}) {
+  return (
+    <span className="image-glyph" style={{ width: size, height: size }} title={credit}>
+      <img src={src} alt={label ? `${label} 字形` : '字形图'} loading="lazy" decoding="async" />
+    </span>
+  );
+}
