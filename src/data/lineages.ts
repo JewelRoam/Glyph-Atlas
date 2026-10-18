@@ -204,22 +204,18 @@ export const lineages: Lineage[] = [
 
   {
     id: 'kana',
-    nameZh: '汉字 → 平假名',
-    nameEn: 'Kanji → hiragana',
+    nameZh: '汉字 → 假名',
+    nameEn: 'Kanji → kana',
     mode: 'pair',
     description:
-      '平假名并非凭空发明：每个假名都是某个汉字的草书简省。' +
-      '安→あ、以→い、宇→う、衣→え、於→お。' +
-      '这是"文字被借去记音"的又一个典型样本，与字母表的诞生如出一辙。',
+      '平假名与片假名都从汉字借来：整字的草书一路简省成平假名，' +
+      '整字的一个部件截下来当片假名。格子里一个音节一格，' +
+      '汉字一列写的是万叶假名给这个音用的借字——安→あ、以→い、宇→う、加→カ。' +
+      '浊音、半浊音是后来在假名上加符号造出来的，走过去时飞入。',
     stops: [
       { script: 'chinese-regular', char: '安', label: '汉字「安」', phonetic: 'an' },
       { script: 'hiragana', char: 'あ', label: '平假名「あ」', phonetic: 'a' },
-      { script: 'chinese-regular', char: '宇', label: '汉字「宇」', phonetic: 'u' },
-      { script: 'hiragana', char: 'う', label: '平假名「う」', phonetic: 'u' },
-      { script: 'chinese-regular', char: '衣', label: '汉字「衣」', phonetic: 'i' },
-      { script: 'hiragana', char: 'え', label: '平假名「え」', phonetic: 'e' },
-      { script: 'chinese-regular', char: '加', label: '汉字「加」', phonetic: 'ka' },
-      { script: 'katakana', char: 'カ', label: '片假名「カ」', phonetic: 'ka' },
+      { script: 'katakana', char: 'ア', label: '片假名「ア」', phonetic: 'a' },
     ],
   },
 

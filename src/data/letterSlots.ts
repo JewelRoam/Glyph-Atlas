@@ -37,6 +37,8 @@
  *    马拉雅拉姆、僧伽罗、藏文、爪哇、巴厘、高棉、泰文、老挝文、缅文。
  *  · 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇——按音位
  *    位次与上面各表对齐，多出来的音位另立一格（见 per 系与 perm 系槽位）。
+ *  · 假名：汉字借字、平假名、片假名三套——一个音节一格（见 kana-* 槽位），
+ *    汉字一列是万叶假名给这个音用的借字，浊音半浊音在汉字一列是空的、飞入。
  *
  * 三套槽位各管各的：开头是闪米特—希腊的字母位（ʾālep → Α → A 那条线），
  * 中间 av-* 是阿维斯陀自己新造的字母，mong-* 是蒙古在回鹘之上分出的字母
@@ -333,6 +335,87 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-ssa', label: 'ṣa ष（卷舌咝音）' },
   { id: 'varga-sa', label: 'sa स（齿咝音）' },
   { id: 'varga-ha', label: 'ha ह（浊喉擦音）' },
+
+  // ── 假名（五十音）：汉字借字 → 平假名 → 片假名 ───────────────────
+  // 格子的身份是"音节"而不是字源：一个音占一格，三种写法在同一格里换。
+  // 这与上面 varga-* 的做法一致——读音对得上就同格，读音对不上才另立。
+  // 平假名出自借字的整字草书，片假名出自借字的一个部件，两边常常挑的不是
+  // 同一个汉字（え 取「衣」、エ 取「江」），所以格子名把两种借字都记下来。
+  { id: 'kana-a', label: 'あ / ア（安 · 阿）' },
+  { id: 'kana-i', label: 'い / イ（以 · 伊）' },
+  { id: 'kana-u', label: 'う / ウ（宇）' },
+  { id: 'kana-e', label: 'え / エ（衣 · 江）' },
+  { id: 'kana-o', label: 'お / オ（於）' },
+  { id: 'kana-ka', label: 'か / カ（加）' },
+  { id: 'kana-ki', label: 'き / キ（幾）' },
+  { id: 'kana-ku', label: 'く / ク（久）' },
+  { id: 'kana-ke', label: 'け / ケ（計 · 介）' },
+  { id: 'kana-ko', label: 'こ / コ（己）' },
+  { id: 'kana-sa', label: 'さ / サ（左 · 散）' },
+  { id: 'kana-shi', label: 'し / シ（之）' },
+  { id: 'kana-su', label: 'す / ス（寸 · 須）' },
+  { id: 'kana-se', label: 'せ / セ（世）' },
+  { id: 'kana-so', label: 'そ / ソ（曽）' },
+  { id: 'kana-ta', label: 'た / タ（太 · 多）' },
+  { id: 'kana-chi', label: 'ち / チ（知 · 千）' },
+  { id: 'kana-tsu', label: 'つ / ツ（川）' },
+  { id: 'kana-te', label: 'て / テ（天）' },
+  { id: 'kana-to', label: 'と / ト（止）' },
+  { id: 'kana-na', label: 'な / ナ（奈）' },
+  { id: 'kana-ni', label: 'に / ニ（仁 · 二）' },
+  { id: 'kana-nu', label: 'ぬ / ヌ（奴）' },
+  { id: 'kana-ne', label: 'ね / ネ（祢）' },
+  { id: 'kana-no', label: 'の / ノ（乃）' },
+  { id: 'kana-ha', label: 'は / ハ（波 · 八）' },
+  { id: 'kana-hi', label: 'ひ / ヒ（比）' },
+  { id: 'kana-fu', label: 'ふ / フ（不）' },
+  { id: 'kana-he', label: 'へ / ヘ（部）' },
+  { id: 'kana-ho', label: 'ほ / ホ（保）' },
+  { id: 'kana-ma', label: 'ま / マ（末 · 万）' },
+  { id: 'kana-mi', label: 'み / ミ（美 · 三）' },
+  { id: 'kana-mu', label: 'む / ム（武 · 牟）' },
+  { id: 'kana-me', label: 'め / メ（女）' },
+  { id: 'kana-mo', label: 'も / モ（毛）' },
+  { id: 'kana-ya', label: 'や / ヤ（也）' },
+  { id: 'kana-yu', label: 'ゆ / ユ（由）' },
+  { id: 'kana-yo', label: 'よ / ヨ（与）' },
+  { id: 'kana-ra', label: 'ら / ラ（良）' },
+  { id: 'kana-ri', label: 'り / リ（利）' },
+  { id: 'kana-ru', label: 'る / ル（留 · 流）' },
+  { id: 'kana-re', label: 'れ / レ（礼）' },
+  { id: 'kana-ro', label: 'ろ / ロ（呂）' },
+  { id: 'kana-wa', label: 'わ / ワ（和）' },
+  { id: 'kana-wi', label: 'ゐ / ヰ（為 · 井）' },
+  { id: 'kana-we', label: 'ゑ / ヱ（恵）' },
+  { id: 'kana-wo', label: 'を / ヲ（遠 · 乎）' },
+  { id: 'kana-n', label: 'ん / ン（无 · 尓）' },
+  // 浊音与半浊音是给假名加符号造出来的，没有各自的借字：走到假名那一步时
+  // 它们从下方飞入，被看作这套音节表的"新增字母"。
+  { id: 'kana-ga', label: 'が / ガ（か + 濁点）' },
+  { id: 'kana-gi', label: 'ぎ / ギ（き + 濁点）' },
+  { id: 'kana-gu', label: 'ぐ / グ（く + 濁点）' },
+  { id: 'kana-ge', label: 'げ / ゲ（け + 濁点）' },
+  { id: 'kana-go', label: 'ご / ゴ（こ + 濁点）' },
+  { id: 'kana-za', label: 'ざ / ザ（さ + 濁点）' },
+  { id: 'kana-ji', label: 'じ / ジ（し + 濁点）' },
+  { id: 'kana-zu', label: 'ず / ズ（す + 濁点）' },
+  { id: 'kana-ze', label: 'ぜ / ゼ（せ + 濁点）' },
+  { id: 'kana-zo', label: 'ぞ / ゾ（そ + 濁点）' },
+  { id: 'kana-da', label: 'だ / ダ（た + 濁点）' },
+  { id: 'kana-di', label: 'ぢ / ヂ（ち + 濁点）' },
+  { id: 'kana-du', label: 'づ / ヅ（つ + 濁点）' },
+  { id: 'kana-de', label: 'で / デ（て + 濁点）' },
+  { id: 'kana-do', label: 'ど / ド（と + 濁点）' },
+  { id: 'kana-ba', label: 'ば / バ（は + 濁点）' },
+  { id: 'kana-bi', label: 'び / ビ（ひ + 濁点）' },
+  { id: 'kana-bu', label: 'ぶ / ブ（ふ + 濁点）' },
+  { id: 'kana-be', label: 'べ / ベ（へ + 濁点）' },
+  { id: 'kana-bo', label: 'ぼ / ボ（ほ + 濁点）' },
+  { id: 'kana-pa', label: 'ぱ / パ（は + 濁点）' },
+  { id: 'kana-pi', label: 'ぴ / ピ（ひ + 濁点）' },
+  { id: 'kana-pu', label: 'ぷ / プ（ふ + 濁点）' },
+  { id: 'kana-pe', label: 'ぺ / ペ（へ + 濁点）' },
+  { id: 'kana-po', label: 'ぽ / ポ（ほ + 濁点）' },
 ];
 
 /** 文字的字母表顺序 → 槽位。键是槽位 id，值是这一文字里的字符。 */
@@ -2113,6 +2196,214 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'per-y': '𐖻', // Y y
     zayin: '𐖼', // ZE z
   },
+
+  // ── 假名：汉字借字 → 平假名 → 片假名 ──────────────────────────────
+  // 一个音节一格。汉字一列是万叶假名里给这个音用的借字（平假名那一套），
+  // 平假名取整字的草书，片假名取整字的一个部件；两边挑了不同汉字的音，
+  // 格子里只能放一个，这里放平假名的借字，片假名的借字写在槽位名里。
+  // 浊音、半浊音没有借字：它们在这张表里是纯新增，走过去时飞入。
+  'chinese-regular': {
+    'kana-a': '安', // 安（片假名作「阿」）
+    'kana-i': '以', // 以（片假名作「伊」）
+    'kana-u': '宇', // 宇
+    'kana-e': '衣', // 衣（片假名作「江」）
+    'kana-o': '於', // 於
+    'kana-ka': '加', // 加
+    'kana-ki': '幾', // 幾
+    'kana-ku': '久', // 久
+    'kana-ke': '計', // 計（片假名作「介」）
+    'kana-ko': '己', // 己
+    'kana-sa': '左', // 左（片假名作「散」）
+    'kana-shi': '之', // 之
+    'kana-su': '寸', // 寸（片假名作「須」）
+    'kana-se': '世', // 世
+    'kana-so': '曽', // 曽
+    'kana-ta': '太', // 太（片假名作「多」）
+    'kana-chi': '知', // 知（片假名作「千」）
+    'kana-tsu': '川', // 川
+    'kana-te': '天', // 天
+    'kana-to': '止', // 止
+    'kana-na': '奈', // 奈
+    'kana-ni': '仁', // 仁（片假名作「二」）
+    'kana-nu': '奴', // 奴
+    'kana-ne': '祢', // 祢
+    'kana-no': '乃', // 乃
+    'kana-ha': '波', // 波（片假名作「八」）
+    'kana-hi': '比', // 比
+    'kana-fu': '不', // 不
+    'kana-he': '部', // 部
+    'kana-ho': '保', // 保
+    'kana-ma': '末', // 末（片假名作「万」）
+    'kana-mi': '美', // 美（片假名作「三」）
+    'kana-mu': '武', // 武（片假名作「牟」）
+    'kana-me': '女', // 女
+    'kana-mo': '毛', // 毛
+    'kana-ya': '也', // 也
+    'kana-yu': '由', // 由
+    'kana-yo': '与', // 与
+    'kana-ra': '良', // 良
+    'kana-ri': '利', // 利
+    'kana-ru': '留', // 留（片假名作「流」）
+    'kana-re': '礼', // 礼
+    'kana-ro': '呂', // 呂
+    'kana-wa': '和', // 和
+    'kana-wi': '為', // 為（片假名作「井」）
+    'kana-we': '恵', // 恵
+    'kana-wo': '遠', // 遠（片假名作「乎」）
+    'kana-n': '无', // 无（片假名作「尓」）
+  },  // 汉字借字：48
+
+  hiragana: {
+    'kana-a': 'あ', // 安
+    'kana-i': 'い', // 以
+    'kana-u': 'う', // 宇
+    'kana-e': 'え', // 衣
+    'kana-o': 'お', // 於
+    'kana-ka': 'か', // 加
+    'kana-ki': 'き', // 幾
+    'kana-ku': 'く', // 久
+    'kana-ke': 'け', // 計
+    'kana-ko': 'こ', // 己
+    'kana-sa': 'さ', // 左
+    'kana-shi': 'し', // 之
+    'kana-su': 'す', // 寸
+    'kana-se': 'せ', // 世
+    'kana-so': 'そ', // 曽
+    'kana-ta': 'た', // 太
+    'kana-chi': 'ち', // 知
+    'kana-tsu': 'つ', // 川
+    'kana-te': 'て', // 天
+    'kana-to': 'と', // 止
+    'kana-na': 'な', // 奈
+    'kana-ni': 'に', // 仁
+    'kana-nu': 'ぬ', // 奴
+    'kana-ne': 'ね', // 祢
+    'kana-no': 'の', // 乃
+    'kana-ha': 'は', // 波
+    'kana-hi': 'ひ', // 比
+    'kana-fu': 'ふ', // 不
+    'kana-he': 'へ', // 部
+    'kana-ho': 'ほ', // 保
+    'kana-ma': 'ま', // 末
+    'kana-mi': 'み', // 美
+    'kana-mu': 'む', // 武
+    'kana-me': 'め', // 女
+    'kana-mo': 'も', // 毛
+    'kana-ya': 'や', // 也
+    'kana-yu': 'ゆ', // 由
+    'kana-yo': 'よ', // 与
+    'kana-ra': 'ら', // 良
+    'kana-ri': 'り', // 利
+    'kana-ru': 'る', // 留
+    'kana-re': 'れ', // 礼
+    'kana-ro': 'ろ', // 呂
+    'kana-wa': 'わ', // 和
+    'kana-wi': 'ゐ', // 為
+    'kana-we': 'ゑ', // 恵
+    'kana-wo': 'を', // 遠
+    'kana-n': 'ん', // 无
+    'kana-ga': 'が', // か 加浊点
+    'kana-gi': 'ぎ', // き 加浊点
+    'kana-gu': 'ぐ', // く 加浊点
+    'kana-ge': 'げ', // け 加浊点
+    'kana-go': 'ご', // こ 加浊点
+    'kana-za': 'ざ', // さ 加浊点
+    'kana-ji': 'じ', // し 加浊点
+    'kana-zu': 'ず', // す 加浊点
+    'kana-ze': 'ぜ', // せ 加浊点
+    'kana-zo': 'ぞ', // そ 加浊点
+    'kana-da': 'だ', // た 加浊点
+    'kana-di': 'ぢ', // ち 加浊点
+    'kana-du': 'づ', // つ 加浊点
+    'kana-de': 'で', // て 加浊点
+    'kana-do': 'ど', // と 加浊点
+    'kana-ba': 'ば', // は 加浊点
+    'kana-bi': 'び', // ひ 加浊点
+    'kana-bu': 'ぶ', // ふ 加浊点
+    'kana-be': 'べ', // へ 加浊点
+    'kana-bo': 'ぼ', // ほ 加浊点
+    'kana-pa': 'ぱ', // は 加浊点
+    'kana-pi': 'ぴ', // ひ 加浊点
+    'kana-pu': 'ぷ', // ふ 加浊点
+    'kana-pe': 'ぺ', // へ 加浊点
+    'kana-po': 'ぽ', // ほ 加浊点
+  },  // 平假名：48 + 25
+
+  katakana: {
+    'kana-a': 'ア', // 阿
+    'kana-i': 'イ', // 伊
+    'kana-u': 'ウ', // 宇
+    'kana-e': 'エ', // 江
+    'kana-o': 'オ', // 於
+    'kana-ka': 'カ', // 加
+    'kana-ki': 'キ', // 幾
+    'kana-ku': 'ク', // 久
+    'kana-ke': 'ケ', // 介
+    'kana-ko': 'コ', // 己
+    'kana-sa': 'サ', // 散
+    'kana-shi': 'シ', // 之
+    'kana-su': 'ス', // 須
+    'kana-se': 'セ', // 世
+    'kana-so': 'ソ', // 曽
+    'kana-ta': 'タ', // 多
+    'kana-chi': 'チ', // 千
+    'kana-tsu': 'ツ', // 川
+    'kana-te': 'テ', // 天
+    'kana-to': 'ト', // 止
+    'kana-na': 'ナ', // 奈
+    'kana-ni': 'ニ', // 二
+    'kana-nu': 'ヌ', // 奴
+    'kana-ne': 'ネ', // 祢
+    'kana-no': 'ノ', // 乃
+    'kana-ha': 'ハ', // 八
+    'kana-hi': 'ヒ', // 比
+    'kana-fu': 'フ', // 不
+    'kana-he': 'ヘ', // 部
+    'kana-ho': 'ホ', // 保
+    'kana-ma': 'マ', // 万
+    'kana-mi': 'ミ', // 三
+    'kana-mu': 'ム', // 牟
+    'kana-me': 'メ', // 女
+    'kana-mo': 'モ', // 毛
+    'kana-ya': 'ヤ', // 也
+    'kana-yu': 'ユ', // 由
+    'kana-yo': 'ヨ', // 与
+    'kana-ra': 'ラ', // 良
+    'kana-ri': 'リ', // 利
+    'kana-ru': 'ル', // 流
+    'kana-re': 'レ', // 礼
+    'kana-ro': 'ロ', // 呂
+    'kana-wa': 'ワ', // 和
+    'kana-wi': 'ヰ', // 井
+    'kana-we': 'ヱ', // 恵
+    'kana-wo': 'ヲ', // 乎
+    'kana-n': 'ン', // 尓
+    'kana-ga': 'ガ', // か 加浊点
+    'kana-gi': 'ギ', // き 加浊点
+    'kana-gu': 'グ', // く 加浊点
+    'kana-ge': 'ゲ', // け 加浊点
+    'kana-go': 'ゴ', // こ 加浊点
+    'kana-za': 'ザ', // さ 加浊点
+    'kana-ji': 'ジ', // し 加浊点
+    'kana-zu': 'ズ', // す 加浊点
+    'kana-ze': 'ゼ', // せ 加浊点
+    'kana-zo': 'ゾ', // そ 加浊点
+    'kana-da': 'ダ', // た 加浊点
+    'kana-di': 'ヂ', // ち 加浊点
+    'kana-du': 'ヅ', // つ 加浊点
+    'kana-de': 'デ', // て 加浊点
+    'kana-do': 'ド', // と 加浊点
+    'kana-ba': 'バ', // は 加浊点
+    'kana-bi': 'ビ', // ひ 加浊点
+    'kana-bu': 'ブ', // ふ 加浊点
+    'kana-be': 'ベ', // へ 加浊点
+    'kana-bo': 'ボ', // ほ 加浊点
+    'kana-pa': 'パ', // は 加浊点
+    'kana-pi': 'ピ', // ひ 加浊点
+    'kana-pu': 'プ', // ふ 加浊点
+    'kana-pe': 'ペ', // へ 加浊点
+    'kana-po': 'ポ', // ほ 加浊点
+  },  // 片假名：48 + 25
 };
 
 /** 槽位在字母场格子里的固定次序 */
