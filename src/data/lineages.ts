@@ -433,4 +433,29 @@ export const lineages: Lineage[] = [
       { script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
     ],
   },
+
+  {
+    id: 'sharada-branch',
+    nameZh: '夏拉达 a → 北印度诸支 a',
+    nameEn: 'Sharada a → North Indian a',
+    mode: 'cognate',
+    description:
+      '夏拉达文是八世纪克什米尔一带的书体，它往下分出塔克里、多格拉、霍杰基、' +
+      '胡达瓦迪、穆尔塔尼与马哈贾尼几支。这几家都按梵语字音表排字母，' +
+      '所以同一个 ka、同一个 ma 能逐格对上；分野在于各自添的字：' +
+      '信德三文（霍杰基、胡达瓦迪、穆尔塔尼）从信德语借来四个内爆音——' +
+      'ɓ ɗ ɠ ʄ，写成在基字下加小钩的 ॺ 形；塔克里与多格拉添卷舌边音 ḷa、' +
+      '闪音 ṛa，穆尔塔尼再添一个 ṛha，霍杰基借来波斯语的 qa；' +
+      '记账体马哈贾尼图快，把 ya 与三个咝音连同 nga 一起丢掉了，' +
+      '走到那一站时这四格会消失，下一站又飞回来。',
+    stops: [
+      { script: 'sharada', char: '𑆃', label: '夏拉达 a', phonetic: 'a' },
+      { script: 'takri', char: '𑚀', label: '塔克里 a', phonetic: 'a' },
+      { script: 'mahajani', char: '𑅐', label: '马哈贾尼 a', phonetic: 'a' },
+      { script: 'khojki', char: '𑈀', label: '霍杰基 a', phonetic: 'a' },
+      { script: 'multani', char: '𑊀', label: '穆尔塔尼 a', phonetic: 'a' },
+      { script: 'khudawadi', char: '𑊰', label: '胡达瓦迪 a', phonetic: 'a' },
+      { script: 'dogra', char: '𑠀', label: '多格拉 a', phonetic: 'a' },
+    ],
+  },
 ]
