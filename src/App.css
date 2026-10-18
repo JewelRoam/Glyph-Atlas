@@ -780,6 +780,9 @@ main {
   user-select: none;
   touch-action: none;
   cursor: grab;
+  /* 展签独占底部一条带：中央字形在这条带之上居中，两者不再叠在一起。
+     字号的缩放由 WalkView 按实测高度算（见 --walk-cap 的消费方）。 */
+  --walk-cap: 88px;
 }
 .walk-stage:active {
   cursor: grabbing;
@@ -792,7 +795,7 @@ main {
 }
 .walk-side {
   position: absolute;
-  top: 47%;
+  top: calc((100% - var(--walk-cap)) / 2);
   left: 50%;
   pointer-events: auto;
   cursor: pointer;
@@ -802,7 +805,7 @@ main {
 
 .walk-center {
   position: absolute;
-  inset: 0;
+  inset: 0 0 var(--walk-cap) 0;
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -825,7 +828,7 @@ main {
 /* 过去与未来形态的虚线残影：让"正在变形"这件事可见 */
 .walk-ghost {
   position: absolute;
-  inset: 0;
+  inset: 0 0 var(--walk-cap) 0;
   display: grid;
   place-items: center;
   opacity: 0.16;
@@ -846,10 +849,10 @@ main {
 /* 中央舞台的展柜光 */
 .walk-halo {
   position: absolute;
-  top: 50%;
+  top: calc((100% - var(--walk-cap)) / 2);
   left: 50%;
-  width: 420px;
-  height: 420px;
+  width: var(--walk-halo, 420px);
+  height: var(--walk-halo, 420px);
   transform: translate(-50%, -50%);
   pointer-events: none;
   background: radial-gradient(
@@ -859,13 +862,13 @@ main {
     transparent 68%
   );
 }
-/* 舞台脚下的基线，像展签底边 */
-.walk-halo::after {
+/* 舞台脚下的基线，像展签底边：位置由 WalkView 按字号算，贴着字形底缘 */
+.walk-center::after {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: 74px;
-  width: 300px;
+  bottom: var(--walk-baseline-gap, 12px);
+  width: var(--walk-baseline-w, 300px);
   height: 1px;
   transform: translateX(-50%);
   background: linear-gradient(
@@ -880,7 +883,11 @@ main {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 2px;
+  bottom: 0;
+  height: var(--walk-cap);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
   pointer-events: none;
 }
@@ -967,6 +974,9 @@ main {
 /* 外层高度由 AlphabetField 按内容量出，格子增减时整块一起收放 */
 .alpha-scroll {
   height: 0;
+  /* JS 按内容量出的高度是"想长多高"；这里再按视口封顶，
+     窄屏 / 矮屏上字母场不抢走舞台的全部高度 */
+  max-height: min(196px, 24vh);
   overflow: hidden;
   overscroll-behavior: contain;
   transition: height 0.32s cubic-bezier(0.22, 0.68, 0.28, 1);
@@ -1463,6 +1473,30 @@ main {
   }
   .walk {
     padding: 14px 14px 12px;
+    /* 窄屏上轨道多、字母场又要占一条，整块允许纵向滚动，
+       不让溢出部分被 overflow: hidden 直接裁掉 */
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+  /* 窄屏：轨道标签排成一行横向滚动。之前允许折行，十几条轨道折成 590px 高，
+     把中央舞台挤成 0 高，字形会压到展签和街道上 */
+  .walk-tabs {
+    flex-wrap: nowrap;
+  }
+  /* 舞台无论如何要留出一屏能看字的高度 */
+  .walk-stage {
+    min-height: 190px;
+  }
+  .walk-swap {
+    flex-shrink: 0;
+  }
+  /* 窄屏把格子压小，一屏里尽量铺下整张字母表；字形字号由 AlphabetField
+     量出真实列宽后回算，跟着一起缩 */
+  .alpha-grid {
+    grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
+  }
+  .alpha-cell {
+    min-height: 36px;
   }
   .walk-side {
     display: none;

@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { lineages } from '../data';
 import { glyphPaths } from '../data/glyphPaths';
 import { scriptById } from '../data/writingSystems';
+import type { CSSProperties } from 'react';
 import type { GlyphStop, Lineage } from '../data/types';
 import { FontGlyph, ImageGlyph, PathGlyph } from './Glyph';
 import { AlphabetField } from './AlphabetField';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
-import { hasLetterMap } from '../data/letterSlots';
+import { hasRoster } from '../data/letterSlots';
 import { familyFor } from '../data/fontFallback';
 import { preloadAlphabetGroup, preloadAlphabetPaths } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
@@ -22,6 +23,11 @@ function resolveGlyphPath(stop: GlyphStop): string | null {
 
 /** 换轨道的交叉淡变时长：与轨道内的补间同量级，切换不会显得突兀 */
 const SWAP_MS = 420;
+
+/** 展签带高度：与 CSS 的 --walk-cap 保持一致，用来给中央字形换算可用高度 */
+const CAPTION_BAND = 88;
+/** 中央字形的上限；实际字号由舞台高度决定，字母场铺开时自动缩小 */
+const GLYPH_MAX = 260;
 
 /**
  * 微观维度：沿一条血统轨道"往前走 / 往后走"。
@@ -126,6 +132,8 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
   /** 位置的最新值：动画与手势互相打断时都要读它 */
   const pRef = useRef(p);
   const animRef = useRef<number | null>(null);
+  /** 正在滑向的那一站：补间途中再点左右，以它为准往前/往后，目标不会来回抖 */
+  const targetRef = useRef(p);
 
   useEffect(() => {
     pRef.current = p;
@@ -171,6 +179,7 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       stopGlide();
       const from = pRef.current;
       const to = clamp(target);
+      targetRef.current = to;
       const dist = Math.abs(to - from);
       if (dist < 0.001) {
         setP(to);
@@ -187,6 +196,25 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       animRef.current = requestAnimationFrame(step);
     },
     [clamp, stopGlide],
+  );
+
+  /**
+   * 往前走 / 往后走一站。
+   *
+   * 补间途中再点一次，基准是"当前要去的那一站"而不是当前画面位置：连点三下就是
+   * 连走三站，中途改向也从那一站折回，不会因为画面还在半路而原地抖一下。
+   */
+  const stepBy = useCallback(
+    (dir: 1 | -1) => {
+      const base = animRef.current !== null ? targetRef.current : pRef.current;
+      const next = clamp(
+        dir > 0 ? Math.floor(base + 1e-6) + 1 : Math.ceil(base - 1e-6) - 1,
+      );
+      if (next === base) return;
+      setPlaying(false);
+      glideTo(next);
+    },
+    [clamp, glideTo],
   );
 
   /** 手势与滑杆：立刻跟手，同时取消补间 */
@@ -225,13 +253,51 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
         e.preventDefault();
-        setPlaying(false);
-        glideTo(Math.round(pRef.current) + (e.key === 'ArrowRight' ? 1 : -1));
+        stepBy(e.key === 'ArrowRight' ? 1 : -1);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [glideTo, interactive]);
+  }, [interactive, stepBy]);
+
+  /**
+   * 舞台高度决定中央字形的大小。
+   *
+   * 展签在底部独占一条带（CSS 的 --walk-cap），字形只能在这条带之上居中；
+   * 一旦字母场把舞台压矮，还用固定的 260px 画字，字形就会盖住展签。所以这里
+   * 按实测高度算字号，字号始终落在展签带以上。
+   */
+  const [stageBox, setStageBox] = useState({ w: 0, h: 0 });
+  useLayoutEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const read = () => {
+      const r = el.getBoundingClientRect();
+      setStageBox((prev) =>
+        Math.abs(prev.w - r.width) < 1 && Math.abs(prev.h - r.height) < 1
+          ? prev
+          : { w: r.width, h: r.height },
+      );
+    };
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const glyphSize = useMemo(() => {
+    // 还没量到宽度（首帧之前）：先按上限画，layout effect 会在绘制前纠正
+    if (!stageBox.w) return GLYPH_MAX;
+    const byHeight = stageBox.h - CAPTION_BAND - 10;
+    const byWidth = stageBox.w * 0.3;
+    return Math.round(Math.max(40, Math.min(GLYPH_MAX, byHeight, byWidth)));
+  }, [stageBox]);
+
+  /** 贴住字形底缘的那条基线：字形缩小时它跟着往上走，不会掉进展签里 */
+  const baselineGap = useMemo(() => {
+    const centerH = Math.max(0, stageBox.h - CAPTION_BAND);
+    return Math.round(Math.max(6, (centerH - glyphSize) / 2 + 6));
+  }, [stageBox.h, glyphSize]);
 
   const i0 = Math.max(0, Math.min(stops.length - 1, Math.floor(p)));
   const i1 = Math.min(stops.length - 1, i0 + 1);
@@ -259,14 +325,16 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
   const showGhost = ghostOpacity > 0.004 && (ghostPath || ghostStop.char);
 
   /**
-   * 这一段轨道能不能铺字母场：两站的书写体系都得有字母槽位表（见
-   * data/letterSlots.ts）。没有对照表的文字仍然只显示单字形的街景。
+   * 这一段轨道能不能铺字母场：任意一站有字母表就铺（见 data/letterSlots.ts）。
+   *
+   * 只有一边有字母表时，对面按"整表未出现 / 已消失"处理：那一家的字母会成批
+   * 飞入或飞出。语素文字（汉字、圣书体）没有字母表，仍然只显示单字形的街景。
    */
   const alphabetPair = useMemo(() => {
     const sa = a.script;
     const sb = b.script;
-    if (sa === sb) return hasLetterMap(sa) ? { a: sa, b: sb, t: 0 } : null;
-    if (!hasLetterMap(sa) || !hasLetterMap(sb)) return null;
+    if (sa === sb) return hasRoster(sa) ? { a: sa, b: sb, t: 0 } : null;
+    if (!hasRoster(sa) && !hasRoster(sb)) return null;
     return { a: sa, b: sb, t };
   }, [a.script, b.script, t]);
 
@@ -335,14 +403,14 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
       >
-        <div className="walk-halo" />
+        <div className="walk-halo" style={{ '--walk-halo': `${Math.round(glyphSize * 1.6)}px` } as CSSProperties} />
 
         {showGhost && (
           <div
             className={`walk-ghost ${ghostPath ? '' : 'font-ghost'}`}
             style={{ opacity: ghostOpacity }}
           >
-            <StopGlyph stop={ghostStop} size={260} />
+            <StopGlyph stop={ghostStop} size={glyphSize} />
           </div>
         )}
 
@@ -353,16 +421,24 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
           {sideStop(i1 + 2, 2)}
         </div>
 
-        <div className="walk-center">
+        <div
+          className="walk-center"
+          style={
+            {
+              '--walk-baseline-gap': `${baselineGap}px`,
+              '--walk-baseline-w': `${Math.round(Math.min(300, glyphSize * 1.15))}px`,
+            } as CSSProperties
+          }
+        >
           {morphPath ? (
-            <PathGlyph d={morphPath} size={260} color="var(--ink-strong)" />
+            <PathGlyph d={morphPath} size={glyphSize} color="var(--ink-strong)" />
           ) : (
             <div className="walk-fade">
               <span style={{ opacity: 1 - t }}>
-                <StopGlyph stop={a} size={260} />
+                <StopGlyph stop={a} size={glyphSize} />
               </span>
               <span style={{ opacity: t }}>
-                <StopGlyph stop={b} size={260} />
+                <StopGlyph stop={b} size={glyphSize} />
               </span>
             </div>
           )}
@@ -387,13 +463,7 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       {alphabetPair && <AlphabetField a={alphabetPair.a} b={alphabetPair.b} t={alphabetPair.t} />}
 
       <div className="walk-controls">
-        <button
-          onClick={() => {
-            setPlaying(false);
-            glideTo(Math.round(pRef.current) - 1);
-          }}
-          aria-label="上一个"
-        >
+        <button onClick={() => stepBy(-1)} aria-label="上一个">
           ←
         </button>
         <button
@@ -406,13 +476,7 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
         >
           {playing ? '暂停' : '播放演进'}
         </button>
-        <button
-          onClick={() => {
-            setPlaying(false);
-            glideTo(Math.round(pRef.current) + 1);
-          }}
-          aria-label="下一个"
-        >
+        <button onClick={() => stepBy(1)} aria-label="下一个">
           →
         </button>
       </div>

@@ -1,9 +1,9 @@
-import { useLayoutEffect, useMemo, useRef, type CSSProperties } from 'react';
-import { letterMaps, sharedSlots, slotLabel } from '../data/letterSlots';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { rosterFor, sharedSlots, slotLabel } from '../data/letterSlots';
 import { scriptById } from '../data/writingSystems';
 import { familyFor } from '../data/fontFallback';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
-import { useAlphabetPaths } from '../lib/alphabetPaths';
+import { alphabetGroup, useAlphabetPaths } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { FontGlyph, ImageGlyph, PathGlyph } from './Glyph';
 
@@ -99,9 +99,38 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const rectsRef = useRef(new Map<string, DOMRect>());
   const paintedRef = useRef(false);
-  const ma = letterMaps[a] ?? {};
-  const mb = letterMaps[b] ?? {};
+  // 一家的完整字表 = 手工核过的同源槽位 + 这一家自己的其余字母（自动补位）
+  const ma = rosterFor(a);
+  const mb = rosterFor(b);
   const slotKey = slots.join('|');
+
+  /**
+   * 格子里的字形跟着格子一起缩。
+   *
+   * 列宽由 CSS 的 auto-fit 决定：宽屏一格 44px 以上，窄屏为了把整张字母表塞进
+   * 一屏会把格子压小。字形如果固定 46px，窄屏上就会溢出格子互相压字，所以这里
+   * 量出真实列宽再回算字号（上限仍是 46，宽屏一个字都不缩）。
+   */
+  const [cellSize, setCellSize] = useState(0);
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const read = () => {
+      const first = grid.querySelector<HTMLElement>('.alpha-cell');
+      const w = first?.getBoundingClientRect().width ?? 0;
+      if (w > 0) setCellSize((prev) => (Math.abs(prev - w) < 0.5 ? prev : w));
+    };
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(grid);
+    return () => ro.disconnect();
+  }, [slotKey]);
+  const glyphSize = cellSize ? Math.round(Math.min(46, cellSize * 0.9)) : 46;
+  /**
+   * 轮廓包还在路上：只有"这一对文字真的会用轮廓包"时才画骨架。两边都靠字体
+   * 渲染时（例如两个没有手工对照表的体系）直接铺字形，不必空等。
+   */
+  const pathsPending = !paths && (Boolean(alphabetGroup(a)) || Boolean(alphabetGroup(b)));
 
   /**
    * 一段轨道上的格子数会变（走到下一站时这一段的槽位增减），网格就会换行重排。
@@ -185,6 +214,8 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
     else if (cb) added++;
     else lost++;
   }
+  // 一边完全没有手工同源位时，整场都是"增 / 删"，说明这一段的对应关系还没核过
+  const swapOnly = kept === 0 && added > 0 && lost > 0;
 
   const nameA = scriptById[a]?.nameZh ?? a;
   const nameB = scriptById[b]?.nameZh ?? b;
@@ -213,13 +244,13 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
             const cb = mb[slot];
             const shift = slots.length > 1 ? (i / (slots.length - 1)) * SPREAD : 0;
             const local = clamp01((t - shift) / (1 - SPREAD));
-            const label = slotLabel[slot] ?? slot;
+            const label = slotLabel[slot] ?? ca ?? cb ?? slot;
             const da = ca ? paths?.[`${a}:${ca}`] : undefined;
             const db = cb ? paths?.[`${b}:${cb}`] : undefined;
             const plateA = plateFor(a, ca);
             const plateB = plateFor(b, cb);
             // 轮廓还没到位；有图版的字先画图版，其余画骨架
-            const pending = !paths;
+            const pending = pathsPending;
 
             let body;
             if (ca && cb) {
@@ -232,14 +263,14 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
                     )
                   : null;
               if (morph) {
-                body = <LetterGlyph script={a} char={ca} size={46} d={morph} />;
+                body = <LetterGlyph script={a} char={ca} size={glyphSize} d={morph} />;
               } else {
                 body = (
                   <>
                     <LetterGlyph
                       script={a}
                       char={ca}
-                      size={46}
+                      size={glyphSize}
                       d={da}
                       plate={plateA}
                       pending={pending}
@@ -248,7 +279,7 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
                     <LetterGlyph
                       script={b}
                       char={cb}
-                      size={46}
+                      size={glyphSize}
                       d={db}
                       plate={plateB}
                       pending={pending}
@@ -265,7 +296,7 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
                 <LetterGlyph
                   script={b}
                   char={cb}
-                  size={46}
+                  size={glyphSize}
                   d={db}
                   plate={plateB}
                   pending={pending}
@@ -282,7 +313,7 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
                 <LetterGlyph
                   script={a}
                   char={ca}
-                  size={46}
+                  size={glyphSize}
                   d={da}
                   plate={plateA}
                   pending={pending}
@@ -311,6 +342,7 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
       <p className="alpha-note">
         格子按"同源槽位"排列，不是各自字母表的书写顺序。
         {added || lost ? '只在一边出现的格子就是字母表的增删：它们会飞入或飞出。' : ''}
+        {swapOnly ? '这一段还没有核对过的同源字母，两边的字表各自整批进出，不做形变。' : ''}
       </p>
     </section>
   );

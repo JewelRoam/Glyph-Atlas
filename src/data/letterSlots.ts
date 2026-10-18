@@ -11,6 +11,11 @@
  *  · SLOTS    —— 槽位的全局顺序（字母场的格子顺序按它排，跨文字保持稳定）；
  *  · letterMaps —— 文字 → (槽位 → 该文字里代表这个槽位的字符)。
  *
+ * 手工表之外，字母表性质的文字还会按字形样本集自动补位（见文件末尾的
+ * rosterFor）：补位的格子只在一家有字面，走到相邻文字时按字母表的增删处理，
+ * 飞入或飞出。这样一条轨道上的两家都能整表铺开，而没核对过的对应关系
+ * 不会被硬凑成"原地变形"。
+ *
  * 三种特殊写法：
  *  · 同一个字符可以出现在两个槽位里，用来表示"一个祖形分出两支"。
  *    例如腓尼基 𐤅 (wāw) 同时进 waw 槽（→ 希腊 Υ → 拉丁 V）和 digamma 槽
@@ -82,6 +87,10 @@
  */
 
 import { SVARA_SLOTS, svaraMaps } from './svaraSlots.ts';
+import { glyphSets } from './glyphSets.ts';
+import { scriptById } from './writingSystems.ts';
+import { familyFor } from './fontFallback.ts';
+import { coverageOf } from '../lib/coverage.ts';
 
 export interface LetterSlot {
   id: string;
@@ -623,6 +632,9 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-llla', label: 'ḻa ழ（卷舌边擦音，泰米尔—马拉雅拉姆的 ழ）' },
   { id: 'varga-rra', label: 'ṛa / ṟa ड़（r 之外另立的闪音或颤音）' },
   { id: 'varga-nnna', label: 'ṉa ன（齿龈鼻音，泰米尔的 ன）' },
+  // 婆罗米文本里另有一格教科书字母表不收的卷舌边音：U+11075 OLD TAMIL LLA，
+  // 是婆罗米时代泰米尔语留下的独立字母位，只有婆罗米一面有字面。
+  { id: 'varga-old-tamil-lla', label: 'ḷa 古泰米尔（U+11075 婆罗米旧泰米尔边音）' },
   // 夏拉达—信德诸支自己添的字母位：夏拉达与它的后身（塔克里、多格拉、
   // 霍杰基、穆尔塔尼、胡达瓦迪、马哈贾尼）在梵语 33 音之外还留了几个字母，
   // 大多是信德语特有的内爆音（ɓ ɗ ɠ ʄ，写成在基字下加小钩）与地方卷舌音。
@@ -2224,7 +2236,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-llla': '𑀵',
     'varga-rra': '𑀶',
     'varga-nnna': '𑀷',
-  },  // 婆罗米文：33/33
+    'varga-old-tamil-lla': '𑁵',
+  },  // 婆罗米文：34 格（33 音 + 旧泰米尔边音）
   siddham: {
     'varga-ka': '𑖎',
     'varga-kha': '𑖏',
@@ -3967,17 +3980,144 @@ export const letterMaps: Record<string, Record<string, string>> = Object.fromEnt
 /** 槽位在字母场格子里的固定次序 */
 const slotIndex = new Map(SLOTS.map((slot, i) => [slot.id, i]));
 
-/** 某个文字有没有字母槽位表 */
+/** 某个文字有没有手工核过的字母槽位表 */
 export function hasLetterMap(scriptId: string): boolean {
   return Boolean(letterMaps[scriptId]);
 }
 
+/**
+ * 会自动补位的书写体系类型。
+ *
+ * 字母表、辅音音素文字、元音附标文字、音节文字、特征文字都有确定的字母清单，
+ * 可以在手工同源位之外把剩下的字逐格补上；语素文字（汉字、西夏文、圣书体）
+ * 本来就没有"字母表"，整批铺格只会得到一屏毫无对应关系的方块，所以不进这一套。
+ */
+const ALPHABETIC_TYPES = new Set<string>([
+  'alphabet',
+  'abjad',
+  'abugida',
+  'syllabary',
+  'featural',
+]);
+
+/** 每个体系最多自动补多少格：音节文字动辄几百字，其余的不进字母场 */
+const AUTO_LIMIT = 240;
+
+/**
+ * 不进自动补位的"长得像字、其实不是字"的记号。
+ *
+ * 这些字符的 Unicode 类别是修饰字母（Lm），但它们只能加在别的字母上：单独
+ * 占一格时只剩一个小点或小钩，混在字母表里像缺字。只挡自动补位——手工对照
+ * 表里若核实过它是这一家的字母，照旧保留。
+ */
+const NON_LETTER_MARKS = new Set([
+  0x037a, // 希腊 ὑπογεγραμμένη：写在字母下的小 ι
+  0x0559, // 亚美尼亚修饰半环：句读记号
+  0x06e5, // 阿拉伯小 wāw
+  0x06e6, // 阿拉伯小 yāʾ
+  0x0971, // 天城文高间距点
+  0x10fc, // 格鲁吉亚修饰 n：后缀标记
+  0xa67f, // 西里尔 payerok：缩写记号
+]);
+
+/** 自动槽位的键：一个字母一格，跨文字不复用 */
+function autoSlot(scriptId: string, char: string): string {
+  return `auto:${scriptId}:${(char.codePointAt(0) ?? 0).toString(16)}`;
+}
+
+/**
+ * 判断两个字面是不是"同一个字母"：忽略大小写与附加符号。
+ *
+ * 大小写是书写层的分化，不是字母表里的两个字母，所以补位时把 A 与 a、
+ * Α 与 ά 收进同一格；但 ñ 的波浪线、 আ 的元音符号这类会改变字母身份的
+ * 记号不忽略——除了一组纯附加符号，折叠后必须还是同一个基本字母。
+ */
+function letterKey(char: string): string {
+  const folded = char.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase();
+  // 折叠后不是单个字符（例如 ß → SS）就退回原字：宁可多一格，也不并错
+  return Array.from(folded).length === 1 ? folded : char;
+}
+
+/**
+ * 自动补位：这一家的字形清单里，还没进手工对照表的字母各占一格。
+ *
+ * 只对有确定字表、有可核验字体、且覆盖表里确实有字形的体系补位。图版体系
+ * 排不出逐字表；没有可靠来源的体系宁可空着，也不拿现代字体凑数。
+ */
+function autoRoster(scriptId: string, manual?: Record<string, string>): Record<string, string> {
+  const system = scriptById[scriptId];
+  if (!system || !ALPHABETIC_TYPES.has(system.type)) return {};
+  const family = familyFor(scriptId, system.fontFamily);
+  if (!family) return {};
+
+  // 手工表里的字面就是这些字母的正式站位；同字母的其它字面（小写、带调）不再单列
+  const used = new Set(Object.values(manual ?? {}).map(letterKey));
+  const chars = glyphSets[scriptId]?.chars ?? [];
+  const out: Record<string, string> = {};
+  let count = 0;
+
+  for (const char of chars) {
+    if (count >= AUTO_LIMIT) break;
+    const cp = char.codePointAt(0);
+    // 纯附加记号不铺格（见 NON_LETTER_MARKS）
+    if (cp !== undefined && NON_LETTER_MARKS.has(cp)) continue;
+    const key = letterKey(char);
+    if (used.has(key)) continue;
+    // 字库里没有这个字形就不铺格，免得字母场里飞进一堆"字库未收"的小名片
+    if (coverageOf(family, char) === 'no') continue;
+    used.add(key);
+    out[autoSlot(scriptId, char)] = char;
+    count++;
+  }
+  return out;
+}
+
+const rosterCache = new Map<string, Record<string, string>>();
+
+/**
+ * 某文字在字母场里的完整字表：手工核过的同源槽位在前，其余字母按码位补在后面。
+ *
+ * 补位的格子只在一边有字面，走到相邻文字时按"新增 / 消失"处理——飞入或飞出，
+ * 不会被塞进一个没核对过的同源关系里。要让某个字原地变形，先在 letterMaps
+ * 里给它一个真正对应的槽位。
+ */
+export function rosterFor(scriptId: string): Record<string, string> {
+  const cached = rosterCache.get(scriptId);
+  if (cached) return cached;
+
+  const manual = letterMaps[scriptId];
+  const roster: Record<string, string> = { ...(manual ?? {}), ...autoRoster(scriptId, manual) };
+  rosterCache.set(scriptId, roster);
+  return roster;
+}
+
+/** 某个文字有没有可铺的字母表（手工槽位或自动补位） */
+export function hasRoster(scriptId: string): boolean {
+  return Object.keys(rosterFor(scriptId)).length > 0;
+}
+
+/** 自动槽位在同一条轨道里的次序：先 a 的补位，再 b 的补位，各按码位 */
+function autoRank(slot: string, a: string, b: string): number {
+  const [, script = '', hex = '0'] = slot.split(':');
+  const side = a !== b && script === b ? 1 : 0;
+  return side * 0x200000 + parseInt(hex, 16);
+}
+
 /** 一对文字共用的槽位，按全局顺序返回（两边的并集） */
 export function sharedSlots(a: string, b: string): string[] {
-  const ma = letterMaps[a] ?? {};
-  const mb = letterMaps[b] ?? {};
+  const ma = rosterFor(a);
+  const mb = rosterFor(b);
   const ids = new Set([...Object.keys(ma), ...Object.keys(mb)]);
-  return [...ids].sort((x, y) => (slotIndex.get(x) ?? 99) - (slotIndex.get(y) ?? 99));
+  return [...ids].sort((x, y) => {
+    const ix = slotIndex.get(x);
+    const iy = slotIndex.get(y);
+    if (ix !== undefined || iy !== undefined) {
+      if (ix === undefined) return 1;
+      if (iy === undefined) return -1;
+      return ix - iy;
+    }
+    return autoRank(x, a, b) - autoRank(y, a, b);
+  });
 }
 
 /** 槽位名的查表 */
