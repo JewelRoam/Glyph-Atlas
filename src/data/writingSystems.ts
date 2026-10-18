@@ -422,14 +422,14 @@ export const writingSystems: WritingSystem[] = [
     origin: 'derived', parents: ['greek', 'glagolitic'], dateFrom: 890, dateTo: null,
     family: 'greek', region: '东欧', countries: ['俄罗斯', '乌克兰', '保加利亚', '塞尔维亚', '蒙古', '哈萨克斯坦'],
     type: 'alphabet', status: 'living', direction: 'ltr',
-    unicodeBlock: 'Cyrillic U+0400', sample: 'А',
+    unicodeBlock: 'Cyrillic U+0400', sample: 'А', fontFamily: 'Noto Sans',
   },
   {
     id: 'armenian', nameZh: '亚美尼亚字母', nameEn: 'Armenian',
     origin: 'influence', parents: ['greek'], dateFrom: 405, dateTo: null,
     family: 'greek', region: '高加索', countries: ['亚美尼亚'],
     type: 'alphabet', status: 'living', direction: 'ltr',
-    unicodeBlock: 'Armenian U+0530', sample: 'Ա',
+    unicodeBlock: 'Armenian U+0530', sample: 'Ա', fontFamily: 'Noto Sans Armenian',
     note: '公元 405 年由圣梅斯罗布创制，至今几乎未变。',
   },
   {
@@ -446,7 +446,8 @@ export const writingSystems: WritingSystem[] = [
     origin: 'influence', parents: ['greek'], dateFrom: 430, dateTo: null,
     family: 'greek', region: '高加索', countries: ['格鲁吉亚'],
     type: 'alphabet', status: 'living', direction: 'ltr',
-    unicodeBlock: 'Georgian U+10A0', sample: 'ა',
+    unicodeBlock: 'Georgian U+10A0', sample: 'ა', fontFamily: 'Noto Sans Georgian',
+    note: '本土称"姆赫德鲁利"；同族另有古老的阿索姆塔夫鲁利体与今日常用的姆塔夫鲁利体。',
   },
   {
     id: 'ogham', nameZh: '欧甘字母', nameEn: 'Ogham',

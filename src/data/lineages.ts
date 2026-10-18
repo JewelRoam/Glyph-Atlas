@@ -149,6 +149,41 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'aramaic-pahlavi',
+    nameZh: '阿拉米 ʾālep → 巴列维支系',
+    nameEn: 'Aramaic ʾālep → Pahlavi branch',
+    mode: 'cognate',
+    description:
+      '阿拉米字母进入伊朗高原后笔画被压扁、粘连，成了书写中古波斯语的巴列维字母。' +
+      '同一套骨架下分出几支后身：萨珊王朝石壁上的碑铭体、吐鲁番写本里的诗篇体，' +
+      '以及借它记经书的阿维斯陀字母——到最后一站，ʾālep 已经收成一个规整的 /a/。',
+    stops: [
+      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'inscriptional-pahlavi', char: '𐭠', label: '碑铭巴列维 aleph', phonetic: 'ʔ' },
+      { script: 'psalter-pahlavi', char: '𐮀', label: '诗篇巴列维 aleph', phonetic: 'ʔ' },
+      { script: 'avestan', char: '𐬀', label: '阿维斯陀 a', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'greek-diaspora',
+    nameZh: '希腊 Α → 各地的 a',
+    nameEn: 'Greek Α → regional a',
+    mode: 'cognate',
+    description:
+      '希腊字母的模型向四方扩散，被不同语言借去时都留下了各自的 /a/：' +
+      '尼罗河谷的科普特 Ⲁ、巴尔干半岛的哥特 𐌰，' +
+      '以及高加索的亚美尼亚 Ա 与格鲁吉亚 ა。共用一个起点，笔画却毫无相似。',
+    stops: [
+      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'coptic', char: 'Ⲁ', label: '科普特 alfa', phonetic: 'a' },
+      { script: 'gothic', char: '𐌰', label: '哥特 aza', phonetic: 'a' },
+      { script: 'armenian', char: 'Ա', label: '亚美尼亚 ayb', phonetic: 'a' },
+      { script: 'georgian', char: 'ა', label: '格鲁吉亚 ani', phonetic: 'a' },
+    ],
+  },
+
+  {
     id: 'silk-road',
     nameZh: '阿拉米 ʾālep → 蒙古 a',
     nameEn: "Aramaic aleph → Mongolian a",
