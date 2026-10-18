@@ -397,11 +397,13 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'runic', nameZh: '卢恩字母', nameEn: 'Runic',
-    origin: 'influence', parents: ['old-italic'], dateFrom: 150, dateTo: 1100,
-    family: 'greek', region: '北欧', countries: ['瑞典', '丹麦', '挪威', '德国'],
+    origin: 'influence', parents: ['old-italic'], dateFrom: 150, dateTo: 1500,
+    family: 'greek', region: '北欧',
+    countries: ['瑞典', '丹麦', '挪威', '德国', '英国', '冰岛'],
     type: 'alphabet', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Runic U+16A0', sample: 'ᚠ', fontFamily: 'Noto Sans Runic',
-    note: '日耳曼民族的字母，起源于古意大利字母或拉丁字母的早期形态。',
+    note: '日耳曼民族的字母。老弗萨克的 24 个字母从古意大利—拉丁一类字母长出来，' +
+      '后来盎格鲁-撒克逊的 futhorc 与北欧的 younger futhark 各自添字改形。',
   },
   {
     id: 'gothic', nameZh: '哥特字母', nameEn: 'Gothic',

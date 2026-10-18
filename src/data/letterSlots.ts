@@ -29,6 +29,8 @@
  *    加上法利希、奥斯坎、翁布里亚、南皮切努姆、维内蒂、雷蒂亚各家添的字）；
  *  · 希腊的东支：科普特、西里尔；
  *  · 希腊的两条支流：哥特（斯堪的纳维亚—黑海）、格拉哥里（斯拉夫）；
+ *  · 日耳曼的北支：卢恩字母（futhark，从古意大利—拉丁一类的字母长出来，
+ *    老弗萨克的 24 个里 19 个能接回拉丁槽位，其余各代添的字见 run-* 槽位）；
  *  · 阿拉米东支：粟特、回鹘、碑铭巴列维、诗篇巴列维；
  *  · 回鹘的下游：蒙古字母；
  *  · 阿维斯陀：巴列维的经书后身，字母从 22 个扩到 54 个（见 av-* 槽位）；
@@ -204,6 +206,79 @@ export const SLOTS: LetterSlot[] = [
   { id: 'ital-ye', label: '𐌭 YE（维内蒂添的字母）' },
   { id: 'ital-n-tse', label: '𐌮 NORTHERN TSE（雷蒂亚添的字母）' },
   { id: 'ital-s-tse', label: '𐌯 SOUTHERN TSE（雷蒂亚添的字母）' },
+  // ── 卢恩字母：日耳曼人的 futhark ────────────────────────────────────
+  // 卢恩字母从古意大利／拉丁一类字母的早期形态里长出来。Unicode 第 8 章把
+  // 这层关系说得直白："多数卢恩字母的形状能对上某个拉丁大写字母，但未必
+  // 对得上读音相同的那个字母。" 所以下面只把形状与读音确实对得上的 19 格
+  // 接回古意大利—拉丁那套槽位——f u a r k g h n i p z s t b e m l d o；
+  // þ w j ï ŋ 这五个音拉丁字母表里没有，另占一格。其余 59 格是盎格鲁-撒克逊
+  // futhorc、北欧 younger futhark 与中世纪卢恩陆续添的字母（Unicode 把各时
+  // 代的字面收在同一条区块里），长枝／短枝、加点这类同一字母的不同字面也各
+  // 自占格，走到卢恩这一站时整批从下方飞入，把字母表补成一个全：
+  { id: 'run-thurisaz', label: 'ᚦ thurisaz þ（/θ/）' },
+  { id: 'run-wunjo', label: 'ᚹ wunjo w（/w/）' },
+  { id: 'run-jeran', label: 'ᛃ jeran j（/j/）' },
+  { id: 'run-iwaz', label: 'ᛇ iwaz ï（日耳曼语的 ee 音）' },
+  { id: 'run-ingwaz', label: 'ᛜ ingwaz ŋ（/ŋ/）' },
+  { id: 'run-v', label: 'ᚡ V（古英语的 v）' },
+  { id: 'run-yr', label: 'ᚣ yr（古英语的 y）' },
+  { id: 'run-y', label: 'ᚤ Y（y 的另一个字面）' },
+  { id: 'run-w', label: 'ᚥ W（w 的另一个字面）' },
+  { id: 'run-eth', label: 'ᚧ eth ð' },
+  { id: 'run-os', label: 'ᚩ os（古英语的 o）' },
+  { id: 'run-ac', label: 'ᚪ ac（古英语的 a）' },
+  { id: 'run-aesc', label: 'ᚫ aesc æ' },
+  { id: 'run-oss-lb', label: 'ᚬ oss（长枝，younger futhark 的 o）' },
+  { id: 'run-oss-st', label: 'ᚭ oss（短枝，同一字母的另一字面）' },
+  { id: 'run-o', label: 'ᚮ O（o）' },
+  { id: 'run-oe', label: 'ᚯ oe ø' },
+  { id: 'run-on', label: 'ᚰ on ą' },
+  { id: 'run-cen', label: 'ᚳ cen（古英语的 c）' },
+  { id: 'run-kaun', label: 'ᚴ kaun（younger futhark 的 k）' },
+  { id: 'run-g', label: 'ᚵ G（g）' },
+  { id: 'run-eng', label: 'ᚶ eng ŋ（古英语的 ŋ）' },
+  { id: 'run-gar', label: 'ᚸ gar（古英语的 g）' },
+  { id: 'run-haegl', label: 'ᚻ haegl（古英语的 h）' },
+  { id: 'run-hagall-lb', label: 'ᚼ hagall（长枝，younger futhark 的 h）' },
+  { id: 'run-hagall-st', label: 'ᚽ hagall（短枝）' },
+  { id: 'run-naud-st', label: 'ᚿ naud（短枝，younger futhark 的 n）' },
+  { id: 'run-n-dotted', label: 'ᛀ dotted n（中世纪加点的 n）' },
+  { id: 'run-e', label: 'ᛂ E（e）' },
+  { id: 'run-ger', label: 'ᛄ ger（古英语的 j）' },
+  { id: 'run-ar-lb', label: 'ᛅ ar（长枝，younger futhark 的 a）' },
+  { id: 'run-ar-st', label: 'ᛆ ar（短枝）' },
+  { id: 'run-sigel', label: 'ᛋ sigel（古英语的 s）' },
+  { id: 'run-sol-st', label: 'ᛌ sol（短枝）' },
+  { id: 'run-c', label: 'ᛍ C（c）' },
+  { id: 'run-z', label: 'ᛎ Z（z）' },
+  { id: 'run-tyr-st', label: 'ᛐ tyr（短枝，younger futhark 的 t）' },
+  { id: 'run-d', label: 'ᛑ D（d）' },
+  { id: 'run-bjarkan-st', label: 'ᛓ bjarkan（短枝，younger futhark 的 b）' },
+  { id: 'run-p-dotted', label: 'ᛔ dotted p（中世纪加点的 p）' },
+  { id: 'run-p-open', label: 'ᛕ open p（开口的 p）' },
+  { id: 'run-madr-lb', label: 'ᛘ maðr（长枝，younger futhark 的 m）' },
+  { id: 'run-madr-st', label: 'ᛙ maðr（短枝）' },
+  { id: 'run-l-dotted', label: 'ᛛ dotted l（中世纪加点的 l）' },
+  { id: 'run-ing', label: 'ᛝ ing（younger futhark 的 ŋ）' },
+  { id: 'run-ear', label: 'ᛠ ear（古英语添的字母）' },
+  { id: 'run-ior', label: 'ᛡ ior（古英语添的字母）' },
+  { id: 'run-cweorth', label: 'ᛢ cweorth（古英语添的字母）' },
+  { id: 'run-calc', label: 'ᛣ calc（古英语的 k）' },
+  { id: 'run-cealc', label: 'ᛤ cealc（古英语的 k）' },
+  { id: 'run-stan', label: 'ᛥ stan（古英语的 st）' },
+  { id: 'run-yr-lb', label: 'ᛦ ýr（长枝，younger futhark 的 ʀ）' },
+  { id: 'run-yr-st', label: 'ᛧ ýr（短枝）' },
+  { id: 'run-yr-ice', label: 'ᛨ ýr（冰岛写法）' },
+  { id: 'run-q', label: 'ᛩ Q（q）' },
+  { id: 'run-x', label: 'ᛪ X（x）' },
+  { id: 'run-k', label: 'ᛱ K（中世纪加点的 k）' },
+  { id: 'run-sh', label: 'ᛲ SH（中世纪添的 sh）' },
+  { id: 'run-oo', label: 'ᛳ OO（中世纪添的 ø）' },
+  { id: 'run-fc-os', label: 'ᛴ 弗兰克斯小箱 os（单篇铭文专用）' },
+  { id: 'run-fc-is', label: 'ᛵ 弗兰克斯小箱 is（单篇铭文专用）' },
+  { id: 'run-fc-eh', label: 'ᛶ 弗兰克斯小箱 eh（单篇铭文专用）' },
+  { id: 'run-fc-ac', label: 'ᛷ 弗兰克斯小箱 ac（单篇铭文专用）' },
+  { id: 'run-fc-aesc', label: 'ᛸ 弗兰克斯小箱 aesc（单篇铭文专用）' },
   // ── 阿维斯陀字母自己新造的字母 ──────────────────────────────────────
   // 阿维斯陀字母是为逐音记录《阿维斯陀》经文造的，3—4 世纪成书时把字母表
   // 从巴列维的 22 个扩到了 54 个。能接回巴列维的 17 格写在下面的对照表里，
@@ -1007,6 +1082,100 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'ital-ye': '𐌭',
     'ital-n-tse': '𐌮',
     'ital-s-tse': '𐌯',
+  },
+
+  // 卢恩字母：Unicode 区块 U+16A0–U+16F8 一共 83 个字母（另有 3 个标点、
+  // 3 个数字符号不在字母表内）。开头 24 个是老弗萨克（Elder Futhark），
+  // 其中 19 格按转写接回上面已经有的槽位：f u a r k g h n i p z s t b e m
+  // l d o 一路对上 digamma / waw / aleph / resh / kaph / gai / heth / nun /
+  // yodh / pe / zayin / shin / taw / beth / he / mem / lamedh / daleth / ayin。
+  // 剩下 þ w j ï ŋ 五个音拉丁字母表里没有，另立 run-* 槽位；再往后是 futhorc、
+  // younger futhark 与中世纪卢恩添的 59 个字面，也是各占一格。走到卢恩这一
+  // 站时它们整批从下方飞入。
+  runic: {
+    digamma: 'ᚠ', // f fehu
+    waw: 'ᚢ', // u uruz
+    'run-thurisaz': 'ᚦ', // þ thurisaz
+    aleph: 'ᚨ', // a ansuz
+    resh: 'ᚱ', // r raido
+    kaph: 'ᚲ', // k kauna
+    gai: 'ᚷ', // g gebo
+    'run-wunjo': 'ᚹ', // w wunjo
+    heth: 'ᚺ', // h hagalaz
+    nun: 'ᚾ', // n naudiz
+    yodh: 'ᛁ', // i isaz
+    'run-jeran': 'ᛃ', // j jeran
+    'run-iwaz': 'ᛇ', // ï iwaz
+    pe: 'ᛈ', // p pertho
+    zayin: 'ᛉ', // z algiz
+    shin: 'ᛊ', // s sowilo
+    taw: 'ᛏ', // t tiwaz
+    beth: 'ᛒ', // b berkanan
+    he: 'ᛖ', // e ehwaz
+    mem: 'ᛗ', // m mannaz
+    lamedh: 'ᛚ', // l laukaz
+    'run-ingwaz': 'ᛜ', // ŋ ingwaz
+    daleth: 'ᛞ', // d dagaz
+    ayin: 'ᛟ', // o othalan
+    'run-v': 'ᚡ',
+    'run-yr': 'ᚣ',
+    'run-y': 'ᚤ',
+    'run-w': 'ᚥ',
+    'run-eth': 'ᚧ',
+    'run-os': 'ᚩ',
+    'run-ac': 'ᚪ',
+    'run-aesc': 'ᚫ',
+    'run-oss-lb': 'ᚬ',
+    'run-oss-st': 'ᚭ',
+    'run-o': 'ᚮ',
+    'run-oe': 'ᚯ',
+    'run-on': 'ᚰ',
+    'run-cen': 'ᚳ',
+    'run-kaun': 'ᚴ',
+    'run-g': 'ᚵ',
+    'run-eng': 'ᚶ',
+    'run-gar': 'ᚸ',
+    'run-haegl': 'ᚻ',
+    'run-hagall-lb': 'ᚼ',
+    'run-hagall-st': 'ᚽ',
+    'run-naud-st': 'ᚿ',
+    'run-n-dotted': 'ᛀ',
+    'run-e': 'ᛂ',
+    'run-ger': 'ᛄ',
+    'run-ar-lb': 'ᛅ',
+    'run-ar-st': 'ᛆ',
+    'run-sigel': 'ᛋ',
+    'run-sol-st': 'ᛌ',
+    'run-c': 'ᛍ',
+    'run-z': 'ᛎ',
+    'run-tyr-st': 'ᛐ',
+    'run-d': 'ᛑ',
+    'run-bjarkan-st': 'ᛓ',
+    'run-p-dotted': 'ᛔ',
+    'run-p-open': 'ᛕ',
+    'run-madr-lb': 'ᛘ',
+    'run-madr-st': 'ᛙ',
+    'run-l-dotted': 'ᛛ',
+    'run-ing': 'ᛝ',
+    'run-ear': 'ᛠ',
+    'run-ior': 'ᛡ',
+    'run-cweorth': 'ᛢ',
+    'run-calc': 'ᛣ',
+    'run-cealc': 'ᛤ',
+    'run-stan': 'ᛥ',
+    'run-yr-lb': 'ᛦ',
+    'run-yr-st': 'ᛧ',
+    'run-yr-ice': 'ᛨ',
+    'run-q': 'ᛩ',
+    'run-x': 'ᛪ',
+    'run-k': 'ᛱ',
+    'run-sh': 'ᛲ',
+    'run-oo': 'ᛳ',
+    'run-fc-os': 'ᛴ',
+    'run-fc-is': 'ᛵ',
+    'run-fc-eh': 'ᛶ',
+    'run-fc-ac': 'ᛷ',
+    'run-fc-aesc': 'ᛸ',
   },
   latin: {
     aleph: 'A',

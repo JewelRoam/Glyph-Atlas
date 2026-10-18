@@ -106,6 +106,24 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'northern-runes',
+    nameZh: '古意大利字母 → 卢恩字母',
+    nameEn: 'Old Italic → Runic',
+    mode: 'chain',
+    description:
+      '阿尔卑斯山北麓的日耳曼人借走了一套古意大利—拉丁类型的字母：F 还是那根竖钩、' +
+      'R 还是那个弯头、O 还是那个圈，骨架认得出，读音却按自己的语言重排了一遍，还添了' +
+      '拉丁字母表里根本没有的音——þ w j ï ŋ。头六个字母是 f u þ a r k，这张表因此叫' +
+      '"futhark"。往后英格兰人与北欧人各自添字改形：盎格鲁-撒克逊的 futhorc、北欧的' +
+      'younger futhark、中世纪加点的卢恩，Unicode 把各代的字面都收在 U+16A0 一节的' +
+      '83 个字母里，走到卢恩这一站时整批飞入，字母表一次补成一个全。',
+    stops: [
+      { script: 'old-italic', char: '𐌀', label: '古意大利字母 a', phonetic: 'a' },
+      { script: 'runic', char: 'ᚨ', label: '卢恩 ansuz a', phonetic: 'a' },
+    ],
+  },
+
+  {
     id: 'peripheral-alpha',
     nameZh: '希腊 alpha → 高加索与巴尔干 a',
     nameEn: 'Greek alpha → Caucasian and Balkan a',
