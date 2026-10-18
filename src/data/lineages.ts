@@ -187,6 +187,23 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'semitic-south',
+    nameZh: 'ʾālep → 南方闪米特诸字母',
+    nameEn: 'ʾālep → South Semitic alphabets',
+    mode: 'cognate',
+    description:
+      '腓尼基—阿拉米那条线把辅音并成了 22 个字母：西北闪米特的 ḫ 并进 ḥ、ḏ 并进 z、' +
+      'ġ 并进 ʿ、ẓ 并进 ṣ、ḍ 并进 d。乌加里特与南、北阿拉伯却把这些音分写，' +
+      '字母表停在 29 到 30 个字母上，南阿拉伯还多保留一个边音 s¹。' +
+      '三站是同一祖形的平行后身，不是互相演变的链条。',
+    stops: [
+      { script: 'ugaritic', char: '𐎀', label: '乌加里特 alpa', phonetic: 'ʔ' },
+      { script: 'old-south-arabian', char: '𐩱', label: '古南阿拉伯 alef', phonetic: 'ʔ' },
+      { script: 'old-north-arabian', char: '𐪑', label: '古北阿拉伯 alef', phonetic: 'ʔ' },
+    ],
+  },
+
+  {
     id: 'greek-diaspora',
     nameZh: '希腊 Α → 各地的 a',
     nameEn: 'Greek Α → regional a',

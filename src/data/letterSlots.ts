@@ -92,6 +92,14 @@ export const SLOTS: LetterSlot[] = [
   { id: 'shin', label: '牙 šīn' },
   { id: 'taw', label: '记号 tāw' },
   { id: 'tha', label: 'ث（ت 加点）' },
+  // 南闪米特与乌加里特多出来的辅音位。北方的腓尼基—阿拉米把 *ḫ *ḏ *ġ *ṯ *ẓ *ḍ
+  // 并进了 ḥ z / ġ→ʿ / š ṣ d 里，南阿拉伯与乌加里特却把它们分写；s¹（Ś，边音）
+  // 也只有南边保留。这些格子只在南闪米特那一串字母场里出现（阿拉伯的加点字母
+  // 用的就是上面那六格）。
+  { id: 'sate', label: '𐩪 s¹（南阿拉伯的三组咝音之一）' },
+  { id: 'ugarit-i', label: '𐎛 ʾi（乌加里特的 i 形 ʾ）' },
+  { id: 'ugarit-u', label: '𐎜 ʾu（乌加里特的 u 形 ʾ）' },
+  { id: 'ugarit-ssu', label: '𐎝 ssu（乌加里特为胡里特语补的咝音）' },
   // 粟特在阿拉米之上分出的两个擦音字母：feth 由 pē 分化，leš 表示 ž；
   // 回鹘只继承了 leš。只出现在这两家的字母场里，别的对照表不建这一格。
   { id: 'feth', label: '𐽃 feth（粟特由 pē 分出的擦音）' },
@@ -2404,6 +2412,104 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'kana-pe': 'ペ', // へ 加浊点
     'kana-po': 'ポ', // ほ 加浊点
   },  // 片假名：48 + 25
+
+  // ── 南闪米特与乌加里特：保留 29/30 个辅音的那几套字母 ─────────────
+  // 这三套都不走腓尼基—阿拉米的 22 字母合并路线：*ḫ *ḏ *ġ *ṯ *ẓ *ḍ 各自分写，
+  // 南阿拉伯还多一个 s¹。前 22 格按字母名接回闪米特祖形，多出来的接上面那几格。
+  ugaritic: {
+    aleph: '𐎀',   // alpa
+    beth: '𐎁',    // beta
+    gimel: '𐎂',   // gamla
+    daleth: '𐎄',  // delta
+    he: '𐎅',      // ho
+    waw: '𐎆',     // wo
+    zayin: '𐎇',   // zeta
+    heth: '𐎈',    // hota
+    teth: '𐎉',    // tet
+    yodh: '𐎊',    // yod
+    kaph: '𐎋',    // kaf
+    lamedh: '𐎍',  // lamda
+    mem: '𐎎',     // mem
+    nun: '𐎐',     // nun
+    samekh: '𐎒',  // samka
+    ayin: '𐎓',    // ain
+    pe: '𐎔',      // pu
+    sadhe: '𐎕',   // sade
+    qoph: '𐎖',    // qopa
+    resh: '𐎗',    // rasha
+    shin: '𐎌',    // shin
+    taw: '𐎚',     // to
+    kha: '𐎃',     // kha
+    dhal: '𐎏',    // dhal
+    zah: '𐎑',     // zu（ẓ）
+    tha: '𐎘',     // thanna（ṯ）
+    ghayn: '𐎙',   // ghain（ġ）
+    'ugarit-i': '𐎛',
+    'ugarit-u': '𐎜',
+    'ugarit-ssu': '𐎝',
+  },  // 乌加里特字母：30/30
+  'old-south-arabian': {
+    aleph: '𐩱',
+    beth: '𐩨',
+    gimel: '𐩴',
+    daleth: '𐩵',
+    he: '𐩠',
+    waw: '𐩥',
+    zayin: '𐩸',
+    heth: '𐩢',
+    teth: '𐩷',
+    yodh: '𐩺',
+    kaph: '𐩫',
+    lamedh: '𐩡',
+    mem: '𐩣',
+    nun: '𐩬',
+    samekh: '𐩯',
+    ayin: '𐩲',
+    pe: '𐩰',
+    sadhe: '𐩮',
+    qoph: '𐩤',
+    resh: '𐩧',
+    shin: '𐩦',
+    taw: '𐩩',
+    kha: '𐩭',
+    dad: '𐩳',
+    ghayn: '𐩶',
+    dhal: '𐩹',
+    tha: '𐩻',
+    zah: '𐩼',
+    sate: '𐩪',
+  },  // 古南阿拉伯字母：29/29
+  'old-north-arabian': {
+    aleph: '𐪑',
+    beth: '𐪈',
+    gimel: '𐪔',
+    daleth: '𐪕',
+    he: '𐪀',
+    waw: '𐪅',
+    zayin: '𐪘',
+    heth: '𐪂',
+    teth: '𐪗',
+    yodh: '𐪚',
+    kaph: '𐪋',
+    lamedh: '𐪁',
+    mem: '𐪃',
+    nun: '𐪌',
+    samekh: '𐪏',
+    ayin: '𐪒',
+    pe: '𐪐',
+    sadhe: '𐪎',
+    qoph: '𐪄',
+    resh: '𐪇',
+    shin: '𐪆',
+    taw: '𐪉',
+    kha: '𐪍',
+    dad: '𐪓',
+    ghayn: '𐪖',
+    dhal: '𐪙',
+    tha: '𐪛',
+    zah: '𐪜',
+    sate: '𐪊',
+  },  // 古北阿拉伯字母：29/29
 
   // ── 阿拉米东支的中古伊朗与中亚字母 ────────────────────────────
   // 这四套都是阿拉米字母的地方后身，字母名和 22 个字母的次序照旧（Unicode 的
