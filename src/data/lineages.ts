@@ -66,6 +66,39 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'anatolian-alpha',
+    nameZh: '希腊 alpha → 安纳托利亚 a',
+    nameEn: 'Greek alpha → Anatolian a',
+    mode: 'cognate',
+    description:
+      '希腊字母向安纳托利亚传播后，卡里亚、吕底亚和吕基亚各自改造出一套地方字母。' +
+      '三个字母都沿用 alpha 的 /a/ 音值，却在笔画收束与书写方向上分道扬镳。',
+    stops: [
+      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'carian', char: '𐊠', label: '卡里亚 a', phonetic: 'a' },
+      { script: 'lydian', char: '𐤠', label: '吕底亚 a', phonetic: 'a' },
+      { script: 'lycian', char: '𐊀', label: '吕基亚 a', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'peripheral-alpha',
+    nameZh: '希腊 alpha → 高加索与巴尔干 a',
+    nameEn: 'Greek alpha → Caucasian and Balkan a',
+    mode: 'cognate',
+    description:
+      '希腊字母的模型不只进入西欧：高加索阿尔巴尼亚字母、古彼尔姆字母，' +
+      '以及阿尔巴尼亚人的埃尔巴桑、维特库奇字母，都把 A 音写成各自的本地骨架。',
+    stops: [
+      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'caucasian-albanian', char: '𐔰', label: '高加索阿尔巴尼亚 alt', phonetic: 'a' },
+      { script: 'old-permic', char: '𐍐', label: '古彼尔姆 an', phonetic: 'a' },
+      { script: 'elbasan', char: '𐔀', label: '埃尔巴桑 a', phonetic: 'a' },
+      { script: 'vithkuqi', char: '𐕰', label: '维特库奇 a', phonetic: 'a' },
+    ],
+  },
+
+  {
     id: 'ka',
     nameZh: '婆罗米 ka → 各国 ka',
     nameEn: 'Brahmi ka → modern ka',
