@@ -187,6 +187,8 @@ export const writingSystems: WritingSystem[] = [
     family: 'levant', region: '黎凡特', countries: ['以色列'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
     unicodeBlock: 'Phoenician U+10900', sample: '𐤀', fontFamily: 'Noto Sans Phoenician',
+    note: '与腓尼基字母共用 Unicode 的 U+10900 一节，22 个字母逐一同形；'
+      + '撒玛利亚字母与它一脉相承，方形希伯来字母则另走阿拉米一支。',
   },
   {
     id: 'samaritan', nameZh: '撒玛利亚字母', nameEn: 'Samaritan',

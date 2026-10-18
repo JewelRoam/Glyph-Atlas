@@ -620,6 +620,35 @@ export const letterMaps: Record<string, Record<string, string>> = {
     taw: '𐤕',
   },
 
+  // 古希伯来字母：Unicode 与腓尼基共用 U+10900 一节，22 个字母逐一对应。
+  // 撒玛利亚人与圣殿时期的犹太人守着这套字面，没有改用后来从阿拉米长出来的
+  // 方形希伯来字母，所以这一站与腓尼基几乎重合，分歧要到撒玛利亚那一站才出现。
+  'paleo-hebrew': {
+    aleph: '𐤀',
+    beth: '𐤁',
+    gimel: '𐤂',
+    daleth: '𐤃',
+    he: '𐤄',
+    waw: '𐤅',
+    digamma: '𐤅',
+    zayin: '𐤆',
+    heth: '𐤇',
+    teth: '𐤈',
+    yodh: '𐤉',
+    kaph: '𐤊',
+    lamedh: '𐤋',
+    mem: '𐤌',
+    nun: '𐤍',
+    samekh: '𐤎',
+    ayin: '𐤏',
+    pe: '𐤐',
+    sadhe: '𐤑',
+    qoph: '𐤒',
+    resh: '𐤓',
+    shin: '𐤔',
+    taw: '𐤕',
+  },
+
   // 阿拉米字母：与腓尼基同序，字面已经开始连写化
   aramaic: {
     aleph: '𐡀',
@@ -1489,10 +1518,13 @@ export const letterMaps: Record<string, Record<string, string>> = {
     izhitsa: 'Ⱛ',
   },
 
-  // 粟特字母：阿拉米字母随丝路东传后留下的直系后代，22 个字母与阿拉米一一对应。
-  // 𐽀 是 resh 与 ayin 合流后的写法，所以只占 resh 一格；𐽃 feth 与 𐽄 leš 是
-  // 粟特自己在阿拉米之上分出的擦音字母，另立两格。𐽅 是 š 的独立形（词尾写法），
-  // 与叙利亚字母的处理一样，同一字母只取一个字形，不进对照表。
+  // 粟特字母：阿拉米字母随丝路东传后留下的直系后代。Unicode 第 14 章说它
+  // "the repertoire corresponds to that of Old Sogdian"：早期粟特字母里 r / ʿ / d
+  // 已合成一个字面，晚期的 U+10F40 SOGDIAN LETTER RESH-AYIN 沿用它，所以这里
+  // daleth 与 resh 两格都指向 𐽀；ayin 另有自己的写法 𐼽，仍单占一格。
+  // 𐽃 feth 与 𐽄 leš 是粟特在阿拉米之上分出的擦音字母，另立两格。
+  // 𐽅 是 š 的独立形（词尾写法），与叙利亚字母的处理一样，同一字母只取一个字形，
+  // 不进对照表。
   sogdian: {
     aleph: '𐼰',
     beth: '𐼱',
@@ -1511,6 +1543,7 @@ export const letterMaps: Record<string, Record<string, string>> = {
     ayin: '𐼽',
     pe: '𐼾',
     sadhe: '𐼿',
+    daleth: '𐽀',
     resh: '𐽀',
     shin: '𐽁',
     taw: '𐽂',
@@ -3067,12 +3100,19 @@ export const letterMaps: Record<string, Record<string, string>> = {
     shin: '𐿃',
     taw: '𐿄',
   },  // 花剌子模字母：22 个字母里少了 teth / sadhe / qoph
+  // 粟特字母（早期）：阿拉米 22 个字母里少了 teth 与 qoph；r / ʿ / d 在《古代
+  // 书信》里写成同一个字面，Unicode 也就只收了一个 U+10F18 RESH-AYIN-DALETH，
+  // 所以 daleth 与 resh 两格都指向它——两个槽位合流成一个字形（同哈特拉的
+  // daleth-resh）。Unicode 第 14 章把它说得很明白："In the Ancient Letters, the
+  // usual glyph for resh is identical to the glyph for daleth and for ayin."
   'old-sogdian': {
     aleph: '𐼀',
     beth: '𐼂',
     gimel: '𐼄',
+    daleth: '𐼘',
     he: '𐼅',
     waw: '𐼇',
+    digamma: '𐼇',
     zayin: '𐼈',
     heth: '𐼉',
     yodh: '𐼊',
@@ -3087,7 +3127,7 @@ export const letterMaps: Record<string, Record<string, string>> = {
     resh: '𐼘',
     shin: '𐼙',
     taw: '𐼚',
-  },  // 粟特字母（早期）：少了 teth 与 qoph，resh 一格用的是 resh-ayin-daleth 合文
+  },
 };
 
 /** 槽位在字母场格子里的固定次序 */

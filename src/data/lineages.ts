@@ -267,11 +267,15 @@ export const lineages: Lineage[] = [
     nameEn: "Aramaic aleph → Mongolian a",
     mode: 'chain',
     description:
-      '字母沿丝绸之路向东传播的一条主干：阿拉米字母的 ʾālep 被粟特人借去，' +
-      '再由回鹘人继承，最后进入蒙古字母。语言换了，音值也变了，' +
+      '字母沿丝绸之路向东传播的一条主干：阿拉米字母先在中亚落地成古粟特文，' +
+      '再长成连写的粟特字母，回鹘人从粟特的草体接过它，最后进入蒙古字母。' +
+      '阿拉米 22 个字母走到古粟特时已经缩了一圈：ṭ 与 q 并掉了，r / ʿ / d 三音' +
+      '合成一个字面（Unicode 把它收作 RESH-AYIN-DALETH），所以那几格会飞出或合拢；' +
+      '粟特自己添的 feth 与 leš 则从下方飞入。语言换了，音值也变了，' +
       '但纵向书写的骨架仍能一路辨认。',
     stops: [
       { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { script: 'old-sogdian', char: '𐼀', label: '古粟特 ʾālep', phonetic: 'ʔ' },
       { script: 'sogdian', char: '𐼰', label: '粟特 ʾālep', phonetic: 'ʔ' },
       { script: 'old-uyghur', char: '𐽰', label: '回鹘 aleph', phonetic: 'a / ʔ' },
       { script: 'mongolian', char: 'ᠠ', label: '蒙古 a', phonetic: 'a' },
@@ -386,9 +390,13 @@ export const lineages: Lineage[] = [
     description:
       '撒玛利亚人没有跟着改用方形希伯来字母，而是守着古希伯来书体一路写下来，' +
       '成为后来的撒玛利亚字母——《撒玛利亚五经》到今天仍用它抄写。' +
-      '二十二个字母的骨架都能追回腓尼基。',
+      '中间那一站是圣殿时期犹太人刻在钱币与印章上的古希伯来字母，' +
+      '它与腓尼基共用 Unicode U+10900 一节，二十二个字母逐一对应；' +
+      '走到撒玛利亚字母，字面才换成圆转的连写体——二十二字位一脉相承，' +
+      '元音另外用标号记，不进字母表。',
     stops: [
       { script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
+      { script: 'paleo-hebrew', char: '𐤀', label: '古希伯来 ʾālep', phonetic: 'ʔ' },
       { script: 'samaritan', char: 'ࠀ', label: '撒玛利亚 alaf', phonetic: 'ʔ' },
     ],
   },
