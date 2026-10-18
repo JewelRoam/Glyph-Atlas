@@ -613,9 +613,11 @@ main {
 
 .walk-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 2px;
   flex-shrink: 0;
   border-bottom: 1px solid var(--line);
+  /* 轨道多了以后一行放不下：允许折行，窄屏再退化成横向滚动 */
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
