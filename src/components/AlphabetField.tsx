@@ -93,7 +93,7 @@ function PendingGlyph({ size }: { size: number }) {
 }
 
 export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) {
-  const paths = useAlphabetPaths();
+  const paths = useAlphabetPaths(a, b);
   const slots = useMemo(() => sharedSlots(a, b), [a, b]);
   const gridRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);

@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / 'work' / 'glyph-outline-cache'
 OUT = ROOT / 'src' / 'data' / 'glyphPaths.ts'
 OUT_ALPHA = ROOT / 'src' / 'data' / 'glyphAlphabets.ts'
+OUT_ALPHA_VARGA = ROOT / 'src' / 'data' / 'glyphAlphabetsVarga.ts'
 UA = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36')
 
@@ -121,7 +122,9 @@ def download(url: str) -> Path:
     return path
 
 
-FMT = '{:.2f}'
+# 坐标保留一位小数：轮廓先归一化到 100x100 的盒子，0.1 个坐标单位换算到
+# 字母场的 46px 格子里是 0.05px，肉眼分不出来，但整包能省掉一成多的体积。
+FMT = '{:.1f}'
 
 
 def fmt(value: float) -> str:
@@ -205,8 +208,13 @@ def letter_slots() -> list[dict]:
 
 
 def write_alphabets() -> int:
-    """字母槽位表里每个字符的轮廓，供 MICRO 字母场做整套字母表的形变。"""
-    entries: dict[str, str] = {}
+    """字母槽位表里每个字符的轮廓，供 MICRO 字母场做整套字母表的形变。
+
+    分成两包：闪米特—希腊—拉丁那条线（core）与婆罗米系的梵语字音表
+    （varga）。字母场只按当前这一段轨道需要的包去取，走闪米特轨道的读者
+    不必先下载印度那 600 多个轮廓。
+    """
+    groups: dict[str, dict[str, str]] = {'core': {}, 'varga': {}}
     sources: dict[str, str] = {}
     failures: list[str] = []
 
@@ -216,43 +224,49 @@ def write_alphabets() -> int:
             failures.append(f"{item['script']}/{item['slot']} 没有可用字体")
             continue
         key = f"{item['script']}:{item['char']}"
-        if key in entries:
+        group = 'varga' if item['slot'].startswith('varga-') else 'core'
+        if key in groups[group]:
             continue
         try:
-            entries[key] = outline(family, item['char'])
+            groups[group][key] = outline(family, item['char'])
             sources[key] = family
         except Exception as error:  # noqa: BLE001
             failures.append(f"{item['script']} {item['slot']} {item['char']} ({family}): {error}")
 
-    lines = [
-        '/**',
-        ' * 字母槽位的矢量轮廓 —— 由 tools/build-glyph-paths.py 生成，请勿手工编辑。',
-        ' *',
-        ' * MICRO 的字母场要把一整套字母表从一种文字形变到另一种文字，所以每个',
-        ' * 参与对照的字母都需要自己的轮廓。字形取自各书写体系声明的字体',
-        ' * （见 src/data/fontFallback.ts），缩放居中到 100x100 坐标盒。',
-        ' *',
-        ' * 键为 `${scriptId}:${char}`。',
-        ' *',
-        ' * 字形来源（Noto 系列，SIL OFL 1.1）：',
-    ]
-    for key in sorted(entries):
-        lines.append(f' *   {key} → {sources[key]}')
-    lines += [
-        ' *',
-        ' * 重新生成：',
-        ' *   work/.venv/bin/python tools/build-glyph-paths.py',
-        ' */',
-    ]
-    lines.append('export const alphabetPaths: Record<string, string> = {')
-    for key in sorted(entries):
-        lines.append(f"  {json.dumps(key, ensure_ascii=False)}: {json.dumps(entries[key])},")
-    lines.append('};')
-    lines.append('')
-    OUT_ALPHA.write_text('\n'.join(lines))
+    for group, path, exported, title in (
+        ('core', OUT_ALPHA, 'alphabetPaths', '闪米特—希腊—拉丁一线'),
+        ('varga', OUT_ALPHA_VARGA, 'alphabetPathsVarga', '婆罗米系（梵语字音表 varga）'),
+    ):
+        entries = groups[group]
+        lines = [
+            '/**',
+            f' * 字母槽位的矢量轮廓（{title}）—— 由 tools/build-glyph-paths.py 生成，请勿手工编辑。',
+            ' *',
+            ' * MICRO 的字母场要把一整套字母表从一种文字形变到另一种文字，所以每个',
+            ' * 参与对照的字母都需要自己的轮廓。字形取自各书写体系声明的字体',
+            ' * （见 src/data/fontFallback.ts），缩放居中到 100x100 坐标盒。',
+            ' *',
+            ' * 键为 `${scriptId}:${char}`；按组拆包是因为这组字只在这几条轨道上用得到，',
+            ' * 让 lib/alphabetPaths.ts 按需取。',
+            ' *',
+            ' * 字形来源（Noto 系列，SIL OFL 1.1）：',
+        ]
+        for key in sorted(entries):
+            lines.append(f' *   {key} → {sources[key]}')
+        lines += [
+            ' *',
+            ' * 重新生成：',
+            ' *   work/.venv/bin/python tools/build-glyph-paths.py',
+            ' */',
+        ]
+        lines.append(f'export const {exported}: Record<string, string> = {{')
+        for key in sorted(entries):
+            lines.append(f"  {json.dumps(key, ensure_ascii=False)}: {json.dumps(entries[key])},")
+        lines.append('};')
+        lines.append('')
+        path.write_text('\n'.join(lines))
+        print(f'写入 {path.relative_to(ROOT)}：{len(entries)} 个字母轮廓，{path.stat().st_size / 1024:.1f} KB')
 
-    size = OUT_ALPHA.stat().st_size
-    print(f'写入 {OUT_ALPHA.relative_to(ROOT)}：{len(entries)} 个字母轮廓，{size / 1024:.1f} KB')
     for message in failures:
         print(f'  ✗ {message}')
     return 1 if failures else 0

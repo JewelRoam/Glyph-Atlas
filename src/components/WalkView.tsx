@@ -8,7 +8,7 @@ import { AlphabetField } from './AlphabetField';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { hasLetterMap } from '../data/letterSlots';
 import { familyFor } from '../data/fontFallback';
-import { preloadAlphabetPaths } from '../lib/alphabetPaths';
+import { preloadAlphabetGroup, preloadAlphabetPaths } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { loadFont } from '../lib/fonts';
 import { LINEAGE_MODE_HINT, LINEAGE_MODE_LABEL, formatSpan } from '../lib/time';
@@ -32,9 +32,10 @@ export function WalkView() {
   const [lineageId, setLineageId] = useState(lineages[0].id);
   const lineage = lineages.find((l) => l.id === lineageId) ?? lineages[0];
 
-  // 进 MICRO 就先把字母轮廓包拉起来：第一段有字母表的轨道不该先闪一次字体
+  // 进 MICRO 先把闪米特—希腊那条线（core 包）拉起来，别等字母场挂载才请求；
+  // 鼠标移到某条轨道标签上时，再顺手预取那条轨道要用的包（婆罗米系在另一包里）
   useEffect(() => {
-    preloadAlphabetPaths();
+    preloadAlphabetGroup('core');
   }, []);
 
   return (
@@ -45,6 +46,8 @@ export function WalkView() {
             key={l.id}
             className={l.id === lineageId ? 'active' : ''}
             aria-pressed={l.id === lineageId}
+            onMouseEnter={() => preloadAlphabetPaths(l.stops.map((s) => s.script))}
+            onFocus={() => preloadAlphabetPaths(l.stops.map((s) => s.script))}
             onClick={() => setLineageId(l.id)}
           >
             {l.nameZh}
