@@ -35,6 +35,8 @@
  *  · 婆罗米系（梵语字音表 varga 的 33 个辅音位）：婆罗米、悉昙、格兰塔、
  *    天城、孟加拉、古吉拉特、果鲁穆奇、奥里亚、泰米尔、泰卢固、卡纳达、
  *    马拉雅拉姆、僧伽罗、藏文、爪哇、巴厘、高棉、泰文、老挝文、缅文。
+ *  · 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇——按音位
+ *    位次与上面各表对齐，多出来的音位另立一格（见 per 系与 perm 系槽位）。
  *
  * 三套槽位各管各的：开头是闪米特—希腊的字母位（ʾālep → Α → A 那条线），
  * 中间 av-* 是阿维斯陀自己新造的字母，mong-* 是蒙古在回鹘之上分出的字母
@@ -238,6 +240,61 @@ export const SLOTS: LetterSlot[] = [
   { id: 'p-ejective', label: 'პ（挤喉音 pʼ）' },
   { id: 'tse-ejective', label: 'წ（挤喉音 tsʼ）' },
   { id: 'che-ejective', label: 'ჭ（挤喉音 tʃʼ）' },
+  // ── 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇 ─────────
+  // 这四套字母都在希腊字母的辐射圈里，却不是彼此的直系后代：
+  //   · 高加索阿尔巴尼亚字母（N4131）——5 世纪为高加索阿尔巴尼亚语造的 52
+  //     个字母，按希腊式数值次序排（1-9、10-90、100-900、1000-9000……）；
+  //   · 古彼尔姆字母（N4263）——1372 年 Stefan 创制时把希腊／西里尔的次序
+  //     连同字母位一起搬过来（提案 §1 说"看字母次序就知道"），字形多取科米
+  //     印记符号；
+  //   · 埃尔巴桑（N3985）与维特库奇（N5138）——18、19 世纪为阿尔巴尼亚语
+  //     造的两套字母，按现代阿尔巴尼亚字母表排，一个音位一个字，字形以新造
+  //     为主、带希腊笔调。
+  // 所以这条轨道上的格子按"音位位次"排：同一个音位在四套字母里占同一格，
+  // 与 varga-* 的做法一致。只有这四套字母自己多出来的音位（挤喉音、擦音、
+  // 腭化辅音、央元音……）才在下面另立一格，走过去时从下方飞入。
+  // 能接回上面已有槽位的一律接回去——ale（希腊 Α 位）、zhe（西里尔 Ж 位）、
+  // schwa（亚美尼亚 Ը 位）、yod-cons（半元音 j 位）、gha（浊擦音 ɣ 位）、
+  // chi（希腊 Χ 位）……它们讲的都是"该音位占哪一格"。
+  { id: 'per-dzh', label: 'dž（dzhoi / 送气塞擦音）' },
+  { id: 'per-dz', label: 'x（dz 的塞擦音位）' },
+  { id: 'per-cha', label: '𐔹 ć（cha，硬腭塞擦音）' },
+  { id: 'per-zha', label: '𐔻 ź（zha）' },
+  { id: 'per-ayn', label: '𐔽 ʕ（sha，咽音）' },
+  { id: 'per-inya', label: '𐔿 n’（inya，腭化的 n）' },
+  { id: 'per-dyan', label: '𐕁 d’（dyan，腭化的 d）' },
+  { id: 'per-lyit', label: '𐕅 l’（lyit，腭化的 l）' },
+  { id: 'per-qay', label: '𐕇 x̣（qay，紧喉的 x）' },
+  { id: 'per-aor', label: '𐕈 å（aor）' },
+  { id: 'per-choy', label: '𐕉 ć（choy，第二个 ć）' },
+  { id: 'per-cyay', label: '𐕋 c’（cyay，音值未定）' },
+  { id: 'per-dzyay', label: '𐕏 ʒ’（dzyay，音值未定）' },
+  { id: 'per-jayn', label: '𐕑 ž（jayn，音值未定）' },
+  { id: 'per-tyay', label: '𐕓 ṭ’（tyay）' },
+  { id: 'per-dzay', label: '𐕕 ʒ（dzay）' },
+  { id: 'per-chat', label: '𐕖 č（chat）' },
+  { id: 'per-pen', label: '𐕗 ṗ（pen，第二个 p）' },
+  { id: 'per-gheys', label: '𐕘 ġ（gheys）' },
+  { id: 'per-shoy', label: '𐕝 ś（shoy，第二个咝音）' },
+  { id: 'per-iwn', label: '𐕞 ü（iwn）' },
+  { id: 'per-cyaw', label: '𐕟 c’（cyaw，第二个 c’）' },
+  { id: 'per-cayn', label: '𐕠 c（cayn，第二个 c）' },
+  { id: 'per-piwr', label: '𐕢 p（piwr，第二个 p 字母）' },
+  { id: 'per-kiw', label: '𐕣 k（kiw，第二个 k 字母）' },
+  { id: 'per-nd', label: '𐔅 nd（前鼻化的 d）' },
+  { id: 'per-dh', label: '𐔆 / 𐖝 dh（ð）' },
+  { id: 'per-gj', label: '𐔋 / 𐖦 gj（ɟ）' },
+  { id: 'per-ll', label: '𐔑 / 𐖪 ll（ɫ）' },
+  { id: 'per-n2', label: '𐔔 na（第二个 n，前鼻化位置用）' },
+  { id: 'per-nj', label: '𐔕 / 𐖭 nj（ɲ）' },
+  { id: 'per-q', label: '𐔘 / 𐖰 q（c）' },
+  { id: 'per-rr', label: '𐔚 rr（颤音）' },
+  { id: 'per-y', label: '𐔢 / 𐖻 y（圆唇前元音）' },
+  { id: 'per-ghamma', label: '𐔦 γ（ghe 之外的第二个 ɣ）' },
+  { id: 'per-hha', label: '𐖤 ħ（hha）' },
+  { id: 'per-bbe', label: '𐖘 ƀ（bbe，第二个 b 字母）' },
+  { id: 'perm-ver', label: '𐍮 v（ver，第二个 v 字母）' },
+  { id: 'perm-yeru', label: '𐍨 yeru（yry 的从属形）' },
   // ── 婆罗米系（梵语字音表 varga）─────────────────────────────────────
   // 婆罗米文把梵语的 33 个辅音按发音部位排成五组（五处）：软腭、硬腭、
   // 卷舌、齿、唇，每组五个（鼻音收尾），后面接 4 个半元音、3 个咝音和 ha。
@@ -1854,6 +1911,208 @@ export const letterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'သ',
     'varga-ha': 'ဟ',
   },  // 缅文：33/33
+
+  // ── 外缘支流：高加索阿尔巴尼亚、古彼尔姆、埃尔巴桑、维特库奇 ─────────
+  // 四套字母的音值分别照 N4131（高加索阿尔巴尼亚，Sinai 重写本转写表）、
+  // N4263（古彼尔姆，Lytkin 1952 的字母序与西里尔从属对照）、N3985（埃尔巴桑，
+  // 字名即现代阿尔巴尼亚字母表，§3 说明 ç 写作 CH、e 写作 EI、ë 写作 E）、
+  // N5138（维特库奇，字名同样取自阿尔巴尼亚字母表）。对接原则：
+  // 音值能落到上面某个槽位的就接过去，落不到的（挤喉音、擦音、腭化辅音、
+  // 央元音、双写的第二个字母）各立一格，走过去时飞入。
+
+  // 高加索阿尔巴尼亚字母：52 个，按希腊式数值次序排。头七个字母
+  // （a b g d e z ē）与希腊 α β γ δ ε ζ η 位置、音值都对得上；
+  // 其余字母按音值接（i l n x h o f r s v w……），本地音位另立格子。
+  'caucasian-albanian': {
+    aleph: '𐔰', // 1 ALT a
+    beth: '𐔱', // 2 BET b
+    gimel: '𐔲', // 3 GIM g
+    daleth: '𐔳', // 4 DAT d
+    he: '𐔴', // 5 EB e
+    zayin: '𐔵', // 6 ZARL z
+    heth: '𐔶', // 7 EYN ē：第 7 位、长 e，与希腊 Η 同位
+    zhe: '𐔷', // 8 ZHIL ž
+    teth: '𐔸', // 9 TAS ṭ：第 9 位、字母名近闪米特 tēt／希腊 Θ，接 teth
+    'per-cha': '𐔹', // 10 CHA ć
+    'yod-cons': '𐔺', // 11 YOWD y（半元音 j）
+    'per-zha': '𐔻', // 12 ZHA ź
+    yodh: '𐔼', // 13 IRB i
+    'per-ayn': '𐔽', // 14 SHA ʕ（咽音）
+    lamedh: '𐔾', // 15 LAN l
+    'per-inya': '𐔿', // 16 INYA n’
+    chi: '𐕀', // 17 XEYN x
+    'per-dyan': '𐕁', // 18 DYAN d’
+    tse: '𐕂', // 19 CAR c̣（塞擦音 c）
+    je: '𐕃', // 20 JHOX ʒ́（浊塞擦音）
+    kaph: '𐕄', // 21 KAR ḳ
+    'per-lyit': '𐕅', // 22 LYIT l’
+    h: '𐕆', // 23 HEYT h
+    'per-qay': '𐕇', // 24 QAY x̣
+    'per-aor': '𐕈', // 25 AOR å
+    'per-choy': '𐕉', // 26 CHOY ć（第二个 ć）
+    che: '𐕊', // 27 CHI č̣
+    'per-cyay': '𐕋', // 28 CYAY c’：N4131 明说音值未定，不硬接
+    mem: '𐕌', // 29 MAQ m
+    qoph: '𐕍', // 30 QAR q̇
+    nun: '𐕎', // 31 NOWC n
+    'per-dzyay': '𐕏', // 32 DZYAY ʒ’：音值未定
+    sha: '𐕐', // 33 SHAK š
+    'per-jayn': '𐕑', // 34 JAYN ž：音值未定，另立一格
+    ayin: '𐕒', // 35 ON o
+    'per-tyay': '𐕓', // 36 TYAY ṭ’
+    phi: '𐕔', // 37 FAM f
+    'per-dzay': '𐕕', // 38 DZAY ʒ
+    'per-chat': '𐕖', // 39 CHAT č
+    'per-pen': '𐕗', // 40 PEN ṗ
+    'per-gheys': '𐕘', // 41 GHEYS ġ
+    resh: '𐕙', // 42 RAT r
+    shin: '𐕚', // 43 SEYK s
+    vede: '𐕛', // 44 VEYZ v（与西里尔 В 同位）
+    taw: '𐕜', // 45 TIWR ṭ：与 TAS 同写作 ṭ，按字名近亚美尼亚 տիւն（t）接 taw
+    'per-shoy': '𐕝', // 46 SHOY ś
+    'per-iwn': '𐕞', // 47 IWN ü
+    'per-cyaw': '𐕟', // 48 CYAW c’
+    'per-cayn': '𐕠', // 49 CAYN c
+    digamma: '𐕡', // 50 YAYD w（希腊 Ϝ 的音位）
+    'per-piwr': '𐕢', // 51 PIWR p
+    'per-kiw': '𐕣', // 52 KIW k
+  },
+
+  // 古彼尔姆字母：38 个，字母次序照 Lytkin 1952（1-24 主字母、25-34 补充、
+  // 末尾四对从属形）。模型是希腊＋西里尔，所以能接西里尔槽位的一律接过去
+  // （ž→zhe、č→che、š→sha、šč→shcha、ъ→er、ь→erj、ы→ery、ѣ→jat、е→ye、
+  // ю→yu、я→ya、ѧ→yus-small、ѡ→omega），只有 Cyrillic 也没有的 dž 与
+  // 两个"第二个字母"另立格子。
+  'old-permic': {
+    aleph: '𐍐', // 1 AN a
+    beth: '𐍑', // 2 BUR b
+    gimel: '𐍒', // 3 GAI g
+    daleth: '𐍓', // 4 DOI d
+    he: '𐍔', // 5 E e
+    zhe: '𐍕', // 6 ZHOI ž
+    'per-dzh': '𐍖', // 7 DZHOI dž（西里尔没有这个音位）
+    zayin: '𐍗', // 8 ZATA z
+    'per-dz': '𐍘', // 9 DZITA dz
+    yodh: '𐍙', // 10 I i
+    kaph: '𐍚', // 11 KOKE k
+    lamedh: '𐍛', // 12 LEI l
+    mem: '𐍜', // 13 MENOE m
+    nun: '𐍝', // 14 NENOE n
+    vede: '𐍞', // 15 VOOI v
+    pe: '𐍟', // 16 PEEI p
+    resh: '𐍠', // 17 REI r
+    shin: '𐍡', // 18 SII s
+    taw: '𐍢', // 19 TAI t
+    waw: '𐍣', // 20 U u
+    che: '𐍤', // 21 CHERY č
+    sha: '𐍥', // 22 SHOOI š
+    shcha: '𐍦', // 22a SHCHOOI šč
+    ery: '𐍧', // 23 YRY ы
+    'perm-yeru': '𐍨', // 23a YERU：YRY 的从属形，另立一格
+    ayin: '𐍩', // 24 O o
+    omega: '𐍪', // 24a OO ѡ
+    phi: '𐍫', // 25 EF f
+    h: '𐍬', // 26 HA h
+    tse: '𐍭', // 27 TSIU c
+    'perm-ver': '𐍮', // 28 VER：第二个 v 字母
+    er: '𐍯', // 29 YER ъ
+    erj: '𐍰', // 30 YERI ь
+    jat: '𐍱', // 31 YAT ѣ
+    ye: '𐍲', // 32 IE е
+    yu: '𐍳', // 33 YU ю
+    ya: '𐍴', // 34 YA я
+    'yus-small': '𐍵', // 34a IA ѧ
+  },
+
+  // 埃尔巴桑字母：40 个，字名就是现代阿尔巴尼亚字母表（N3985 §3：ç 写作 CH、
+  // e 写作 EI、ë 写作 E），所以音值可靠。能接希腊／西里尔槽位的接过去，
+  // 阿尔巴尼亚语特有的音位（ç、dh、gj、ll、nj、q、rr、x、y、ë、γ 的第二个
+  // 字母……）另立格子。
+  elbasan: {
+    aleph: '𐔀', // A a
+    beth: '𐔁', // BE b
+    tse: '𐔂', // CE c（塞擦音）
+    che: '𐔃', // CHE ç
+    daleth: '𐔄', // DE d
+    'per-nd': '𐔅', // NDE 前鼻化的 nd
+    'per-dh': '𐔆', // DHE dh（ð）
+    he: '𐔇', // EI e
+    schwa: '𐔈', // E ë（央元音）
+    phi: '𐔉', // FE f
+    gimel: '𐔊', // GE g
+    'per-gj': '𐔋', // GJE gj（ɟ）
+    h: '𐔌', // HE h
+    yodh: '𐔍', // I i
+    'yod-cons': '𐔎', // JE j
+    kaph: '𐔏', // KE k
+    lamedh: '𐔐', // LE l
+    'per-ll': '𐔑', // LLE ll
+    mem: '𐔒', // ME m
+    nun: '𐔓', // NE n
+    'per-n2': '𐔔', // NA：专用于前鼻化位置的第二个 n
+    'per-nj': '𐔕', // NJE nj（ɲ）
+    ayin: '𐔖', // O o
+    pe: '𐔗', // PE p
+    'per-q': '𐔘', // QE q（c）
+    resh: '𐔙', // RE r
+    'per-rr': '𐔚', // RRE rr
+    shin: '𐔛', // SE s
+    sha: '𐔜', // SHE sh
+    taw: '𐔝', // TE t
+    teth: '𐔞', // THE th（θ）
+    waw: '𐔟', // U u
+    vede: '𐔠', // VE v
+    'per-dz': '𐔡', // XE x（dz）
+    'per-y': '𐔢', // Y y（圆唇前元音）
+    zayin: '𐔣', // ZE z
+    zhe: '𐔤', // ZHE zh
+    gha: '𐔥', // GHE ɣ
+    'per-ghamma': '𐔦', // GHAMMA：第二个 ɣ
+    chi: '𐔧', // KHE khe（x）
+  },
+
+  // 维特库奇字母：Unicode 收录的是 Veqilharxhi 1844 年那 35 个字母（大小写各
+  // 一套，这里统一取小写），音值照 N5138 §6 的对应表。它按阿尔巴尼亚字母表
+  // 排，与埃尔巴桑是同一套音位，所以两站之间大部分格子能原地变形；
+  // 缺的字母（gj、rr、xh、zh）是 19 世纪原本就没造、现代才补的，
+  // 走到它这一站时按"消失"处理。
+  vithkuqi: {
+    aleph: '𐖗', // A a
+    'per-bbe': '𐖘', // BBE ƀ：与 BE 并存的第二个 b 字母
+    beth: '𐖙', // BE b
+    tse: '𐖚', // CE c
+    che: '𐖛', // CHE ç
+    daleth: '𐖜', // DE d
+    'per-dh': '𐖝', // DHE dh
+    he: '𐖞', // EI e
+    schwa: '𐖟', // E ë
+    phi: '𐖠', // FE f
+    gimel: '𐖡', // GA g
+    h: '𐖣', // HA h
+    'per-hha': '𐖤', // HHA ħ
+    yodh: '𐖥', // I i
+    'per-gj': '𐖦', // IJE：写成 g / j 之后带一个 ĩ，记的就是 gj 这个音
+    'yod-cons': '𐖧', // JE j
+    kaph: '𐖨', // KA k
+    lamedh: '𐖩', // LA l
+    'per-ll': '𐖪', // LLA ll
+    mem: '𐖫', // ME m
+    nun: '𐖬', // NE n
+    'per-nj': '𐖭', // NJE nj
+    ayin: '𐖮', // O o
+    pe: '𐖯', // PE p
+    'per-q': '𐖰', // QA q
+    resh: '𐖱', // RE r
+    shin: '𐖳', // SE s
+    sha: '𐖴', // SHE sh
+    taw: '𐖵', // TE t
+    teth: '𐖶', // THE th
+    waw: '𐖷', // U u
+    vede: '𐖸', // VE v
+    'per-dz': '𐖹', // XE x（dz）
+    'per-y': '𐖻', // Y y
+    zayin: '𐖼', // ZE z
+  },
 };
 
 /** 槽位在字母场格子里的固定次序 */
