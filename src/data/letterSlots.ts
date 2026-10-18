@@ -28,13 +28,15 @@
  *  · 希腊的东支：科普特、西里尔；
  *  · 希腊的两条支流：哥特（斯堪的纳维亚—黑海）、格拉哥里（斯拉夫）；
  *  · 阿拉米东支：粟特、回鹘、碑铭巴列维、诗篇巴列维；
+ *  · 阿维斯陀：巴列维的经书后身，字母从 22 个扩到 54 个（见 av-* 槽位）；
  *  · 婆罗米系（梵语字音表 varga 的 33 个辅音位）：婆罗米、悉昙、格兰塔、
  *    天城、孟加拉、古吉拉特、果鲁穆奇、奥里亚、泰米尔、泰卢固、卡纳达、
  *    马拉雅拉姆、僧伽罗、藏文、爪哇、巴厘、高棉、泰文、老挝文、缅文。
  *
- * 两套槽位各管各的：前 30 格是闪米特—希腊的字母位（ʾālep → Α → A 那条线），
- * 后面的 varga-* 是梵语字音表的辅音位（婆罗米 ka → 天城 क → 泰文 ก 那条线）。
- * 一条轨道上只会出现其中一套，格子不会混。
+ * 三套槽位各管各的：开头是闪米特—希腊的字母位（ʾālep → Α → A 那条线），
+ * 中间 av-* 是阿维斯陀自己新造的字母（巴列维那一段轨道才用得到），
+ * 末尾的 varga-* 是梵语字音表的辅音位（婆罗米 ka → 天城 क → 泰文 ก 那条线）。
+ * 一条轨道上只会出现其中一套或两套相邻的字母位，格子不会混。
  *
  * 暂不收录：拉丁 J / U / W。它们是中世纪以后从 I / V 分出来的，
  * 与希腊字母不是一对一的对应关系，放进对照表反而会误导，故排除。
@@ -118,6 +120,48 @@ export const SLOTS: LetterSlot[] = [
   { id: 'yus-iot-big', label: 'ѭ / Ѭ（iotated 大尤斯）' },
   { id: 'izhitsa', label: 'ѵ / Ѵ（希腊 Υ，借词用）' },
   { id: 'gai', label: 'G（罗马新造，由 C 分化）' },
+  // ── 阿维斯陀字母自己新造的字母 ──────────────────────────────────────
+  // 阿维斯陀字母是为逐音记录《阿维斯陀》经文造的，3—4 世纪成书时把字母表
+  // 从巴列维的 22 个扩到了 54 个。能接回巴列维的 17 格写在下面的对照表里，
+  // 其余 37 格——长音符、θ δ x f β 这些巴列维没有的音——都是新造的字，
+  // 在字母场里没有祖先格，走到阿维斯陀这一站时飞入。
+  { id: 'av-aa', label: '𐬁 aa（a 的长音）' },
+  { id: 'av-ao', label: '𐬂 ao' },
+  { id: 'av-aao', label: '𐬃 aao（长音 ao）' },
+  { id: 'av-an', label: '𐬄 an（鼻化 a）' },
+  { id: 'av-aan', label: '𐬅 aan（鼻化长音 a）' },
+  { id: 'av-ae', label: '𐬆 ae（央元音）' },
+  { id: 'av-aee', label: '𐬇 aee（长音 ae）' },
+  { id: 'av-e', label: '𐬈 e' },
+  { id: 'av-ee', label: '𐬉 ee（长音 e）' },
+  { id: 'av-o', label: '𐬊 o' },
+  { id: 'av-oo', label: '𐬋 oo（长音 o）' },
+  { id: 'av-i', label: '𐬌 i' },
+  { id: 'av-ii', label: '𐬍 ii（长音 i）' },
+  { id: 'av-u', label: '𐬎 u' },
+  { id: 'av-uu', label: '𐬏 uu（长音 u）' },
+  { id: 'av-xe', label: '𐬑 xe x' },
+  { id: 'av-xye', label: '𐬒 xye x́' },
+  { id: 'av-xve', label: '𐬓 xve xʷ' },
+  { id: 'av-gge', label: '𐬕 gge ġ' },
+  { id: 'av-ghe', label: '𐬖 ghe γ' },
+  { id: 'av-ce', label: '𐬗 ce c' },
+  { id: 'av-je', label: '𐬘 je j' },
+  { id: 'av-the', label: '𐬚 the θ' },
+  { id: 'av-dhe', label: '𐬜 dhe δ' },
+  { id: 'av-tte', label: '𐬝 tte t̰' },
+  { id: 'av-fe', label: '𐬟 fe f' },
+  { id: 'av-bhe', label: '𐬡 bhe β' },
+  { id: 'av-nge', label: '𐬢 nge ŋ' },
+  { id: 'av-ngye', label: '𐬣 ngye ŋ́' },
+  { id: 'av-ngve', label: '𐬤 ngve ŋʷ' },
+  { id: 'av-nye', label: '𐬦 nye ń' },
+  { id: 'av-nne', label: '𐬧 nne（腭鼻音）' },
+  { id: 'av-hme', label: '𐬩 hme m̨' },
+  { id: 'av-yye', label: '𐬪 yye ẏ' },
+  { id: 'av-zhe', label: '𐬲 zhe ž' },
+  { id: 'av-shye', label: '𐬳 shye š́' },
+  { id: 'av-sshe', label: '𐬴 sshe ṣ̌' },
   // ── 婆罗米系（梵语字音表 varga）─────────────────────────────────────
   // 婆罗米文把梵语的 33 个辅音按发音部位排成五组（五处）：软腭、硬腭、
   // 卷舌、齿、唇，每组五个（鼻音收尾），后面接 4 个半元音、3 个咝音和 ha。
@@ -774,6 +818,67 @@ export const letterMaps: Record<string, Record<string, string>> = {
     sadhe: '𐮏',
     shin: '𐮐',
     taw: '𐮑',
+  },
+  // 阿维斯陀字母：骨架取自巴列维字母，字母数却涨到 54。
+  // 能按音值对回巴列维的只有 17 个（a b g d h v z y k l m n s p r š t），
+  // 其余 37 个是阿维斯陀为记经文新造的字——长音符、擦音、鼻音各占一格——
+  // 因此走到这一站时的"新增"特别多，那正是这套字母的特点。
+  // 对不上的巴列维字母（ṭ ʿ ṣ q）在这里空着，走"消失"动画。
+  avestan: {
+    aleph: '𐬀',
+    beth: '𐬠',
+    gimel: '𐬔',
+    daleth: '𐬛',
+    he: '𐬵',
+    waw: '𐬬',
+    zayin: '𐬰',
+    yodh: '𐬫',
+    kaph: '𐬐',
+    lamedh: '𐬮',
+    mem: '𐬨',
+    nun: '𐬥',
+    samekh: '𐬯',
+    pe: '𐬞',
+    resh: '𐬭',
+    shin: '𐬱',
+    taw: '𐬙',
+    'av-aa': '𐬁',
+    'av-ao': '𐬂',
+    'av-aao': '𐬃',
+    'av-an': '𐬄',
+    'av-aan': '𐬅',
+    'av-ae': '𐬆',
+    'av-aee': '𐬇',
+    'av-e': '𐬈',
+    'av-ee': '𐬉',
+    'av-o': '𐬊',
+    'av-oo': '𐬋',
+    'av-i': '𐬌',
+    'av-ii': '𐬍',
+    'av-u': '𐬎',
+    'av-uu': '𐬏',
+    'av-xe': '𐬑',
+    'av-xye': '𐬒',
+    'av-xve': '𐬓',
+    'av-gge': '𐬕',
+    'av-ghe': '𐬖',
+    'av-ce': '𐬗',
+    'av-je': '𐬘',
+    'av-the': '𐬚',
+    'av-dhe': '𐬜',
+    'av-tte': '𐬝',
+    'av-fe': '𐬟',
+    'av-bhe': '𐬡',
+    'av-nge': '𐬢',
+    'av-ngye': '𐬣',
+    'av-ngve': '𐬤',
+    'av-nye': '𐬦',
+    'av-nne': '𐬧',
+    'av-hme': '𐬩',
+    'av-yye': '𐬪',
+    'av-zhe': '𐬲',
+    'av-shye': '𐬳',
+    'av-sshe': '𐬴',
   },
   // ── 婆罗米系 20 种文字（梵语字音表的 33 个辅音位）────────────────────
   // 对照关系来自各文字的梵语/Pali 字音对应表，字符按 Unicode 名逐个核对
