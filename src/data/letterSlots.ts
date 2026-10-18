@@ -124,6 +124,7 @@ export const SLOTS: LetterSlot[] = [
   { id: 'ae', label: 'ە（库尔德语 /ɛ/）' },
   { id: 'zhe', label: 'ж / Ж（斯拉夫新造）' },
   { id: 'waw', label: '钩 wāw' },
+  { id: 'waw-curled', label: '𐾷（花剌子模文卷曲 wāw，wāw 的第二个字面）' },
   { id: 'u', label: 'ۇ（维吾尔语 /u/，wāw 上加一撇）' },
   { id: 'oe', label: 'ۆ（库尔德语 /o/）' },
   { id: 'waw-yu', label: 'ۈ（维吾尔语 /y/）' },
@@ -640,6 +641,52 @@ export const SLOTS: LetterSlot[] = [
   { id: 'varga-nha', label: 'nha（尼瓦尔语的浊送鼻音）' },
   { id: 'varga-mha', label: 'mha（尼瓦尔语的浊送鼻音）' },
   { id: 'varga-lha', label: 'lha（尼瓦尔语的浊送边音）' },
+
+  // ── 各家在梵语音位之外自己的字母 ─────────────────────────────────
+  // 上面那些槽位多是"同一格换字面"——两家文字用不同的字形表示同一个音。
+  // 这一组不一样：这些字母只在一种文字里成立，别家没有对应音位，所以走到那
+  // 一站时它们整格飞入，离开时整格飞出。字面都取 Unicode 里分类为"字母"
+  // （Lo/Lu/Ll）的码位，Vedic 的 jihvāmūlīya、upadhmānīya 一类"符号"不进表。
+  //  · 天城文除梵语音位外还给印地语、马拉地语、克什米尔语、信德语添了八个独立
+  //    元音 ऄ ऑ ॲ ॳ ॴ ॵ ॶ ॷ 与八个辅音 ॸ ॹ ॺ ॻ ॼ ॽ ॾ ॿ；
+  //  · 古吉拉特文补 candra o ઑ 与 zha ૹ；果鲁穆奇文的 ੲ ੳ 是 /i/ /u/ 的载体；
+  //    奥里亚文的 ୟ ୱ、泰卢固文的 ౘ ౙ ౚ、马拉雅拉姆文的 ഺ 同理；
+  //  · 泰米尔文的 ஃ（aytham）是它 31 个字母里的一个；藏文的 ཛྷ 是 dzha；
+  //  · 高棉文的 ឨ ឪ ឲ 是三个不在这 18 个元音位里的独立元音；
+  //  · 花剌子模文的 𐾷 是 wāw 的第二个字面，与上面那些"别家添的字"一样处理。
+  { id: 'varga-deva-short-a', label: 'ऄ（天城文短 a，阿瓦迪语）' },
+  { id: 'varga-deva-candra-o', label: 'ऑ（天城文 candra o，印地语的 /ɔ/）' },
+  { id: 'varga-deva-candra-a', label: 'ॲ（天城文 candra a，马拉地语）' },
+  { id: 'varga-deva-oe', label: 'ॳ（天城文 ö，克什米尔语）' },
+  { id: 'varga-deva-ooe', label: 'ॴ（天城文 öö）' },
+  { id: 'varga-deva-aw', label: 'ॵ（天城文 aw）' },
+  { id: 'varga-deva-ue', label: 'ॶ（天城文 ü）' },
+  { id: 'varga-deva-uue', label: 'ॷ（天城文 üü）' },
+  { id: 'varga-deva-marwari-dda', label: 'ॸ（天城文 Marwari ḍa）' },
+  { id: 'varga-deva-zha', label: 'ॹ（天城文 zha，马拉地语 झ़）' },
+  { id: 'varga-deva-heavy-ya', label: 'ॺ（天城文重 y，马拉地语 yya）' },
+  { id: 'varga-deva-gga', label: 'ॻ（天城文 ɠa，信德语）' },
+  { id: 'varga-deva-jja', label: 'ॼ（天城文 ʄa，信德语）' },
+  { id: 'varga-deva-glottal', label: 'ॽ（天城文的声门塞音）' },
+  { id: 'varga-deva-ddda', label: 'ॾ（天城文 ɗa，信德语）' },
+  { id: 'varga-deva-bba', label: 'ॿ（天城文 ɓa，信德语）' },
+  { id: 'varga-gujarati-candra-o', label: 'ઑ（古吉拉特文 candra o）' },
+  { id: 'varga-gujarati-zha', label: 'ૹ（古吉拉特文 zha）' },
+  { id: 'varga-gurmukhi-iri', label: 'ੲ（果鲁穆奇文 iri，/i/ 的载体）' },
+  { id: 'varga-gurmukhi-ura', label: 'ੳ（果鲁穆奇文 ura，/u/ 的载体）' },
+  { id: 'varga-odia-yya', label: 'ୟ（奥里亚文 yya）' },
+  { id: 'varga-odia-wa', label: 'ୱ（奥里亚文 wa）' },
+  { id: 'varga-tamil-aytham', label: 'ஃ（泰米尔文 aytham）' },
+  { id: 'varga-telugu-tsa', label: 'ౘ（泰卢固文 tsa）' },
+  { id: 'varga-telugu-dza', label: 'ౙ（泰卢固文 dza）' },
+  { id: 'varga-telugu-rrra', label: 'ౚ（泰卢固文 ṟa）' },
+  { id: 'varga-malayalam-ttta', label: 'ഺ（马拉雅拉姆文 ṯa）' },
+  { id: 'varga-tibetan-dzha', label: 'ཛྷ（藏文 dzha）' },
+  { id: 'varga-khmer-quk', label: 'ឨ（高棉文独立元音 quk）' },
+  { id: 'varga-khmer-quuv', label: 'ឪ（高棉文独立元音 quuv）' },
+  { id: 'varga-khmer-qoo2', label: 'ឲ（高棉文独立元音 qoo 第二式）' },
+  { id: 'varga-bengali-khanda-ta', label: 'ৎ（孟加拉文的 khanda ta，词尾的 t）' },
+  { id: 'varga-nakaara-pollu', label: 'n̥（泰卢固文 ౝ ／ 卡纳达文 ೝ 的 nakaara pollu）' },
 
   // ── 东南亚本语字母：泰、老、高棉、缅在梵语 33 音之外自己添的字 ────────
   // 泰文与老挝文的字母表比梵语音位表长：两文把 ข ค ผ พ ห 一类的字加一笔或换
@@ -2284,7 +2331,24 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'स',
     'varga-ha': 'ह',
     'varga-lla': 'ळ',
-  },  // 天城文：33/33
+    // 印地语、马拉地语、克什米尔语、信德语在天城文里另造的字母（见上面「各家在梵语音位之外自己的字母」一段）
+    'varga-deva-short-a': 'ऄ',
+    'varga-deva-candra-o': 'ऑ',
+    'varga-deva-candra-a': 'ॲ',
+    'varga-deva-oe': 'ॳ',
+    'varga-deva-ooe': 'ॴ',
+    'varga-deva-aw': 'ॵ',
+    'varga-deva-ue': 'ॶ',
+    'varga-deva-uue': 'ॷ',
+    'varga-deva-marwari-dda': 'ॸ',
+    'varga-deva-zha': 'ॹ',
+    'varga-deva-heavy-ya': 'ॺ',
+    'varga-deva-gga': 'ॻ',
+    'varga-deva-jja': 'ॼ',
+    'varga-deva-glottal': 'ॽ',
+    'varga-deva-ddda': 'ॾ',
+    'varga-deva-bba': 'ॿ',
+  },  // 天城文：33 音位 + 16 个本语字母
   // 孟加拉文把 v 并进了 b（ব 一字两用），va 一格空着走"消失"
   bengali: {
     'varga-ka': 'ক',
@@ -2320,7 +2384,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'স',
     'varga-ha': 'হ',
     'varga-rra': 'ড়',
-  },  // 孟加拉文：32/33
+    'varga-bengali-khanda-ta': 'ৎ',
+  },  // 孟加拉文：32 音位 + khanda ta
   gujarati: {
     'varga-ka': 'ક',
     'varga-kha': 'ખ',
@@ -2356,7 +2421,9 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'સ',
     'varga-ha': 'હ',
     'varga-lla': 'ળ',
-  },  // 古吉拉特文：33/33
+    'varga-gujarati-candra-o': 'ઑ',
+    'varga-gujarati-zha': 'ૹ',
+  },  // 古吉拉特文：33 音位 + 2 个本语字母
   // 果鲁穆奇文没有卷舌咝音 ṣa（只有 ਸ਼），ssa 一格空着
   gurmukhi: {
     'varga-ka': 'ਕ',
@@ -2392,7 +2459,9 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-sa': 'ਸ',
     'varga-ha': 'ਹ',
     'varga-rra': 'ੜ',
-  },  // 果鲁穆奇文：32/33
+    'varga-gurmukhi-iri': 'ੲ',
+    'varga-gurmukhi-ura': 'ੳ',
+  },  // 果鲁穆奇文：32 音位 + 两个元音载体
   odia: {
     'varga-ka': 'କ',
     'varga-kha': 'ଖ',
@@ -2429,7 +2498,9 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-ha': 'ହ',
     'varga-lla': 'ଳ',
     'varga-rra': 'ଡ଼',
-  },  // 奥里亚文：33/33
+    'varga-odia-yya': 'ୟ',
+    'varga-odia-wa': 'ୱ',
+  },  // 奥里亚文：33 音位 + 2 个本语字母
   // 泰米尔文不分送气/清浊，ச 系之后只留各发一个音的字，其余 14 格全空
   tamil: {
     'varga-ka': 'க',
@@ -2455,7 +2526,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-llla': 'ழ',
     'varga-rra': 'ற',
     'varga-nnna': 'ன',
-  },  // 泰米尔文：19/33
+    'varga-tamil-aytham': 'ஃ',
+  },  // 泰米尔文：19 音位 + aytham
   telugu: {
     'varga-ka': 'క',
     'varga-kha': 'ఖ',
@@ -2493,7 +2565,11 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-lla': 'ళ',
     'varga-llla': 'ఴ',
     'varga-rra': 'ఱ',
-  },  // 泰卢固文：33/33
+    'varga-telugu-tsa': 'ౘ',
+    'varga-telugu-dza': 'ౙ',
+    'varga-telugu-rrra': 'ౚ',
+    'varga-nakaara-pollu': 'ౝ',
+  },  // 泰卢固文：33 音位 + 3 个本语字母 + nakaara pollu
   kannada: {
     'varga-ka': 'ಕ',
     'varga-kha': 'ಖ',
@@ -2531,7 +2607,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-lla': 'ಳ',
     'varga-llla': 'ೞ',  // Unicode 名字误写成 FA，实为 ḻa（见 NamesList）
     'varga-rra': 'ಱ',
-  },  // 卡纳达文：33/33
+    'varga-nakaara-pollu': 'ೝ',
+  },  // 卡纳达文：33 音位 + nakaara pollu
   malayalam: {
     'varga-ka': 'ക',
     'varga-kha': 'ഖ',
@@ -2580,7 +2657,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-chillu-m': 'ൔ',
     'varga-chillu-y': 'ൕ',
     'varga-chillu-lll': 'ൖ',
-  },  // 马拉雅拉姆文：62/67（33 音位 + 九个 chillu）
+    'varga-malayalam-ttta': 'ഺ',
+  },  // 马拉雅拉姆文：33 音位 + 九个 chillu + ṯa
   sinhala: {
     'varga-ka': 'ක',
     'varga-kha': 'ඛ',
@@ -2668,7 +2746,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-a-chung': 'འ',
     'varga-kka': 'ཫ',
     'varga-rra-tib': 'ཬ',
-  },  // 藏文：41/50（余下多为祭仪符号；jha 是组合字，留空）
+    'varga-tibetan-dzha': 'ཛྷ',
+  },  // 藏文：41/50 + dzha（余下多为祭仪符号；jha 是组合字，留空）
   java: {
     'varga-ka': 'ꦏ',
     'varga-kha': 'ꦑ',
@@ -2792,7 +2871,10 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-lla': 'ឡ',
     // អ 是高棉字母表的第 33 个辅音，也是写元音的载体，独立元音 a 的后身
     'varga-o-ang': 'អ',
-  },  // 高棉文：35/35（梵语字音表 33 音 + ឡ + អ）
+    'varga-khmer-quk': 'ឨ',
+    'varga-khmer-quuv': 'ឪ',
+    'varga-khmer-qoo2': 'ឲ',
+  },  // 高棉文：33 音位 + ឡ + អ + 3 个独立元音
   thai: {
     'varga-ka': 'ก',
     'varga-kha': 'ข',
@@ -3840,7 +3922,8 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     resh: '𐿂',
     shin: '𐿃',
     taw: '𐿄',
-  },  // 花剌子模字母：22 个字母里少了 teth / sadhe / qoph
+    'waw-curled': '𐾷',
+  },  // 花剌子模字母：23 个字母（少了 teth / sadhe / qoph）
   // 粟特字母（早期）：阿拉米 22 个字母里少了 teth 与 qoph；r / ʿ / d 在《古代
   // 书信》里写成同一个字面，Unicode 也就只收了一个 U+10F18 RESH-AYIN-DALETH，
   // 所以 daleth 与 resh 两格都指向它——两个槽位合流成一个字形（同哈特拉的
