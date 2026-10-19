@@ -5,9 +5,11 @@
  * 用法：node --import ./tools/register-ts.mjs tools/audit-rosters.mjs
  * （已挂在 npm run validate 后面，跟着 npm run check 一起跑）
  *
- * 字母场要铺出这一家字母表的全部字母，所以除了两类字，别的字都不该缺席：
+ * 字母场要铺出这一家字母表的全部字母，所以除了三类字，别的字都不该缺席：
  *  · 同字母的另一种写法（大小写 á/Á、附加符号）—— 占同一格；
- *  · 纯组合 / 叠字 / 标调一类记号（NON_LETTER_MARKS）—— 单独成格像缺字。
+ *  · 名称上不是字母的码位（符号 / 记号 / 词尾形，glyphSets.nonLetters）——
+ *    符号与记号不占格，词尾形折进基字那一格；
+ *  · 手工核过的纯组合 / 叠字 / 标调记号（NON_LETTER_MARKS）。
  * 剩下的字如果没进字表，要么是撞上了 AUTO_LIMIT（截断，报错），要么是声明的
  * 字族里根本没有这个字形（缺字，提示里说明，页面留空而不拿别的字体顶替）。
  */
@@ -44,7 +46,8 @@ if (process.env.ROSTER_AUDIT_VERBOSE) {
     const detail = Object.keys(rosterFor(id)).length;
     console.log(
       `${id}\t样本 ${a.inventory}\t自动补位 ${a.displayed}\t字表 ${detail}\t` +
-        `算同格 ${a.folded}\t非字母记号 ${a.marks}\t字库未收 ${a.uncovered}\t截断 ${a.truncated}`,
+        `算同格 ${a.folded}\t符号 ${a.symbols}\t非字母记号 ${a.marks}\t` +
+        `同字母异体 ${a.variants}\t字库未收 ${a.uncovered}\t截断 ${a.truncated}`,
     );
   }
 }

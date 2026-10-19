@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import type { WritingSystem } from '../data/types';
 import { glyphSets } from '../data/glyphSets';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
+import { nonLetterKind } from '../data/letterSlots';
 import { coverageOf, hasCoverage } from '../lib/coverage';
 import { assetUrl } from '../lib/assets';
 import { FontGlyph, ImageGlyph } from './Glyph';
@@ -38,7 +39,13 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
   const source = glyphSourceFor(system);
   const family = source.kind === 'font' ? source.family ?? system.fontFamily : undefined;
   const set = glyphSets[system.id];
-  const full = set?.chars.length ? set.chars : system.sample ? [system.sample] : [];
+  const raw = set?.chars.length ? set.chars : system.sample ? [system.sample] : [];
+  // 符号（OM、表词符号）与记号（叠字、长音、标调）不是字母，不摆进字表；
+  // 词尾形这类异体是同一个字母的另一种写法，留在字表里当字形样本
+  const full = raw.filter((c) => {
+    const kind = nonLetterKind(system.id, c);
+    return kind !== 'symbol' && kind !== 'mark';
+  });
 
   // 覆盖表说"有"的才算数；font 来源之外（图片 / 留空）一格都不摆
   const covered = source.kind === 'font' ? full.filter((c) => coverageOf(family, c) !== 'no') : [];

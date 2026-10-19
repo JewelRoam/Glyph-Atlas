@@ -87,7 +87,7 @@
  */
 
 import { SVARA_SLOTS, svaraMaps } from './svaraSlots.ts';
-import { glyphSets } from './glyphSets.ts';
+import { glyphSets, type NonLetterKind } from './glyphSets.ts';
 import { scriptById } from './writingSystems.ts';
 import { familyFor } from './fontFallback.ts';
 import { coverageOf } from '../lib/coverage.ts';
@@ -4013,6 +4013,10 @@ const AUTO_LIMIT = 1200;
 /**
  * 不进自动补位的"长得像字、其实不是字"的记号。
  *
+ * 只收需要逐条核过名字、Unicode 名称里看不出来的那批；名称本身就能分辨的
+ * 符号 / 记号 / 同字母异体，由 tools/build-glyph-sets.mjs 写进 glyphSets 的
+ * nonLetters 字段，由 nonLetterKind() 一并筛掉。
+ *
  * 这里收两类：一类是只能加在别的字母上的修饰字母（单独占一格只剩一个小点
  * 或小钩），一类是叠字、重复、标调、词尾一类的记号（单独成格像跑进来一个
  * 标点）。两类混在字母表里都像缺字。
@@ -4057,6 +4061,22 @@ const NON_LETTER_MARKS = new Set([
   0x1e4eb, // 纳格蒙达里 sign ojod：词尾记号
 ]);
 
+/**
+ * 这个字面在 Unicode 名称上算不算"真正的字母"。
+ *
+ * 返回 undefined 才是这一家的字母：symbol（OM、表词符号）与 mark（叠字、
+ * 长音、标调）都不是字母；variant 是同一个字母的词尾形 / 无点形，折进基字
+ * 那一格。字母场一律不给它们单独的格子，详情面板只筛掉符号与记号。
+ */
+export function nonLetterKind(scriptId: string, char: string): NonLetterKind | undefined {
+  const cp = char.codePointAt(0);
+  if (cp === undefined) return undefined;
+  const kind = glyphSets[scriptId]?.nonLetters?.[cp.toString(16).toUpperCase()];
+  // 手工核过的那批记号同理：单独成格只剩一个小钩或一个小点
+  if (!kind && NON_LETTER_MARKS.has(cp)) return 'mark';
+  return kind;
+}
+
 /** 自动槽位的键：一个字母一格，跨文字不复用 */
 function autoSlot(scriptId: string, char: string): string {
   return `auto:${scriptId}:${(char.codePointAt(0) ?? 0).toString(16)}`;
@@ -4098,10 +4118,14 @@ function autoRoster(
   let count = 0;
 
   for (const char of chars) {
-    const cp = char.codePointAt(0);
-    // 纯附加记号不铺格（见 NON_LETTER_MARKS）
-    if (cp !== undefined && NON_LETTER_MARKS.has(cp)) {
-      if (audit) audit.marks++;
+    // 名称上不是字母的码位不占格，见 nonLetterKind()
+    const kind = nonLetterKind(scriptId, char);
+    if (kind) {
+      if (audit) {
+        if (kind === 'symbol') audit.symbols++;
+        else if (kind === 'variant') audit.variants++;
+        else audit.marks++;
+      }
       continue;
     }
     const key = letterKey(char);
@@ -4148,8 +4172,12 @@ export interface RosterAudit {
   displayed: number;
   /** 与手工表里某个字面是同一个字母，不单独占格 */
   folded: number;
+  /** 符号（OM、表词符号一类），不单独占格 */
+  symbols: number;
   /** 纯组合 / 叠字 / 标调一类记号，不单独占格 */
   marks: number;
+  /** 同一个字母的词尾形 / 无点形，折进基字那一格 */
+  variants: number;
   /** 声明的字族里没有这个字形，铺出来只会是"字库未收"名片 */
   uncovered: number;
   /** 被 AUTO_LIMIT 截掉的格数 */
@@ -4163,7 +4191,9 @@ export function rosterAudit(scriptId: string): RosterAudit {
     inventory: glyphSets[scriptId]?.chars.length ?? 0,
     displayed: 0,
     folded: 0,
+    symbols: 0,
     marks: 0,
+    variants: 0,
     uncovered: 0,
     truncated: 0,
   };

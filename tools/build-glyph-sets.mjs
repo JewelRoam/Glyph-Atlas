@@ -174,7 +174,11 @@ async function loadUnicodeData() {
     0x2c2f, 0x2c5f, // 格拉哥里 CAUDATE CHRIVI
   ]);
   const ranges = [];
+  /** 码位 → Unicode 名。字母与符号靠名字分辨（见 classifyNonLetters） */
+  const names = new Map();
   let pending = null;
+  let pendingName = null;
+  let pendingStart = 0;
   for (const line of text.split('\n')) {
     if (!line) continue;
     const f = line.split(';');
@@ -182,6 +186,8 @@ async function loadUnicodeData() {
     const name = f[1];
     const cat = f[2];
     if (name.endsWith(', First>')) {
+      pendingName = name.replace(/, First>$/, '');
+      pendingStart = cp;
       pending = LETTER.has(cat) && !EXCLUDE.has(cp) ? [cp, cp] : null;
       continue;
     }
@@ -191,9 +197,14 @@ async function loadUnicodeData() {
         ranges.push(pending);
         pending = null;
       }
+      if (pendingName !== null) {
+        for (let c = pendingStart; c <= cp; c++) names.set(c, pendingName);
+        pendingName = null;
+      }
       continue;
     }
     if (LETTER.has(cat) && !EXCLUDE.has(cp)) ranges.push([cp, cp]);
+    names.set(cp, name);
   }
   ranges.sort((a, b) => a[0] - b[0]);
   // 合并相邻 / 重叠区间，后续按区块取交集时更快
@@ -203,7 +214,74 @@ async function loadUnicodeData() {
     if (last && r[0] <= last[1] + 1) last[1] = Math.max(last[1], r[1]);
     else merged.push([r[0], r[1]]);
   }
-  return merged;
+  return { ranges: merged, nameOf: (cp) => names.get(cp) };
+}
+
+/**
+ * 单独列出"名称上是字母、其实不是这一家字母"的码位。
+ *
+ * Unicode 把不少符号与记号也归进字母类别（Lo/Ll/Lu），逐区块取字母会把它们
+ * 一并收进样本集：希腊的 β 符号 ϐ、各家的 OM 符号、瓦伊文的表词符号、线性
+ * 文字 B 的表意符号都在其中。字母场只该铺字母，所以生成样本集时把这一批标成
+ * nonLetters，前端据此跳过（MICRO 的字母场与详情面板都照这份名单筛）。
+ *
+ * 三种归类：
+ *   · symbol  —— 符号：名称含 SYMBOL，或者是 OM 一类的宗教符号；
+ *   · mark    —— 记号：叠字记号、长音符、声调或鼻化一类的标记；
+ *   · variant —— 同一个字母的另一种写法：ALTERNATE 异体、FINAL 词尾形、
+ *                DOTLESS 无点形，且这一家里确实有对应的基本字母。
+ *
+ * variant 要同时满足三条才成立，宁可漏判也不误判——误判会把真字母从字母场里
+ * 抹掉，那比多留一格词尾形严重得多：
+ *   ① 名称含 FINAL / DOTLESS / ALTERNATE，且带 " LETTER " 这个词
+ *      —— 排除 NEWA SIGN FINAL ANUSVARA、PAU CIN HAU RISING TONE FINAL
+ *      一类"名字里有 FINAL、其实是独立字符"的编码；
+ *   ② 去掉这三个词后的正名，刚好等于同一套字里另一个字符的名字
+ *      —— 希伯来 ך FINAL KAF 对上 כ KAF、希腊 ς FINAL SIGMA 对上 σ SIGMA；
+ *      IPA 的 ɟ DOTLESS J WITH STROKE 对不出同名字符，不会被并进 j；
+ *   ③ 两个码位落在同一个 Unicode 区块里 —— 同名字符散布在不同区块时多半
+ *      是两套体系，不算同一个字母的异体。
+ */
+const NON_LETTER_PATTERNS = [
+  [/\bSYMBOL\b/, 'symbol'],
+  [/\bOM\b/, 'symbol'],
+  [/\b(ITERATION|PROLONGED)\b/, 'mark'],
+  [/\bMARK\b/, 'mark'],
+];
+const VARIANT_WORD = /\b(FINAL|DOTLESS|ALTERNATE)\b/;
+
+/** 去掉"词尾形 / 无点形 / 异体"字样后的正名 */
+function baseName(name) {
+  return name.replace(/\b(FINAL|DOTLESS|ALTERNATE)\b/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function classifyNonLetters(chars, nameOf, blockOf) {
+  // 正名 → 码位：只收名称本身不是异体的字符，免得链式折叠
+  const baseByCp = new Map();
+  for (const ch of chars) {
+    const cp = ch.codePointAt(0);
+    const name = nameOf(cp);
+    if (name && !VARIANT_WORD.test(name)) baseByCp.set(name, cp);
+  }
+  const out = {};
+  for (const ch of chars) {
+    const cp = ch.codePointAt(0);
+    const name = nameOf(cp);
+    if (!name) continue;
+    let kind;
+    for (const [re, k] of NON_LETTER_PATTERNS) {
+      if (re.test(name)) {
+        kind = k;
+        break;
+      }
+    }
+    if (!kind && VARIANT_WORD.test(name) && name.includes(' LETTER ')) {
+      const baseCp = baseByCp.get(baseName(name));
+      if (baseCp !== undefined && blockOf(baseCp) === blockOf(cp)) kind = 'variant';
+    }
+    if (kind) out[cp.toString(16).toUpperCase()] = kind;
+  }
+  return out;
 }
 
 /** 读取 Scripts.txt，得到"码位 → Unicode 鉴本名"的查询表 */
@@ -242,9 +320,12 @@ function lettersInRange(letterRanges, lo, hi, limit = 20000) {
 }
 
 const systems = loadSystems();
-const letterRanges = await loadUnicodeData();
+const { ranges: letterRanges, nameOf } = await loadUnicodeData();
 const blocks = JSON.parse(read('tools/unicode-block-ranges.json')).blocks;
 const blockByName = new Map(blocks.map((b) => [b.name, b]));
+const blockRanges = blocks.map((b) => [parseInt(b.start, 16), parseInt(b.end, 16), b.name]);
+/** 码位落在哪个 Unicode 区块（名字），用于判断两个字符是不是同一套字 */
+const blockOf = (cp) => blockRanges.find(([lo, hi]) => cp >= lo && cp <= hi)?.[2] ?? '';
 
 const entries = [];
 const unmapped = [];
@@ -258,6 +339,8 @@ for (const s of systems) {
   let total = 0;
   let note;
   let source = 'unicode';
+  /** 名称上不是字母的码位 → 归类，由 classifyNonLetters 填 */
+  let nonLetters;
 
   if (manual) {
     chars = [...manual.chars];
@@ -296,16 +379,19 @@ for (const s of systems) {
       total = all.length;
       chars = all.slice(0, cap);
       if (chars.length < all.length) note = `Unicode 共收录 ${all.length} 个字符，这里截取前 ${chars.length} 个。`;
+      nonLetters = classifyNonLetters(chars, nameOf, blockOf);
     }
   }
 
   if (!s.fontFamily && !manual) missingFont.push(s.id);
-  entries.push({ id: s.id, chars, total: total || chars.length, note, source });
+  entries.push({ id: s.id, chars, total: total || chars.length, note, source, nonLetters });
 }
 
 const lines = entries.map((e) => {
   const chars = e.chars.join('');
   const parts = [`chars: [...${JSON.stringify(chars)}]`, `total: ${e.total}`, `source: '${e.source}'`];
+  if (e.nonLetters && Object.keys(e.nonLetters).length)
+    parts.push(`nonLetters: ${JSON.stringify(e.nonLetters)}`);
   if (e.note) parts.push(`note: ${JSON.stringify(e.note)}`);
   return `  ${JSON.stringify(e.id)}: { ${parts.join(', ')} },`;
 });
@@ -319,8 +405,13 @@ const out = `/**
  *  · 未收录进 Unicode 的文字：留空，由详情面板给出"去找字体"的入口。
  * total 是 Unicode 中该文字的字母总数，与 chars.length 不等时表示做过截取。
  * source 标记这份清单是 Unicode 推导（unicode）还是手工给的（manual）。
+ * nonLetters 记为"名称上是字母、其实不是字母"的码位（符号 / 记号 / 同一字母的
+ * 异体），键是十六进制码位；字母场与详情面板照这份名单把这些格子跳过。
  */
 export type GlyphSetSource = 'unicode' | 'manual';
+
+/** 名称上是字母、其实不是字母的三类码位 */
+export type NonLetterKind = 'symbol' | 'mark' | 'variant';
 
 export interface GlyphSet {
   /** 展示用的字形清单 */
@@ -331,6 +422,8 @@ export interface GlyphSet {
   source: GlyphSetSource;
   /** 截取说明 */
   note?: string;
+  /** 十六进制码位 → 归类，见 NonLetterKind */
+  nonLetters?: Record<string, NonLetterKind>;
 }
 
 export const glyphSets: Record<string, GlyphSet> = {
