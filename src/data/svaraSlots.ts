@@ -58,6 +58,7 @@ const SVARA_TABLE: Record<string, string> = {
   siddham: '𑖀 𑖁 𑖂 𑖃 𑖄 𑖅 𑖆 𑖇 𑖈 𑖉 - 𑖊 𑖋 - 𑖌 𑖍 - -',
   grantha: '𑌅 𑌆 𑌇 𑌈 𑌉 𑌊 𑌋 𑍠 𑌌 𑍡 - 𑌏 𑌐 - 𑌓 𑌔 - -',
   devanagari: 'अ आ इ ई उ ऊ ऋ ॠ ऌ ॡ ऎ ए ऐ ऒ ओ औ ऍ -',
+  nandinagari: '𑦠 𑦡 𑦢 𑦣 𑦤 𑦥 𑦦 𑦧 - - - 𑦪 𑦫 - 𑦬 𑦭 - -',
   newa: '𑐀 𑐁 𑐂 𑐃 𑐄 𑐅 𑐆 𑐇 𑐈 𑐉 - 𑐊 𑐋 - 𑐌 𑐍 - -',
   bengali: 'অ আ ই ঈ উ ঊ ঋ ৠ ঌ ৡ - এ ঐ - ও ঔ - -',
   gujarati: 'અ આ ઇ ઈ ઉ ઊ ઋ ૠ ઌ ૡ - એ ઐ - ઓ ઔ ઍ -',

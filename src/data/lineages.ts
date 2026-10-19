@@ -726,6 +726,7 @@ export const lineages: Lineage[] = [
       { id: 'siddham', script: 'siddham', char: '𑖎', label: '悉昙文', phonetic: 'ka' },
       { id: 'grantha', script: 'grantha', char: '𑌕', label: '格兰塔文', phonetic: 'ka' },
       { id: 'devanagari', script: 'devanagari', char: 'क', label: '天城文', phonetic: 'ka' },
+      { id: 'nandinagari', script: 'nandinagari', char: '𑦮', label: '南迪纳加里文', phonetic: 'ka' },
       { id: 'newa', script: 'newa', char: '𑐎', label: '尼瓦尔文', phonetic: 'ka' },
       { id: 'bengali', script: 'bengali', char: 'ক', label: '孟加拉文', phonetic: 'ka' },
       { id: 'gujarati', script: 'gujarati', char: 'ક', label: '古吉拉特文', phonetic: 'ka' },

@@ -167,13 +167,16 @@ const SCRIPT_EXTRA = {
 };
 
 function loadSystems() {
-  const src = read('src/data/writingSystems.ts')
+  const full = read('src/data/writingSystems.ts');
+  // 只读取原始节点表。写回 parents 的投影段依赖 graphRelations，生成字体样本时用不到。
+  const dataEnd = full.indexOf('/** 边表是 parents 的唯一来源');
+  if (dataEnd < 0) throw new Error('无法定位 writingSystems.ts 的边表投影段');
+  const src = full.slice(0, dataEnd)
     .replace(/^import[^;]*;$/gm, '')
-    .replace(/export const/g, 'const')
     .replace(/export type[\s\S]*?;\n/g, '')
     .replace(/:\s*WritingSystem\[\]/g, '')
     .replace(/:\s*Record<string, WritingSystem>/g, '');
-  return new Function(`${src}; return writingSystems;`)();
+  return new Function(`${src}; return writingSystemData;`)();
 }
 
 async function loadUnicodeData() {
@@ -272,8 +275,10 @@ async function loadUnicodeData() {
 const NON_LETTER_PATTERNS = [
   [/\bSYMBOL\b/, 'symbol'],
   [/\bOM\b/, 'symbol'],
+  [/\bSIGN AVAGRAHA\b/, 'symbol'],
   [/\b(ITERATION|PROLONGED)\b/, 'mark'],
   [/\bMARK\b/, 'mark'],
+  [/\bHEADSTROKE\b/, 'mark'],
 ];
 const VARIANT_WORD = /\b(FINAL|DOTLESS|ALTERNATE)\b/;
 

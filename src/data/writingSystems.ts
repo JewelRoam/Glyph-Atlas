@@ -639,12 +639,17 @@ const writingSystemData: WritingSystem[] = [
   },
   {
     id: 'nandinagari', nameZh: '南迪纳加里文', nameEn: 'Nandinagari',
-    origin: 'derived', parents: ['nagari'], dateFrom: 700, dateTo: 1900,
+    origin: 'derived', parents: ['nagari'], dateFrom: 1000, dateTo: 1900,
     family: 'indic', region: '南印度', countries: ['印度'],
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Nandinagari U+119A0', sample: '𑦮',
     fontFamily: 'Noto Sans Nandinagari',
-    note: '8 至 19 世纪用于南印度梵语手稿与碑铭，与天城文关系密切，字形和字汇高度接近。',
+    note: '约 11 至 19 世纪用于南印度梵语手稿与碑铭；出自城文诸体的中央一支，与天城文是姊妹文字，不是天城文的书写变体。',
+    lineageEntry: { lineageId: 'ka', stopId: 'nandinagari' },
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2017/17162-nandinagari.pdf',
+      'https://www.unicode.org/charts/PDF/U119A0.pdf',
+    ],
   },
 
   {

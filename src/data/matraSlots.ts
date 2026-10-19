@@ -18,9 +18,9 @@
  * 表里 '-' 表示这一家没有这个元音符号：要么它的 a 是内在元音（写辅音就够了），
  * 要么这个音位根本不在这家文字的音系里。走字母场时空格就是"消失"，回程再飞入。
  *
- * 各家自己的元音符号（高棉的 ួ ឿ ៀ、巴厘的 ᭃ、泰文的 ๅ、藏文的反写 i）不在这
- * 二十三个共享音位里，单独列在 MATRA_EXTRA_SLOTS：它们只在一家出现，走到那
- * 一站时整格飞入。
+ * 各家自己的元音符号（高棉的 ួ ឿ ៀ、巴厘的 ᭃ、泰文的 ๅ、藏文的反写 i、南迪纳
+ * 加里文现今 Unicode 收录的前置 e）不在这二十三个共享音位里，单独列在
+ * MATRA_EXTRA_SLOTS：它们只在一家出现，走到那一站时整格飞入。
  */
 
 export interface MatraSlot {
@@ -64,8 +64,8 @@ export const MATRA_SLOTS: MatraSlot[] = [
  * 只在一家文字里成立的元音符号。
  *
  * 它们对不上任何一个共享音位——高棉的 uə / ɨə / iə 三个双元音、巴厘语的长
- * 中央元音、泰文写在 ฤ 之后的长 a、藏文梵语转写里的反写 i——所以各占一格，
- * 走到这一站时飞入、离开时飞出。
+ * 中央元音、泰文写在 ฤ 之后的长 a、藏文梵语转写里的反写 i、南迪纳加里文的
+ * 前置 e——所以各占一格，走到这一站时飞入、离开时飞出。
  */
 export const MATRA_EXTRA_SLOTS: { id: string; label: string; script: string; char: string }[] = [
   { id: 'matra-thai-lakkha', label: 'ๅ lakkhangyao（写在 ฤ / ฦ 后，把它读成长 a）', script: 'thai', char: 'ๅ' },
@@ -74,6 +74,7 @@ export const MATRA_EXTRA_SLOTS: { id: string; label: string; script: string; cha
   { id: 'matra-khmer-ie', label: 'ៀ ie（高棉语的 iə）', script: 'khmer', char: 'ៀ' },
   { id: 'matra-bali-pepet-tedung', label: 'ᭃ pepet tedung（巴厘语的长中央元音）', script: 'balinese', char: 'ᭃ' },
   { id: 'matra-tib-reversed-i', label: 'ྀ 反写 i（藏文转写梵语时的短 i）', script: 'tibetan', char: 'ྀ' },
+  { id: 'matra-nandinagari-prishtha-e', label: '𑧤 pr̥ṣṭhamātrā e（南迪纳加里文的前置 e 写法）', script: 'nandinagari', char: '𑧤' },
 ];
 
 /**
@@ -87,6 +88,7 @@ export const MATRA_BASE: Record<string, string> = {
   siddham: '𑖎',
   grantha: '𑌕',
   devanagari: 'क',
+  nandinagari: '𑦮',
   newa: '𑐎',
   bengali: 'ক',
   gujarati: 'ક',
@@ -131,6 +133,7 @@ const MATRA_TABLE: Record<string, string> = {
   siddham: '- 𑖯 𑖰 𑖱 𑖲 𑖳 𑖴 𑖵 - - - - - 𑖸 𑖹 - - 𑖺 𑖻 - - - 𑖽',
   grantha: '- 𑌾 𑌿 𑍀 𑍁 𑍂 𑍃 𑍄 𑍢 𑍣 - - - 𑍇 𑍈 - - 𑍋 𑍌 - - - 𑌂',
   devanagari: '- ा ि ी ु ू ृ ॄ ॢ ॣ - - ॆ े ै - ॊ ो ौ ॅ - ॉ ं',
+  nandinagari: '- 𑧑 𑧒 𑧓 𑧔 𑧕 𑧖 𑧗 - - - - - 𑧚 𑧛 - - 𑧜 𑧝 - - - 𑧞',
   newa: '- 𑐵 𑐶 𑐷 𑐸 𑐹 𑐺 𑐻 𑐼 𑐽 - - - 𑐾 𑐿 - - 𑑀 𑑁 - - - 𑑄',
   bengali: '- া ি ী ু ূ ৃ ৄ ৢ ৣ - - - ে ৈ - - ো ৌ - - - ং',
   gujarati: '- ા િ ી ુ ૂ ૃ ૄ ૢ ૣ - - - ે ૈ - - ો ૌ ૅ - ૉ ં',

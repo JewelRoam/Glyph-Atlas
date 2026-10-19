@@ -193,7 +193,11 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'brahmi', child: 'siddham', kind: 'descent', evidence: 'pending' },
   { parent: 'siddham', child: 'nagari', kind: 'descent', evidence: 'pending' },
   { parent: 'nagari', child: 'devanagari', kind: 'descent', evidence: 'pending' },
-  { parent: 'nagari', child: 'nandinagari', kind: 'descent', evidence: 'pending' },
+  {
+    parent: 'nagari', child: 'nandinagari', kind: 'descent', evidence: 'sourced',
+    sourceRefs: ['https://www.unicode.org/L2/L2017/17162-nandinagari.pdf'],
+    note: '南迪纳加里文出自城文诸体，与天城文是姊妹关系，不是天城文的书写变体。',
+  },
   { parent: 'devanagari', child: 'modi', kind: 'descent', evidence: 'pending' },
   { parent: 'brahmi', child: 'kaithi', kind: 'descent', evidence: 'pending' },
   { parent: 'siddham', child: 'tirhuta', kind: 'descent', evidence: 'pending' },

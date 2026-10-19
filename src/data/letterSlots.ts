@@ -54,9 +54,9 @@
  *    对应没有定论，不建整表）；
  *  · 婆罗米系（独立元音 svara 的 18 个元音位 + 梵语字音表 varga 的 33 个
  *    辅音位，外加孩子们自己添的卷舌边音 ḷa/ḻa、闪音 ṟa、齿龈鼻音 ṉa）：
- *    婆罗米、悉昙、格兰塔、天城、孟加拉、古吉拉特、果鲁穆奇、奥里亚、泰米尔、
- *    泰卢固、卡纳达、马拉雅拉姆、僧伽罗、藏文、爪哇、巴厘、高棉、缅文、泰文、
- *    老挝文。元音那一半的字面与取舍在 src/data/svaraSlots.ts。
+ *    婆罗米、悉昙、格兰塔、天城、南迪纳加里、孟加拉、古吉拉特、果鲁穆奇、奥里亚、
+ *    泰米尔、泰卢固、卡纳达、马拉雅拉姆、僧伽罗、藏文、爪哇、巴厘、高棉、缅文、
+ *    泰文、老挝文。元音那一半的字面与取舍在 src/data/svaraSlots.ts。
  *  · 夏拉达支系：夏拉达、塔克里、马哈贾尼、霍杰基、穆尔塔尼、胡达瓦迪、多格拉
  *    ——同一套元音位与梵语音位表，外加信德内爆音与几个地方卷舌音、古写 kha；
  *    这几家丢掉的元音位同样按消失处理（例如穆尔塔尼只剩 a i u e 四个）。
@@ -589,7 +589,7 @@ export const SLOTS: LetterSlot[] = [
   // 音位对齐，取轮廓时由 matraSlots.ts 把它们挂回各家的 ka，再交给 HarfBuzz
   // 整形；泰文的前置元音因此会按该文字的真实排法出现在基字前面。
   ...MATRA_SLOTS,
-  // 高棉、巴厘、泰、藏各家独有的元音符号只在一站出现，走到那一站时飞入。
+  // 高棉、巴厘、泰、藏、南迪纳加里各家独有的元音符号只在一站出现，走到那一站时飞入。
   ...MATRA_EXTRA_SLOTS.map(({ id, label }) => ({ id, label })),
 
   // ── 婆罗米系（梵语字音表 varga）─────────────────────────────────────
@@ -2465,6 +2465,45 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-deva-ddda': 'ॾ',
     'varga-deva-bba': 'ॿ',
   },  // 天城文：33 音位 + 16 个本语字母
+  // 南迪纳加里文：提案与 Unicode 名称把 35 个辅音字母逐一列明。前 33 格
+  // 与梵语字音表同位，另有两个达罗毗荼语转写字母 LLA / RRA。
+  nandinagari: {
+    'varga-ka': '𑦮',
+    'varga-kha': '𑦯',
+    'varga-ga': '𑦰',
+    'varga-gha': '𑦱',
+    'varga-nga': '𑦲',
+    'varga-ca': '𑦳',
+    'varga-cha': '𑦴',
+    'varga-ja': '𑦵',
+    'varga-jha': '𑦶',
+    'varga-nya': '𑦷',
+    'varga-tta': '𑦸',
+    'varga-ttha': '𑦹',
+    'varga-dda': '𑦺',
+    'varga-ddha': '𑦻',
+    'varga-nna': '𑦼',
+    'varga-ta': '𑦽',
+    'varga-tha': '𑦾',
+    'varga-da': '𑦿',
+    'varga-dha': '𑧀',
+    'varga-na': '𑧁',
+    'varga-pa': '𑧂',
+    'varga-pha': '𑧃',
+    'varga-ba': '𑧄',
+    'varga-bha': '𑧅',
+    'varga-ma': '𑧆',
+    'varga-ya': '𑧇',
+    'varga-ra': '𑧈',
+    'varga-la': '𑧉',
+    'varga-va': '𑧊',
+    'varga-sha': '𑧋',
+    'varga-ssa': '𑧌',
+    'varga-sa': '𑧍',
+    'varga-ha': '𑧎',
+    'varga-lla': '𑧏',
+    'varga-rra': '𑧐',
+  },  // 南迪纳加里文：35/35
   // 孟加拉文把 v 并进了 b（ব 一字两用），va 一格空着走"消失"
   bengali: {
     'varga-ka': 'ক',
