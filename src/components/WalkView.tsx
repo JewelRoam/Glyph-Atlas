@@ -26,6 +26,28 @@ const SWAP_MS = 420;
 
 /** 展签带高度：与 CSS 的 --walk-cap 保持一致，用来给中央字形换算可用高度 */
 const CAPTION_BAND = 88;
+
+/**
+ * 展签 / 残影的交叉淡变半宽：t 走到 0.5 前后各 0.16 的窗口里换脸。
+ *
+ * 中央字形是连续形变的，展签却只有"这一站"和"下一站"两份文字。之前按
+ * t < 0.5 一刀切，字形还在半路，底下的字名先跳了；给一个窗口，两份文字
+ * 跟着 t 交叉淡变，换脸就落在形变的节奏上。
+ */
+const CAP_FADE = 0.16;
+
+/**
+ * 展签换脸时的纵向错位：旧的一份往上走、新的一份从下面升上来，
+ * 换内容的那一下就有"同一块牌子换了张脸"的方向感，而不是原地闪一下。
+ */
+const CAP_SHIFT = 16;
+
+/** 侧边街道能看到多远：以"离当前位置的站数"计，收在 ±3.8 站以内 */
+const SIDE_REACH = 3.8;
+/** 侧边每站之间的横向间距 */
+const SIDE_GAP = 200;
+
+const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 /** 中央字形的上限；实际字号由舞台高度决定，字母场铺开时自动缩小 */
 const GLYPH_MAX = 260;
 
@@ -310,19 +332,40 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       ? interpolatePath(prepared[i0]!, prepared[i1]!, t)
       : null;
 
-  const dominant = t < 0.5 ? a : b;
-  const dominantScript = scriptById[dominant.script];
   const mode = lineage.mode ?? 'chain';
+
+  /**
+   * 展签从"这一站"换到"下一站"的进度：0 = 完全是 a，1 = 完全是 b。
+   * 两份展签都挂在舞台上，靠这个因子交叉淡变，字名不会在形变半路硬跳。
+   */
+  const capB = clamp01((t - (0.5 - CAP_FADE)) / (2 * CAP_FADE));
+  /**
+   * 两份展签的浓淡：旧的先淡走，新的再淡上来。
+   *
+   * 展签是三行中文，两份各占五成、叠在原处时正中间会糊成一团认不出的字。
+   * 所以这里不做对称的交叉，改成接力：旧的一份在 `capB` 过半之前就淡到几乎
+   * 看不见，新的一份过半之后才起来，只在过半那一线交叠出两层很淡的影子。
+   * 这样既不会糊字，也不会在中间留下一条空白的展签带。
+   */
+  const capAlpha = clamp01((0.52 - capB) / CAP_FADE);
+  const capBeta = clamp01((capB - 0.48) / CAP_FADE);
 
   /**
    * 残影：变形途中，把"你要去的那一站"（或"你刚离开的那一站"）
    * 淡淡地留在后面。它让过渡看起来像在同一个空间里移动，
    * 而不是两张图交叉淡出——这正是街道感的关键。
+   *
+   * 残影同样分两份：t 小的时候留 b（要去的那一站），t 大的时候留 a
+   * （刚离开的那一站），中间跟着 capB 交叉淡变。之前按 t < 0.5 换形状，
+   * 而残影最亮的时候正好是 t = 0.5，那一下虚线轮廓跳得很明显。
    */
-  const ghostStop = t < 0.5 ? b : a;
-  const ghostOpacity = Math.sin(Math.PI * Math.min(Math.max(t, 0), 1)) * 0.2;
-  const ghostPath = resolveGlyphPath(ghostStop);
-  const showGhost = ghostOpacity > 0.004 && (ghostPath || ghostStop.char);
+  const ghostPeak = Math.sin(Math.PI * clamp01(t)) * 0.2;
+  const ghostAlphaB = ghostPeak * (1 - capB);
+  const ghostAlphaA = ghostPeak * capB;
+  const ghostPathA = resolveGlyphPath(a);
+  const ghostPathB = resolveGlyphPath(b);
+  const showGhostA = ghostAlphaA > 0.004 && (ghostPathA || a.char);
+  const showGhostB = ghostAlphaB > 0.004 && (ghostPathB || b.char);
 
   /**
    * 这一段轨道能不能铺字母场：任意一站有字母表就铺（见 data/letterSlots.ts）。
@@ -360,30 +403,22 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
     dragRef.current = null;
   };
 
-  /** 侧边站点：按与当前位置的距离决定尺寸与透明度 */
-  const sideStop = (idx: number, offset: number) => {
-    const s = stops[idx];
-    if (!s) return null;
-    const dist = Math.abs(idx - p);
-    const size = 116 - Math.min(dist, 3) * 26;
-    const opacity = Math.max(0, 0.55 - (dist - 1) * 0.2);
-    return (
-      <div
-        className="walk-side"
-        key={idx}
-        style={{
-          transform: `translate(calc(-50% + ${offset * 200}px), -50%) scale(${size / 116})`,
-          opacity,
-        }}
-        onClick={() => {
-          setPlaying(false);
-          glideTo(idx);
-        }}
-      >
-        <StopGlyph stop={s} size={116} />
-      </div>
-    );
-  };
+  /**
+   * 侧边站点：站位只由"它离当前位置有多远"决定，是连续量（i - p）。
+   *
+   * 之前按 i0 / i1 的固定偏移摆（-2 -1 +1 +2）：跨过整数站时，同一站会从
+   * +2 挪到 +1，整排街道像被人推了一把，还凭空少掉紧邻的那一站。改成按
+   * 真实距离连续排，街道就跟着往前走；正在中央形变的那两站（离得最近）
+   * 淡出，免得一个字母在中央和街边同时出现。
+   */
+  const sideStops: { stop: GlyphStop; idx: number; offset: number }[] = [];
+  for (let i = Math.floor(p - SIDE_REACH); i <= Math.ceil(p + SIDE_REACH); i += 1) {
+    const stop = stops[i];
+    if (!stop) continue;
+    const offset = i - p;
+    if (Math.abs(offset) > SIDE_REACH) continue;
+    sideStops.push({ stop, idx: i, offset });
+  }
 
   return (
     <>
@@ -405,20 +440,47 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       >
         <div className="walk-halo" style={{ '--walk-halo': `${Math.round(glyphSize * 1.6)}px` } as CSSProperties} />
 
-        {showGhost && (
+        {showGhostB && (
           <div
-            className={`walk-ghost ${ghostPath ? '' : 'font-ghost'}`}
-            style={{ opacity: ghostOpacity }}
+            className={`walk-ghost ${ghostPathB ? '' : 'font-ghost'}`}
+            style={{ opacity: ghostAlphaB }}
           >
-            <StopGlyph stop={ghostStop} size={glyphSize} />
+            <StopGlyph stop={b} size={glyphSize} />
+          </div>
+        )}
+        {showGhostA && (
+          <div
+            className={`walk-ghost ${ghostPathA ? '' : 'font-ghost'}`}
+            style={{ opacity: ghostAlphaA }}
+          >
+            <StopGlyph stop={a} size={glyphSize} />
           </div>
         )}
 
         <div className="walk-side-layer">
-          {sideStop(i0 - 2, -2)}
-          {sideStop(i0 - 1, -1)}
-          {sideStop(i1 + 1, 1)}
-          {sideStop(i1 + 2, 2)}
+          {sideStops.map(({ stop, idx, offset }) => {
+            const near = Math.abs(offset);
+            // 中央正在形变的那两站淡出：离得越近越淡，到 0.58 站以内完全让位
+            const nearFade = clamp01((near - 0.58) / 0.32);
+            const size = 116 - Math.min(near, 3) * 26;
+            const opacity = Math.max(0, 0.55 - (near - 1) * 0.2) * nearFade;
+            return (
+              <div
+                className="walk-side"
+                key={idx}
+                style={{
+                  transform: `translate(calc(-50% + ${offset * SIDE_GAP}px), -50%) scale(${size / 116})`,
+                  opacity,
+                }}
+                onClick={() => {
+                  setPlaying(false);
+                  glideTo(idx);
+                }}
+              >
+                <StopGlyph stop={stop} size={116} />
+              </div>
+            );
+          })}
         </div>
 
         <div
@@ -445,17 +507,18 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
         </div>
 
         <div className="walk-caption">
-          <div className="walk-caption-title">{dominant.label ?? dominantScript?.nameZh}</div>
-          <div className="walk-caption-sub">
-            {dominantScript?.nameZh}
-            {dominant.phonetic ? ` · /${dominant.phonetic}/` : ''}
-            {dominantScript ? ` · ${formatSpan(dominantScript.dateFrom, dominantScript.dateTo)}` : ''}
+          <div
+            className="walk-caption-face"
+            style={{ opacity: capAlpha, transform: `translateY(${-CAP_SHIFT * capB}px)` }}
+          >
+            <StopCaption stop={a} />
           </div>
-          {dominantScript && (
-            <div className="walk-caption-country">
-              {dominantScript.countries.join(' · ')}
-            </div>
-          )}
+          <div
+            className="walk-caption-face"
+            style={{ opacity: capBeta, transform: `translateY(${CAP_SHIFT * (1 - capB)}px)` }}
+          >
+            <StopCaption stop={b} />
+          </div>
         </div>
       </div>
 
@@ -510,6 +573,27 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
           ))}
         </div>
       </div>
+    </>
+  );
+}
+
+/**
+ * 单个站点的展签：站名 + 文字名 + 音值 + 年代 + 今用国家。
+ *
+ * 拆出来是因为展签要挂两份（这一站、下一站），跟着形变交叉淡变；
+ * 站与站之间只是同一套排版换内容。
+ */
+function StopCaption({ stop }: { stop: GlyphStop }) {
+  const script = scriptById[stop.script];
+  return (
+    <>
+      <div className="walk-caption-title">{stop.label ?? script?.nameZh}</div>
+      <div className="walk-caption-sub">
+        {script?.nameZh}
+        {stop.phonetic ? ` · /${stop.phonetic}/` : ''}
+        {script ? ` · ${formatSpan(script.dateFrom, script.dateTo)}` : ''}
+      </div>
+      {script && <div className="walk-caption-country">{script.countries.join(' · ')}</div>}
     </>
   );
 }

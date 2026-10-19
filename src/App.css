@@ -889,11 +889,18 @@ main {
   right: 0;
   bottom: 0;
   height: var(--walk-cap);
+  pointer-events: none;
+}
+/* 这一站与下一站的展签叠在同一条带里，靠 opacity 交叉淡变（见 WalkView 的 capB）：
+   中央字形在两地之间形变时，底下的字名跟着一起换，不会在形变半路硬跳 */
+.walk-caption-face {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  pointer-events: none;
+  will-change: opacity, transform;
 }
 .walk-caption-title {
   font-family: var(--display);
@@ -917,6 +924,39 @@ main {
   letter-spacing: 0.04em;
 }
 
+/* ── 交叉淡变：换段时旧内容留成底层，新内容盖上去淡入 ──
+   两层错开半拍：旧的先淡走大半，新的再上。两段文字完全同时淡变时，
+   opacities 各占一半，正中间会糊成一团认不出的字。 */
+@keyframes xfade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes xfade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.xfade {
+  position: relative;
+}
+/* 上一段的内容：留在原位当底，新的淡入盖住它以后再撤掉 */
+.xfade-stale {
+  position: absolute;
+  inset: 0;
+  animation: xfade-out 240ms ease both;
+}
+.xfade-live {
+  position: relative;
+  animation: xfade-in 320ms ease 90ms both;
+}
+
 /* ── 字母场：一整套字母表在两种文字之间的形变对照 ── */
 @keyframes alpha-field-in {
   from {
@@ -937,11 +977,15 @@ main {
   border-bottom: 1px solid var(--line);
 }
 .alpha-head {
+  margin-bottom: 7px;
+}
+/* 表头一行：左边"字母全表 + 名字"，右边同源 / 新增 / 消失的统计。
+   这一行的内容跟着字母场换段，走 CrossFade 的两层交叉淡变。 */
+.alpha-head-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 14px;
-  margin-bottom: 7px;
 }
 .alpha-title {
   font-family: var(--antique);
@@ -1034,10 +1078,13 @@ main {
 }
 .alpha-note {
   margin: 7px 0 0;
+}
+.alpha-note-line {
   font-size: 11px;
   line-height: 1.7;
   color: var(--ink-dim);
   opacity: 0.82;
+  display: block;
 }
 
 .walk-controls {

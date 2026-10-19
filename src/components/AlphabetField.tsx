@@ -6,6 +6,7 @@ import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { alphabetGroup, useAlphabetPaths } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { FontGlyph, ImageGlyph, PathGlyph } from './Glyph';
+import { CrossFade } from './CrossFade';
 
 /**
  * 字母场 —— 把一整套字母表从一种文字连续变形到另一种文字。
@@ -242,6 +243,14 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
   // 同一种文字（轨道最后一站）只写名字，不写成"甲 → 甲"
   const heading = a === b ? nameA : `${nameA} → ${nameB}`;
 
+  // 这一段的两句说明。格子数、增删数一样，只有走到下一站才会变，
+  // 所以按它们做交叉淡变的分段标识，换段时表头与脚注跟着格子一起换。
+  const note = `格子按"同源槽位"排列，不是各自字母表的书写顺序。${
+    added || lost ? '只在一边出现的格子就是字母表的增删：它们会飞入或飞出。' : ''
+  }${
+    swapOnly ? '这一段还没有核对过的同源字母，两边的字表各自整批进出，不做形变。' : ''
+  }`;
+
   return (
     <section
       className="alpha-field"
@@ -249,15 +258,20 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
       style={{ '--alpha-cap': `${scrollCap}px` } as CSSProperties}
     >
       <div className="alpha-head">
-        <span className="alpha-title">
-          字母全表
-          <em>{heading}</em>
-        </span>
-        <span className="alpha-legend">
-          同源 {kept}
-          {added ? <b className="in">· 新增 {added}</b> : null}
-          {lost ? <b className="out">· 消失 {lost}</b> : null}
-        </span>
+        <CrossFade
+          token={`${heading}|${kept}|${added}|${lost}`}
+          className="alpha-head-row"
+        >
+          <span className="alpha-title">
+            字母全表
+            <em>{heading}</em>
+          </span>
+          <span className="alpha-legend">
+            同源 {kept}
+            {added ? <b className="in">· 新增 {added}</b> : null}
+            {lost ? <b className="out">· 消失 {lost}</b> : null}
+          </span>
+        </CrossFade>
       </div>
 
       <div className="alpha-scroll" ref={scrollRef}>
@@ -362,11 +376,11 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
         </div>
       </div>
 
-      <p className="alpha-note">
-        格子按"同源槽位"排列，不是各自字母表的书写顺序。
-        {added || lost ? '只在一边出现的格子就是字母表的增删：它们会飞入或飞出。' : ''}
-        {swapOnly ? '这一段还没有核对过的同源字母，两边的字表各自整批进出，不做形变。' : ''}
-      </p>
+      <div className="alpha-note">
+        <CrossFade token={note} className="alpha-note-line">
+          {note}
+        </CrossFade>
+      </div>
     </section>
   );
 }
