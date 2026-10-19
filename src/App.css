@@ -482,21 +482,19 @@ main {
 .plate {
   margin: 0;
   border: 1px solid var(--line);
-  background: var(--bg-2);
+  background: #fff;
 }
 /* 整幅图版一律可以点开看原尺寸：帕拉瓦、印度河这类图又长又密，
    缩在侧栏里读不出笔形 */
 .plate-open {
   display: block;
   width: 100%;
-  /* 一圈纸边：图版是裱在纸上的实物拓片或照片，不是压在夜色里的浮层 */
+  /* 一圈白边：图版是裱在纸上的实物拓片或照片，不是压在夜色里的浮层。
+     背景必须是不透明纯色，透明底 PNG 和拓片才不会和深色页面叠成一片黑。 */
   padding: 10px;
   border: 0;
-  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  background: #fff;
   cursor: zoom-in;
-  /* 纸面自成一层：图上的 multiply 只和这层纸相乘，
-     不会跟页面深底叠在一起把整幅图压成黑的 */
-  isolation: isolate;
 }
 .plate img {
   display: block;
@@ -505,8 +503,10 @@ main {
   max-height: 340px;
   margin: 0 auto;
   object-fit: contain;
-  background: none;
-  mix-blend-mode: multiply;
+  background: #fff;
+  /* 不再用 multiply：有的浏览器会把透明底图与隔离层相乘成黑块。
+     白底已经保证拓片和线摹的对比度，直接正常绘制即可。 */
+  mix-blend-mode: normal;
 }
 .plate-open:focus-visible {
   outline: 2px solid var(--cinnabar);
@@ -539,7 +539,7 @@ main {
   margin: auto;
   max-width: min(1180px, 94vw);
   border: 1px solid var(--line-mid);
-  background: var(--paper);
+  background: #fff;
   cursor: default;
 }
 .plate-viewer-card img {
@@ -549,7 +549,7 @@ main {
   max-height: 80vh;
   margin: 0 auto;
   object-fit: contain;
-  background: var(--paper);
+  background: #fff;
 }
 .plate-viewer-card figcaption {
   display: flex;
@@ -1527,7 +1527,7 @@ main {
   overflow: hidden;
   padding: 2px;
   border-radius: 1px;
-  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  background: #fff;
 }
 /* 竖长的碑帖拓本不能撑破方框：按宽高两边同时收，等比装进去。
    之前写死 width/height:100%，竖向拓片会把方框撑高、溢出到展签上。 */
@@ -1538,7 +1538,7 @@ main {
   width: auto;
   height: auto;
   object-fit: contain;
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
   user-select: none;
 }
 
