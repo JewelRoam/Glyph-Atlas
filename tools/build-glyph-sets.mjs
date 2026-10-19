@@ -25,8 +25,13 @@ const UCD_VERSION = '18.0.0';
 const UCD_URL = `https://www.unicode.org/Public/${UCD_VERSION}/ucd/UnicodeData.txt`;
 const UCD_PATH = join(root, 'work/unicode/UnicodeData.txt');
 
-/** 每个文字最多存多少个字符（详情面板不会把它全部铺开，但数据要够用） */
-const CAP = { logographic: 64, logosyllabic: 64, syllabary: 400, default: 520 };
+/**
+ * 每个文字最多存多少个字符。
+ *
+ * 语素文字与语素音节文字只取代表样本；字母表、元音附标文字、音节文字必须全量，
+ * 否则“有字母表就穷举”会在数据层被悄悄截断。
+ */
+const CAP = { logographic: 64, logosyllabic: 64, default: Infinity };
 
 /**
  * 手工样本。用于两类情况：
