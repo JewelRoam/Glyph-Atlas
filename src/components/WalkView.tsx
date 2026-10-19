@@ -375,12 +375,21 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
    * 飞入或飞出。语素文字（汉字、圣书体）没有字母表，仍然只显示单字形的街景。
    */
   const alphabetPair = useMemo(() => {
+    if (lineage.alphabetField === 'hidden') return null;
     const sa = a.script;
     const sb = b.script;
+    const hasOverrides =
+      Boolean(lineage.alphabetSlotOverrides?.[sa]) ||
+      Boolean(lineage.alphabetSlotOverrides?.[sb]);
     if (sa === sb) return hasRoster(sa) ? { a: sa, b: sb, t: 0 } : null;
-    if (!hasRoster(sa) && !hasRoster(sb)) return null;
-    return { a: sa, b: sb, t };
-  }, [a.script, b.script, t]);
+    if (!hasRoster(sa) && !hasRoster(sb) && !hasOverrides) return null;
+    return {
+      a: sa,
+      b: sb,
+      t,
+      overrides: lineage.alphabetSlotOverrides,
+    };
+  }, [a.script, b.script, t, lineage.alphabetField, lineage.alphabetSlotOverrides]);
 
   const onWheel = (e: React.WheelEvent) => {
     e.preventDefault();
@@ -528,7 +537,14 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       </div>
 
       {/* 两边都是字母表性质的文字时，铺开一整套字母做形变对照 */}
-      {alphabetPair && <AlphabetField a={alphabetPair.a} b={alphabetPair.b} t={alphabetPair.t} />}
+      {alphabetPair && (
+        <AlphabetField
+          a={alphabetPair.a}
+          b={alphabetPair.b}
+          t={alphabetPair.t}
+          overrides={alphabetPair.overrides}
+        />
+      )}
 
       <div className="walk-controls">
         <button onClick={() => stepBy(-1)} aria-label="上一个">

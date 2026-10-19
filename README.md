@@ -7,7 +7,7 @@
 把世界上所有书写体系的演化关系画成一张可以缩放的有向图，
 并让同一个字在数千年里连续变形。
 
-<sub>193 个书写体系（另有奇普） · 12 个独立起源 · 88 个今仍使用 · 35 条血统轨道</sub>
+<sub>193 个书写体系（另有奇普） · 12 个独立起源 · 88 个今仍使用 · 37 条血统轨道</sub>
 
 </div>
 
@@ -115,6 +115,7 @@ Glyph-Atlas/
     │   ├── types.ts            类型定义：WritingSystem / GlyphStop / Lineage
     │   ├── writingSystems.ts   书写体系主数据
     │   ├── lineages.ts         血统轨道（字形演变路径）
+    │   ├── lineageIndex.ts     站点稳定键与「书写体系 ↔ 轨道」反向索引
     │   ├── glyphPaths.ts       轨道站点的 100×100 矢量轮廓（生成物）
     │   └── index.ts            派生集合：graphSystems / independentSystems …
     ├── lib/                    ── 逻辑层
@@ -262,12 +263,27 @@ Glyph-Atlas/
   source: '……依据哪份资料认定这几站是同一条线。',
   description: '……一句话说清这条轨道在演示什么。',
   stops: [
-    { script: 'egyptian', label: '牛头（圣书体 F1）', phonetic: 'pr / 牛', path: 'M50 8 C42 …' },
-    { script: 'phoenician', label: 'ʾālep', phonetic: 'ʔ', path: 'M30 8 L48 8 …' },
-    { script: 'latin', label: 'A', phonetic: 'a', path: 'M50 4 L98 96 …' },
+    {
+      id: 'egyptian-f1',         // 轨道内稳定；未来深链与节点跳转都靠它
+      script: 'egyptian',
+      label: '牛头（圣书体 F1）',
+      phonetic: 'pr / 牛',
+      path: 'M50 8 C42 …',
+      sourceRef: '……这一站的证据链接',
+      asset: { kind: 'path', credit: '……', license: '……' },
+    },
+    { id: 'phoenician-aleph', script: 'phoenician', label: 'ʾālep', phonetic: 'ʔ', path: 'M30 8 L48 8 …' },
+    { id: 'latin-a', script: 'latin', label: 'A', phonetic: 'a', path: 'M50 4 L98 96 …' },
   ],
 }
 ```
+
+站点键写作 `${lineageId}:${stop.id ?? stop.script}`。同一轨道重复经过同一书写体系
+（例如同一体系的不同书体阶段）时，每个站点都必须给 `id`；否则站点键会相撞，
+校验器会拦下。`stopsByScript` 与 `lineagesByScript` 把“书写体系 → 轨道 / 站点”
+反过来建索引，供未来从任意图谱节点进入对应的前后演变；目前先作为数据层的入口，
+尚未接入界面。`sourceRef` 记单站证据，`asset` 记这一站实际使用的轮廓、图版或
+字体的来源与授权，二者随站点保存，避免换素材时与谱系脱节。
 
 `mode` 决定"往前一步"意味着什么，也决定校验规则：
 
@@ -389,7 +405,8 @@ npm run validate
 
 ## 如何新增一条血统轨道
 
-在 `src/data/lineages.ts` 里追加一条 `Lineage`。站点有三种写法：
+在 `src/data/lineages.ts` 里追加一条 `Lineage`。先给每个站点一个轨道内唯一的
+`id`，再按三种方式之一补字形；同一轨道若重复出现同一书写体系，`id` 不得省略。
 
 **A. 手工矢量路径**——给 `path`，
 坐标统一使用 `viewBox="0 0 100 100"`，可以含多个子路径
@@ -476,7 +493,7 @@ path B ─→ splitSubpaths ─→ 每条子路径沿弧长采样 N+1 个点 ─
 - **有兜底**。拿不到 SVG 几何接口（无 DOM 环境、病态路径）时，退回到
   "读出所有坐标数字当折线均匀采样"，精度下降但不会白屏。
 
-目前 35 条血统轨道上的字符站点，能取到可靠轮廓的会走真·几何形变；
+目前 37 条血统轨道上的字符站点，能取到可靠轮廓的会走真·几何形变；
 隶书、僧侣体、世俗体这类只能看历史图版的站点则保留 **交叉淡变 + 下一站残影**，
 不会用现代字体顶替。其余没有轮廓的站点同样走淡变、缩放与平移的兜底方案，
 所以任何文字都能有"沿街往前走"的连续感。
@@ -1053,6 +1070,15 @@ npm run build && ls dist/
   增加纸白内边距与细边框；逐字图版所在格子也在图片加载前直接铺白。`opacity`、`filter`
   与混合模式均显式归位，避免旧样式或浏览器合成把图版压黑。已抽查奇普、契丹大字、
   玛雅、奥尔梅克、僧侣体、隶书、帕拉瓦及放大视图。
+
+- **2026-10-19 · 稳定血统站点与反向索引**：`GlyphStop` 新增轨道内稳定的 `id`、
+  单站 `sourceRef` 与素材授权 `asset`；新增 `lineageIndex.ts`，以
+  `${lineageId}:${stop.id ?? stop.script}` 为键，建立“书写体系 → 轨道 / 站点”的
+  反向索引与前后邻站查询。假名拆成「安 → あ」与「阿 → ア」两条并列母字链，
+  新增「藏文 ཀ → 八思巴文 ꡀ」，三条都只展示已核实的单字关系，整表映射尚未
+  核清的部分不铺字母场。血统轨道由 35 条增至 37 条，轨道站点 136 → 139。
+  这一层是为未来把 MICRO 与详情页整合、从任意血缘节点进入前后演变预留的数据契约，
+  本轮不改变页面入口。
 
 ---
 

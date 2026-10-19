@@ -4,6 +4,17 @@ import { writingSystems } from './writingSystems';
 export * from './types';
 export { writingSystems, scriptById } from './writingSystems';
 export { lineages } from './lineages';
+export {
+  adjacentStops,
+  allStopRefs,
+  lineageById,
+  lineagesByScript,
+  stopKey,
+  stopRefByKey,
+  stopRefFor,
+  stopsByScript,
+} from './lineageIndex';
+export type { LineageStopRef } from './lineageIndex';
 
 /**
  * 演化图使用的节点集合。

@@ -4500,8 +4500,21 @@ function autoRank(slot: string, a: string, b: string): number {
 
 /** 一对文字共用的槽位，按全局顺序返回（两边的并集） */
 export function sharedSlots(a: string, b: string): string[] {
-  const ma = rosterFor(a);
-  const mb = rosterFor(b);
+  return sharedSlotsFor(a, b, rosterFor(a), rosterFor(b));
+}
+
+/**
+ * 一对已合并轨道覆盖的字表共用的槽位。
+ *
+ * 字母场不能先算 sharedSlots() 再替换字符：轨道覆盖可能引入通用字表里没有的
+ * 槽位，若不把覆盖后的 roster 一起参与并集与排序，那一格会静默消失。
+ */
+export function sharedSlotsFor(
+  a: string,
+  b: string,
+  ma: Record<string, string>,
+  mb: Record<string, string>,
+): string[] {
   const ids = new Set([...Object.keys(ma), ...Object.keys(mb)]);
   return [...ids].sort((x, y) => {
     const ix = slotIndex.get(x);

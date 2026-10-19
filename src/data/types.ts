@@ -87,8 +87,24 @@ export interface WritingSystem {
   note?: string;
 }
 
+/** 字形素材的来源与授权信息，随站点一起保存，避免素材与谱系脱节。 */
+export interface GlyphAsset {
+  kind: 'path' | 'image' | 'font';
+  /** 作者、机构或字体项目名 */
+  credit?: string;
+  /** 授权协议 */
+  license?: string;
+  /** 素材主页、原始文件或字体项目地址 */
+  home?: string;
+}
+
 /** 血统轨道上的一个站点 */
 export interface GlyphStop {
+  /**
+   * 轨道内的稳定站点 id。缺省时以 script 作为键；同一轨道出现同一书写体系
+   * 的多个站点时必须显式填写，供详情页、反向索引与未来图谱节点跳转使用。
+   */
+  id?: string;
   /** 对应书写体系 id */
   script: string;
   /** 用于字体渲染的字符 */
@@ -105,6 +121,10 @@ export interface GlyphStop {
   label?: string;
   /** 音值 */
   phonetic?: string;
+  /** 站点自己的证据链接；优先于轨道级 source */
+  sourceRef?: string;
+  /** 这个站点实际使用的素材与授权 */
+  asset?: GlyphAsset;
 }
 
 /**
@@ -133,4 +153,17 @@ export interface Lineage {
   source: string;
   /** 站点顺序：chain 按时间，cognate / pair 按叙事顺序 */
   stops: GlyphStop[];
+  /**
+   * 轨道级字母槽位覆盖：scriptId → slotId → char。
+   *
+   * 通用 letterSlots 记录的是书写体系层面的同源关系；同一体系在不同轨道上
+   * 可能取不同的代表字形（例如平假名母字与片假名母字），此时由轨道覆盖，
+   * 而不复制或污染全局字表。
+   */
+  alphabetSlotOverrides?: Record<string, Record<string, string>>;
+  /**
+   * 是否铺开字母场。full 为默认；hidden 用于目前只核实了单字链条、
+   * 整表对应关系尚未核清的区段，避免自动补位把错误母字铺到邻站。
+   */
+  alphabetField?: 'full' | 'hidden';
 }

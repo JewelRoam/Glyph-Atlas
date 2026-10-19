@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { letterGlyphKey, rosterFor, sharedSlots, slotLabel } from '../data/letterSlots';
+import { letterGlyphKey, rosterFor, sharedSlotsFor, slotLabel } from '../data/letterSlots';
 import { scriptById } from '../data/writingSystems';
 import { familyFor } from '../data/fontFallback';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
@@ -93,16 +93,34 @@ function PendingGlyph({ size }: { size: number }) {
   return <span className="alpha-skeleton" style={{ width: size * 0.72, height: size * 0.18 }} />;
 }
 
-export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) {
+export function AlphabetField({
+  a,
+  b,
+  t,
+  overrides,
+}: {
+  a: string;
+  b: string;
+  t: number;
+  /** 当前轨道对两边字表的覆盖：scriptId → slotId → char */
+  overrides?: Record<string, Record<string, string>>;
+}) {
   const paths = useAlphabetPaths(a, b);
-  const slots = useMemo(() => sharedSlots(a, b), [a, b]);
+  // 一家的完整字表 = 手工核过的同源槽位 + 这一家自己的其余字母（自动补位），
+  // 再叠加当前轨道的局部覆盖。覆盖必须在并集之前合并，否则新引入的槽位会丢。
+  const ma = useMemo(
+    () => ({ ...rosterFor(a), ...(overrides?.[a] ?? {}) }),
+    [a, overrides],
+  );
+  const mb = useMemo(
+    () => ({ ...rosterFor(b), ...(overrides?.[b] ?? {}) }),
+    [b, overrides],
+  );
+  const slots = useMemo(() => sharedSlotsFor(a, b, ma, mb), [a, b, ma, mb]);
   const gridRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const rectsRef = useRef(new Map<string, DOMRect>());
   const paintedRef = useRef(false);
-  // 一家的完整字表 = 手工核过的同源槽位 + 这一家自己的其余字母（自动补位）
-  const ma = rosterFor(a);
-  const mb = rosterFor(b);
   const slotKey = slots.join('|');
 
   /**

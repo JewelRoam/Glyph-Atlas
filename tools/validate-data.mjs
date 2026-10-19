@@ -150,13 +150,46 @@ for (const s of writingSystems) {
   if (!s.region) err(`[fields] ${s.id} 缺少发源地`);
 }
 
+const lineageIds = new Set();
 for (const l of lineages) {
+  if (!l.id?.trim()) err('[lineage] 存在缺少 id 的轨道');
+  if (lineageIds.has(l.id)) err(`[lineage] 重复的轨道 id: ${l.id}`);
+  lineageIds.add(l.id);
   if (l.stops.length < 2) err(`[lineage] ${l.id} 少于两个站点，无法形成演变`);
   // 每一条轨道都要能指出出处：核对不了的链条不上线，页面也就没得显示
   if (!l.source?.trim()) err(`[lineage] ${l.id} 缺少出处 source`);
+  if (l.alphabetField && !['full', 'hidden'].includes(l.alphabetField))
+    err(`[lineage] ${l.id} 的 alphabetField 只能是 full 或 hidden`);
+  if (l.alphabetSlotOverrides) {
+    for (const [scriptId, slots] of Object.entries(l.alphabetSlotOverrides)) {
+      if (!scriptById[scriptId]) {
+        err(`[lineage] ${l.id} 的 alphabetSlotOverrides 指向不存在的书写体系 "${scriptId}"`);
+        continue;
+      }
+      for (const [slotId, char] of Object.entries(slots)) {
+        if (!slotIds.has(slotId))
+          err(`[lineage] ${l.id} 的 alphabetSlotOverrides.${scriptId} 用了未定义的槽位「${slotId}」`);
+        if (typeof char !== 'string' || Array.from(char).length !== 1)
+          err(`[lineage] ${l.id} 的 alphabetSlotOverrides.${scriptId}.${slotId} 必须是单个字符`);
+      }
+    }
+  }
+
+  const stopIds = new Set();
+  const scriptsInLineage = new Map();
   let prev = -Infinity;
   l.stops.forEach((stop, i) => {
     const script = scriptById[stop.script];
+    const key = `${l.id}:${stop.id ?? stop.script}`;
+    if (stopIds.has(key))
+      err(`[lineage] ${l.id}[${i}] 站点键重复：${key}；同一轨道内请给站点显式 id`);
+    stopIds.add(key);
+
+    const count = (scriptsInLineage.get(stop.script) ?? 0) + 1;
+    scriptsInLineage.set(stop.script, count);
+    if (count > 1 && !stop.id)
+      err(`[lineage] ${l.id}[${i}] 同一轨道重复出现 ${stop.script}，必须给每个站点显式 id`);
+
     if (!script) err(`[lineage] ${l.id}[${i}] 指向不存在的书写体系 "${stop.script}"`);
     else {
       // 只有"单线传承"才要求站点按年代递增；同源辐射与借字记音
@@ -172,6 +205,10 @@ for (const l of lineages) {
       err(`[lineage] ${l.id}[${i}] 既没有 path、图版，也没有可渲染字符`);
     if (stop.path && !/^[MmLlHhVvCcSsQqTtAaZz0-9\s.,+-]+$/.test(stop.path))
       err(`[lineage] ${l.id}[${i}] path 含有可疑字符`);
+    if (stop.sourceRef !== undefined && !stop.sourceRef.trim())
+      err(`[lineage] ${l.id}[${i}] 的 sourceRef 不能为空字符串`);
+    if (stop.asset && !['path', 'image', 'font'].includes(stop.asset.kind))
+      err(`[lineage] ${l.id}[${i}] 的 asset.kind 只能是 path / image / font`);
   });
 }
 

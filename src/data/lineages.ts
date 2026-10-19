@@ -447,21 +447,105 @@ export const lineages: Lineage[] = [
   },
 
   {
-    id: 'kana',
+    id: 'hiragana-source',
     nameZh: '汉字「安」→ 平假名「あ」',
     nameEn: 'Kanji 安 → hiragana あ',
     mode: 'pair',
-    source: 'Wikipedia《Hiragana》《Katakana》《Man\'yōgana》：あ 出「安」，ア 出「阿」',
+    // 目前只核实了「安 → あ」这一对；整张平假名母字表尚未逐格核完，暂不铺字母场。
+    alphabetField: 'hidden',
+    source:
+      'Wikipedia《A (kana)》《Hiragana》《Man\'yōgana》：平假名「あ」由汉字「安」的草书简化而来；' +
+      '平假名与片假名同出万叶假名，但母字并不一一相同。',
     description:
-      '平假名与片假名都从汉字借来：整字的草书一路简省成平假名，' +
-      '整字的一个部件截下来当片假名。汉字一列写的是万叶假名给这个音用的借字——' +
-      'あ 取「安」、い 取「以」、ア 取「阿」。两套假名的母字并不一致，' +
-      '所以这里摆的是平假名「あ」；片假名「ア」与它同占一个音节格，但另有母字，' +
-      '不是「あ」变来的。浊音、半浊音是后来在假名上加符号造出来的，走过去时飞入。',
+      '万叶假名借汉字记日语读音，「安」被借来写 a。进入平假名后，整字的草书不断简省，' +
+      '成为今天的「あ」。这是一条母字到假名的借字记音关系；平假名与片假名是姐妹系统，' +
+      '不能把片假名接在「あ」后面。',
     stops: [
-      { script: 'chinese-regular', char: '安', label: '汉字「安」', phonetic: 'an' },
-      { script: 'hiragana', char: 'あ', label: '平假名「あ」', phonetic: 'a' },
-      { script: 'katakana', char: 'ア', label: '片假名「ア」（母字「阿」）', phonetic: 'a' },
+      {
+        id: 'kanji-an',
+        script: 'chinese-regular',
+        char: '安',
+        label: '汉字「安」',
+        phonetic: 'an',
+        sourceRef: 'https://en.wikipedia.org/wiki/A_(kana)',
+      },
+      {
+        id: 'hiragana-a',
+        script: 'hiragana',
+        char: 'あ',
+        label: '平假名「あ」',
+        phonetic: 'a',
+        sourceRef: 'https://en.wikipedia.org/wiki/A_(kana)',
+      },
+    ],
+  },
+
+  {
+    id: 'katakana-source',
+    nameZh: '汉字「阿」→ 片假名「ア」',
+    nameEn: 'Kanji 阿 → katakana ア',
+    mode: 'pair',
+    // 目前只核实了 a 这一组单字来源；整张片假名母字表仍有不确定项，暂不铺字母场。
+    alphabetField: 'hidden',
+    source:
+      'Wikipedia《A (kana)》《Katakana》《Man\'yōgana》及 SLJ FAQ〈Origin of kana〉：' +
+      '片假名「ア」经由万叶假名取自汉字「阿」的左侧部件；片假名与平假名是姐妹系统，' +
+      '不是「あ」的后身。',
+    description:
+      '「ア」的母字是「阿」，不是平假名「あ」。片假名多截取借字的局部笔画，' +
+      '平假名多把整字草书化；两套假名都从万叶假名分出，走的是并列的两条路。' +
+      '这里只展示已经核实的一对母字与假名，不把整张平假名母字表套到片假名上。',
+    stops: [
+      {
+        id: 'kanji-a',
+        script: 'chinese-regular',
+        char: '阿',
+        label: '汉字「阿」',
+        phonetic: 'a',
+        sourceRef: 'https://www.sljfaq.org/afaq/originofkana.html',
+      },
+      {
+        id: 'katakana-a',
+        script: 'katakana',
+        char: 'ア',
+        label: '片假名「ア」',
+        phonetic: 'a',
+        sourceRef: 'https://www.sljfaq.org/afaq/originofkana.html',
+      },
+    ],
+  },
+
+  {
+    id: 'tibetan-phagspa',
+    nameZh: '藏文 ཀ → 八思巴文 ꡀ',
+    nameEn: 'Tibetan ka → Phags-pa ka',
+    mode: 'chain',
+    // 现有槽位体系还不能准确表达藏文与八思巴文的整表对应，先只展示已核实的 ka。
+    alphabetField: 'hidden',
+    source:
+      'Wikipedia《ʼPhags-pa script》：八思巴文承自藏文；字母 1–30 与藏文三十个基础字母' +
+      '传统顺序对应；ꡀ 为 ka。',
+    description:
+      '忽必烈命八思巴创制国字，字母框架承自藏文。八思巴文的前三十个字母按藏文三十个' +
+      '基础辅音的传统顺序排列，藏文 ཀ 到八思巴文 ꡀ 因此可以逐字对上；' +
+      '这套文字后来也扩展出藏文没有的符号，整表映射留待槽位设计完成后再铺开。',
+    stops: [
+      {
+        id: 'tibetan-ka',
+        script: 'tibetan',
+        char: 'ཀ',
+        label: '藏文 ka',
+        phonetic: 'ka',
+        sourceRef: 'https://en.wikipedia.org/wiki/%CA%BCPhags-pa_script',
+      },
+      {
+        id: 'phagspa-ka',
+        script: 'phagspa',
+        char: 'ꡀ',
+        label: '八思巴文 ka',
+        phonetic: 'ka',
+        sourceRef: 'https://en.wikipedia.org/wiki/%CA%BCPhags-pa_script',
+      },
     ],
   },
 
