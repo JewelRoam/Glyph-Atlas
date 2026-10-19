@@ -518,13 +518,67 @@ export const lineages: Lineage[] = [
   },
 
   {
-    id: 'sharada-branch',
-    nameZh: '夏拉达文 a → 塔克里与兰达诸文',
-    nameEn: 'Sharada a → Takri and Landa a',
-    mode: 'cognate',
-    source: 'Wikipedia《Takri script》（「承自夏拉达，与兰达诸文为姊妹」）《Landa script》',
+    id: 'brahmi-sharada',
+    nameZh: '婆罗米文 → 夏拉达文',
+    nameEn: 'Brahmi → Sharada',
+    mode: 'chain',
+    source: 'Wikipedia《Gurmukhi》（婆罗米分出的西北支「Sharada-based」）《Sharada script》（八至十二世纪克什米尔）',
     description:
-      '夏拉达文是八世纪克什米尔一带的书体，往下分出塔克里一支与兰达一族。' +
+      '西北印度这一支从笈多婆罗米里分出来，八世纪在克什米尔定型为夏拉达文，' +
+      '用来写梵语和克什米尔语，随后沿旁遮普与喜马拉雅山麓铺开。' +
+      '它把婆罗米横平竖直的骨架收成更细的竖笔与斜肩，ka 还是同一个 ka，' +
+      '肩头多了一道弯。夏拉达往下又分出果鲁穆奇、塔克里与兰达一大家子，' +
+      '是北印度文字谱系里承上启下的一站。',
+    stops: [
+      { script: 'brahmi', char: '𑀓', label: '婆罗米 ka', phonetic: 'ka' },
+      { script: 'sharada', char: '𑆑', label: '夏拉达 ka', phonetic: 'ka' },
+    ],
+  },
+
+  {
+    id: 'siddham-bengali',
+    nameZh: '悉昙文 → 孟加拉文',
+    nameEn: 'Siddham → Bengali-Assamese',
+    mode: 'chain',
+    source: 'Wikipedia《Odia script》：东印度的悉昙衍生出孟加拉-阿萨姆、提尔胡塔与奥里亚诸文',
+    description:
+      '悉昙文随佛教在东印度扎根，其后身在孟加拉与阿萨姆一带长成今天的孟加拉文。' +
+      '最大的变化在头顶那条顶线：悉昙的直杠变成带弧度的罩子，' +
+      '笔画也因棕榈叶上刻写而转圆；ka 的骨架还在，钩与肩换了写法。' +
+      '今天孟加拉国与印度西孟加拉邦用它写孟加拉语，阿萨姆语也用这一系字母。',
+    stops: [
+      { script: 'siddham', char: '𑖎', label: '悉昙 ka', phonetic: 'ka' },
+      { script: 'bengali', char: 'ক', label: '孟加拉 ka', phonetic: 'ka' },
+    ],
+  },
+
+  {
+    id: 'siddham-odia',
+    nameZh: '悉昙文 → 奥里亚文',
+    nameEn: 'Siddham → Odia',
+    mode: 'chain',
+    source: 'Wikipedia《Odia script》：奥里亚文由东印度的一支悉昙文发展而来',
+    description:
+      '奥里亚文出自东印度悉昙文的一支，早期称卡林加文，十一世纪留下奥里亚语最早的石刻。' +
+      '棕榈叶上刻字不便落直角，笔画越写越圆，顶线最后收成一顶「伞盖」；' +
+      'ka 的竖笔与左侧钩还看得出悉昙的骨架。' +
+      '今天它是印度奥里亚语的官方文字，写起来一圈圈连得很紧。',
+    stops: [
+      { script: 'siddham', char: '𑖎', label: '悉昙 ka', phonetic: 'ka' },
+      { script: 'odia', char: 'କ', label: '奥里亚 ka', phonetic: 'ka' },
+    ],
+  },
+
+  {
+    id: 'sharada-branch',
+    nameZh: '夏拉达文 a → 果鲁穆奇、塔克里与兰达诸文',
+    nameEn: 'Sharada a → Gurmukhi, Takri and Landa a',
+    mode: 'cognate',
+    source: 'Wikipedia《Takri script》（「承自夏拉达，与兰达诸文为姊妹」）《Landa script》《Gurmukhi》（果鲁穆奇上承夏拉达，中间书体尚有分歧）',
+    description:
+      '夏拉达文是八世纪克什米尔一带的书体，往下分出果鲁穆奇、塔克里一支与兰达一族。' +
+      '果鲁穆奇是西北支里唯一活到今天的日常文字，旁遮普语与锡克教经典都用它；' +
+      '它上承夏拉达没有问题，中间隔着兰达或塔克里一类未定型的书体，具体哪一支是直系尚有分歧。' +
       '塔克里再变出多格拉；霍杰基、胡达瓦迪、穆尔塔尼与马哈贾尼属兰达一族，' +
       '与塔克里并列，不是塔克里的后代。这几家都按梵语字音表排字母，' +
       '所以同一个 ka、同一个 ma 能逐格对上；分野在于各自添的字：' +
@@ -535,6 +589,7 @@ export const lineages: Lineage[] = [
       '走到那一站时这四格会消失，下一站又飞回来。',
     stops: [
       { script: 'sharada', char: '𑆃', label: '夏拉达 a', phonetic: 'a' },
+      { script: 'gurmukhi', char: 'ਅ', label: '果鲁穆奇 a', phonetic: 'a' },
       { script: 'takri', char: '𑚀', label: '塔克里 a', phonetic: 'a' },
       { script: 'mahajani', char: '𑅐', label: '马哈贾尼 a', phonetic: 'a' },
       { script: 'dogra', char: '𑠀', label: '多格拉 a', phonetic: 'a' },
