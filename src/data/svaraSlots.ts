@@ -76,6 +76,7 @@ const SVARA_TABLE: Record<string, string> = {
   malayalam: 'അ ആ ഇ ഈ ഉ ഊ ഋ ൠ ഌ ൡ എ ഏ ഐ ഒ ഓ ഔ - -',
   sinhala: 'අ ආ ඉ ඊ උ ඌ ඍ ඎ ඏ ඐ එ ඒ ඓ ඔ ඕ ඖ ඇ ඈ',
   tibetan: 'ཨ - - - - - - - - - - - - - - - - -',
+  marchen: '𑲏 - - - - - - - - - - - - - - - - -',
   burmese: 'အ - ဣ ဤ ဥ ဦ ၒ ၓ ၔ ၕ - ဧ - - ဩ ဪ - -',
   java: 'ꦄ - ꦆ ꦇ ꦈ - - - - - - ꦌ ꦍ - ꦎ - - -',
   balinese: 'ᬅ ᬆ ᬇ ᬈ ᬉ ᬊ ᬋ ᬌ ᬍ ᬎ - ᬏ ᬐ - ᬑ - - -',

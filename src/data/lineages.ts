@@ -669,6 +669,45 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'tibetan-marchen',
+    nameZh: '藏文 ཀ → 玛钦文 𑱲',
+    nameEn: 'Tibetan ka → Marchen ka',
+    mode: 'chain',
+    source:
+      'Unicode N4491《Final proposal to encode the Marchen script》第 2、3 节及逐字对照表：' +
+      '玛钦文三十个基础字母与藏文三十字母逐位对应，并采用同一套叠写模型；' +
+      '藏文为梵语转写补入的反舌字母在玛钦文中没有记录。',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2013/13197-marchen.pdf',
+      'https://www.unicode.org/charts/PDF/U11C70.pdf',
+      'https://en.wikipedia.org/wiki/Marchen_script',
+    ],
+    description:
+      '玛钦文用于象雄语与苯教文献，三十个基础字母按藏文三十字母逐字建模，' +
+      '元音同样依附在辅音上，叠写方式也承自这套框架。它的传统起源被追到公元 7 世纪前后，' +
+      '却没有早期实物；现存文本与印章要晚得多，所以这里的字形对应可靠，年代只能从宽处理。' +
+      '藏文为梵语转写补的五个反舌字母在玛钦文里没有对应字，走到这一站会消失。',
+    stops: [
+      {
+        id: 'tibetan-ka-marchen',
+        script: 'tibetan',
+        char: 'ཀ',
+        label: '藏文 ka',
+        phonetic: 'ka',
+        sourceRef: 'https://www.unicode.org/L2/L2013/13197-marchen.pdf',
+      },
+      {
+        id: 'marchen-ka',
+        script: 'marchen',
+        char: '𑱲',
+        label: '玛钦文 ka',
+        phonetic: 'ka',
+        sourceRef: 'https://www.unicode.org/L2/L2013/13197-marchen.pdf',
+      },
+    ],
+  },
+
+  {
     id: 'ka',
     nameZh: '婆罗米 ka → 各国 ka',
     nameEn: 'Brahmi ka → modern ka',

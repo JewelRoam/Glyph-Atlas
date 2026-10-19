@@ -249,7 +249,14 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'kawi', child: 'baybayin', kind: 'descent', evidence: 'pending' },
   { parent: 'tibetan', child: 'soyombo', kind: 'descent', evidence: 'pending' },
   { parent: 'tibetan', child: 'zanabazar', kind: 'descent', evidence: 'pending' },
-  { parent: 'tibetan', child: 'marchen', kind: 'descent', evidence: 'pending' },
+  {
+    parent: 'tibetan', child: 'marchen', kind: 'descent', evidence: 'sourced',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2013/13197-marchen.pdf',
+      'https://en.wikipedia.org/wiki/Marchen_script',
+    ],
+    note: '玛钦文三十个基础字母按藏文三十字母逐字建模；传统年代很早，但现存实物不能证明 7—10 世纪已有此文字。',
+  },
   { parent: 'chinese-oracle', child: 'chinese-seal', kind: 'descent', evidence: 'pending' },
   { parent: 'chinese-seal', child: 'chinese-clerical', kind: 'descent', evidence: 'pending' },
   { parent: 'chinese-clerical', child: 'chinese-regular', kind: 'descent', evidence: 'pending' },

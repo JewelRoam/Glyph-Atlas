@@ -1235,11 +1235,17 @@ const writingSystemData: WritingSystem[] = [
   },
   {
     id: 'marchen', nameZh: '玛钦文', nameEn: 'Marchen',
-    origin: 'derived', parents: ['tibetan'], dateFrom: 700, dateTo: 1000,
+    origin: 'derived', parents: ['tibetan'], dateFrom: 700, dateTo: 1900,
     family: 'indic', region: '青藏高原', countries: ['中国（西藏）'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Marchen U+11C70', sample: '𑱰',
     fontFamily: 'Noto Sans Marchen',
+    note: '传统称起源于公元 7 世纪前后的象雄；现存材料很晚，早期年代没有实物佐证。',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2013/13197-marchen.pdf',
+      'https://www.unicode.org/charts/PDF/U11C70.pdf',
+    ],
+    lineageEntry: { lineageId: 'tibetan-marchen', stopId: 'marchen-ka' },
   },
 
   // ─────────────────────────────────────────────

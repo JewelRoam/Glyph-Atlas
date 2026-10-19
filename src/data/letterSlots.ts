@@ -2864,6 +2864,40 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
     'varga-rra-tib': 'ཬ',
     'varga-tibetan-dzha': 'ཛྷ',
   },  // 藏文：41/50 + dzha（余下多为祭仪符号；jha 是组合字，留空）
+  // 玛钦文：N4491 的对照表把 30 个基础字母逐一系到藏文三十字母。
+  // 藏文为梵语转写补的反舌 TTA/TTHA/DDA/NNA/SSA 在玛钦文里没有记录，
+  // 所以这一站没有那五格；ན / ས 分别接 na / sa，不能误接卷舌位。
+  marchen: {
+    'varga-ka': '𑱲',
+    'varga-kha': '𑱳',
+    'varga-ga': '𑱴',
+    'varga-nga': '𑱵',
+    'varga-ca': '𑱶',
+    'varga-cha': '𑱷',
+    'varga-ja': '𑱸',
+    'varga-nya': '𑱹',
+    'varga-ta': '𑱺',
+    'varga-tha': '𑱻',
+    'varga-da': '𑱼',
+    'varga-na': '𑱽',
+    'varga-pa': '𑱾',
+    'varga-pha': '𑱿',
+    'varga-ba': '𑲀',
+    'varga-ma': '𑲁',
+    'varga-tsa': '𑲂',
+    'varga-tsha': '𑲃',
+    'varga-dza': '𑲄',
+    'varga-va': '𑲅',
+    'varga-zha': '𑲆',
+    'varga-za': '𑲇',
+    'varga-a-chung': '𑲈',
+    'varga-ya': '𑲉',
+    'varga-ra': '𑲊',
+    'varga-la': '𑲋',
+    'varga-sha': '𑲌',
+    'varga-sa': '𑲍',
+    'varga-ha': '𑲎',
+  },  // 玛钦文：29 个辅音位 + ཨ 的独立元音位（见 svaraSlots.ts）
   java: {
     'varga-ka': 'ꦏ',
     'varga-kha': 'ꦑ',
