@@ -191,6 +191,14 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'brahmi', child: 'pallava', kind: 'descent', evidence: 'pending' },
   { parent: 'brahmi', child: 'kadamba', kind: 'descent', evidence: 'pending' },
   { parent: 'brahmi', child: 'siddham', kind: 'descent', evidence: 'pending' },
+  {
+    parent: 'siddham', child: 'gaudi', kind: 'descent', evidence: 'sourced',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2011/11175r-tirhuta.pdf',
+      'https://en.wikipedia.org/wiki/Gaudi_script',
+    ],
+    note: '高迪文是 10 至 14 世纪东印度的书体阶段；提尔胡塔文编码提案把它称为原型孟加拉文，并追溯到更早的悉昙/库提拉书体传统。',
+  },
   { parent: 'siddham', child: 'nagari', kind: 'descent', evidence: 'pending' },
   { parent: 'nagari', child: 'devanagari', kind: 'descent', evidence: 'pending' },
   {
@@ -200,7 +208,14 @@ export const graphRelations: GraphRelation[] = [
   },
   { parent: 'devanagari', child: 'modi', kind: 'descent', evidence: 'pending' },
   { parent: 'brahmi', child: 'kaithi', kind: 'descent', evidence: 'pending' },
-  { parent: 'siddham', child: 'tirhuta', kind: 'descent', evidence: 'pending' },
+  {
+    parent: 'gaudi', child: 'tirhuta', kind: 'descent', evidence: 'sourced',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2011/11175r-tirhuta.pdf',
+      'https://en.wikipedia.org/wiki/Gaudi_script',
+    ],
+    note: '提尔胡塔文出自高迪文；约 14 世纪，它与孟加拉、奥里亚等东印度文字分化定型。',
+  },
   { parent: 'siddham', child: 'bhaiksuki', kind: 'influence', evidence: 'pending' },
   { parent: 'nagari', child: 'newa', kind: 'descent', evidence: 'pending' },
   { parent: 'siddham', child: 'bengali', kind: 'descent', evidence: 'pending' },

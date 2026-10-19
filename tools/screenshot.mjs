@@ -154,7 +154,9 @@ try {
     steps: [
       tab('MICRO'),
       async (page) => {
-        await page.locator('.walk-street input[type=range]').fill('2.5');
+        const range = page.locator('.walk-street input[type=range]');
+        const max = Number((await range.getAttribute('max')) ?? 0);
+        await range.fill(String(Math.max(0, max - 0.5)));
         await page.waitForTimeout(700);
       },
     ],
@@ -176,7 +178,9 @@ try {
     steps: [
       tab('MICRO'),
       async (page) => {
-        await page.locator('.walk-street input[type=range]').fill('2.5');
+        const range = page.locator('.walk-street input[type=range]');
+        const max = Number((await range.getAttribute('max')) ?? 0);
+        await range.fill(String(Math.max(0, max - 0.5)));
         await page.waitForTimeout(700);
       },
     ],

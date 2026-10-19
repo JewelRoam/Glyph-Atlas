@@ -100,6 +100,13 @@
   喀拉拉邦埃达卡尔出土的卡丹巴时期铭文拓本，约 5—6 世纪。
   出处：https://commons.wikimedia.org/wiki/File:Kadamba_inscription_from_Kerala.jpg
 
+### 悉昙文 / 库提拉书体（`siddham`）
+
+- `public/glyphs/siddham/faulmann-kutila.jpg` — Carl Faulmann（1835—1894），公有领域
+  《文字之书》（Das Buch der Schrift）第 145 页的 Kuṭila 与阿萨姆书体对照表。
+  左列 Kuṭila 字形取自 10 世纪铭文，右列用于比较阿萨姆书体。
+  出处：https://commons.wikimedia.org/wiki/File:Das_Buch_der_Schrift_(Faulmann)_145.jpg
+
 ### 城文（`nagari`）
 
 - `public/glyphs/nagari/consonant-table.png` — Benedettou / Wikimedia Commons，CC BY-SA 3.0

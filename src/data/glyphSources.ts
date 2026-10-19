@@ -57,6 +57,18 @@ function plateSources(...ids: string[]): Record<string, GlyphSource> {
 }
 
 const OVERRIDES: Record<string, GlyphSource> = {
+  siddham: {
+    kind: 'font',
+    family: 'Noto Sans Siddham',
+    credit: 'Noto Sans Siddham（Google Fonts）',
+    license: 'SIL OFL 1.1',
+    home: 'https://fonts.google.com/?query=Noto%20Sans%20Siddham',
+    plates: glyphPlates.siddham,
+  },
+  gaudi: {
+    kind: 'none',
+    note: '高迪文没有独立 Unicode 编码，也缺少可逐字核对的公有领域字母表；这里留空，不以孟加拉文或悉昙文字体代替。',
+  },
   'chinese-oracle': {
     kind: 'font',
     family: 'Glyph Atlas Oracle Bone',

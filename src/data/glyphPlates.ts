@@ -169,6 +169,15 @@ export const glyphPlates: Record<string, GlyphPlate[]> = {
       home: 'https://commons.wikimedia.org/wiki/File:Kadamba_inscription_from_Kerala.jpg',
     },
   ],
+  siddham: [
+    {
+      src: 'glyphs/siddham/faulmann-kutila.jpg',
+      caption: 'Faulmann《文字之书》第 145 页的 Kuṭila 与阿萨姆书体对照表。左列 Kuṭila 字形取自 10 世纪铭文，右列用于比较阿萨姆书体。',
+      credit: 'Carl Faulmann / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:Das_Buch_der_Schrift_(Faulmann)_145.jpg',
+    },
+  ],
   nagari: [
     {
       src: 'glyphs/nagari/consonant-table.png',

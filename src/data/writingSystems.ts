@@ -615,12 +615,29 @@ const writingSystemData: WritingSystem[] = [
   },
   {
     id: 'siddham', nameZh: '悉昙文', nameEn: 'Siddham',
+    alias: ['Kutila', 'Siddhamātṛkā', '库提拉文'],
     origin: 'derived', parents: ['brahmi'], dateFrom: 600, dateTo: 1200,
     family: 'indic', region: '南亚', countries: ['印度', '中国', '日本'],
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Siddham U+11580', sample: '𑖎', fontFamily: 'Noto Sans Siddham',
-    note: '随佛教东传，成为东亚密教书写咒语的特殊字体。',
+    note: '6 至 13 世纪的棱角书体，又称 Kutila 或 Siddhamātṛkā；随佛教东传，成为东亚密教书写咒语的特殊字体。',
     lineageEntry: { lineageId: 'ka', stopId: 'siddham' },
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2011/11175r-tirhuta.pdf',
+      'https://en.wikipedia.org/wiki/Gaudi_script',
+    ],
+  },
+  {
+    id: 'gaudi', nameZh: '高迪文', nameEn: 'Gauḍī',
+    alias: ['原型孟加拉文', '原始孟加拉文', 'Proto-BAMO'],
+    origin: 'derived', parents: ['siddham'], dateFrom: 1000, dateTo: 1400,
+    family: 'indic', region: '印度东北部', countries: ['印度', '孟加拉国', '尼泊尔', '缅甸'],
+    type: 'abugida', status: 'extinct', direction: 'ltr',
+    note: '10 至 14 世纪通行于东印度及邻近地区；孟加拉—阿萨姆、奥里亚、提尔胡塔等文字约在 14 世纪前后由它分化。',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2011/11175r-tirhuta.pdf',
+      'https://en.wikipedia.org/wiki/Gaudi_script',
+    ],
   },
   {
     id: 'nagari', nameZh: '城文', nameEn: 'Nāgarī',
@@ -671,11 +688,12 @@ const writingSystemData: WritingSystem[] = [
   {
     id: 'tirhuta', nameZh: '提尔胡塔文', nameEn: 'Tirhuta',
     alias: ['弥梯罗文', '迈蒂利文'],
-    origin: 'derived', parents: ['siddham'], dateFrom: 1200, dateTo: null,
+    origin: 'derived', parents: ['gaudi'], dateFrom: 1200, dateTo: null,
     family: 'indic', region: '米蒂拉', countries: ['印度', '尼泊尔'],
     type: 'abugida', status: 'liturgical', direction: 'ltr',
     unicodeBlock: 'Tirhuta U+11480', sample: '𑒀', fontFamily: 'Noto Sans Tirhuta',
-    note: '迈蒂利语的传统文字，旧称弥梯罗文；今主要用于宗教文书，日常书写多由天城文承担。',
+    note: '源自高迪文，13 世纪已有庙宇铭刻，约 14 世纪与孟加拉、奥里亚等文字分化；今主要用于宗教文书，日常书写多由天城文承担。',
+    sourceRefs: ['https://www.unicode.org/L2/L2011/11175r-tirhuta.pdf'],
   },
   {
     id: 'bhaiksuki', nameZh: '跋吉苏基文', nameEn: 'Bhaiksuki',
