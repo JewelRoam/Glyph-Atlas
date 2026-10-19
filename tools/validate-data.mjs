@@ -210,9 +210,10 @@ for (const l of lineages) {
     if (stop.sourceRef && !/^https?:\/\//.test(stop.sourceRef))
       warn(`[lineage] ${l.id}[${i}] 的 sourceRef 不是 http(s) 链接：${stop.sourceRef}`);
   });
+  if (!l.sourceRefs?.length) err(`[lineage] ${l.id} 至少需要一条轨道级来源 sourceRefs`);
   for (const ref of l.sourceRefs ?? []) {
     if (!/^https?:\/\//.test(ref))
-      warn(`[lineage] ${l.id} 的 sourceRefs 不是 http(s) 链接：${ref}`);
+      err(`[lineage] ${l.id} 的 sourceRefs 不是 http(s) 链接：${ref}`);
   }
 }
 

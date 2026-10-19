@@ -75,6 +75,7 @@ const withNeighbors = entries.filter(
 const independent = entries.filter((entry) => entry.origin === 'independent');
 const independentIsolated = independent.filter((entry) => !entry.entry);
 
+const tracksWithoutSourceRefs = lineages.filter((lineage) => !lineage.sourceRefs?.length);
 const incompleteStops = stopRefs.filter(
   ({ lineage, stop }) => !stop.sourceRef && !lineage.sourceRefs?.length,
 );
@@ -93,6 +94,7 @@ const result = {
     independentSystems: independent.length,
     independentSystemsWithEntry: independent.length - independentIsolated.length,
     independentSystemsIsolated: independentIsolated.length,
+    tracksWithoutSourceRefs: tracksWithoutSourceRefs.length,
     stopsWithoutSource: incompleteStops.length,
     stopsWithoutAssetMetadata: undocumentedAssets.length,
   },
@@ -105,6 +107,11 @@ const result = {
     nameZh: entry.nameZh,
     origin: entry.origin,
     family: entry.family,
+  })),
+  tracksWithoutSourceRefs: tracksWithoutSourceRefs.map((lineage) => ({
+    id: lineage.id,
+    nameZh: lineage.nameZh,
+    stopCount: lineage.stops.length,
   })),
   incompleteStops: incompleteStops.map(({ lineage, stop, index }) => ({
     lineageId: lineage.id,
@@ -139,6 +146,10 @@ if (json) {
   console.log(
     `  站点 ${stopRefs.length} · 缺来源 ${incompleteStops.length} · 缺素材登记 ${undocumentedAssets.length}`,
   );
+  console.log(
+    `  轨道 ${lineages.length} · 已有轨道级来源 ${lineages.length - tracksWithoutSourceRefs.length} · ` +
+      `待补 ${tracksWithoutSourceRefs.length}`,
+  );
 
   if (independentIsolated.length) {
     console.log('\n独立起源待补：');
@@ -157,6 +168,13 @@ if (json) {
     }
     for (const [family, list] of byFamily) {
       console.log(`  ${family} (${list.length}): ${list.map((entry) => entry.id).join(', ')}`);
+    }
+  }
+
+  if (tracksWithoutSourceRefs.length) {
+    console.log('\n轨道缺来源链接：');
+    for (const lineage of tracksWithoutSourceRefs) {
+      console.log(`  · ${lineage.id}  ${lineage.nameZh} (${lineage.stops.length} 站)`);
     }
   }
 

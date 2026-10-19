@@ -24,6 +24,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek Α → Etruscan → Old Italic → Latin',
     mode: 'chain',
     source: 'Wikipedia《Etruscan alphabet》《Old Italic scripts》：希腊 → 伊特鲁里亚 → 半岛各家 → 拉丁',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Etruscan_alphabet',
+      'https://en.wikipedia.org/wiki/Old_Italic_scripts',
+    ],
     description:
       '那不勒斯湾的优卑亚希腊字母北上，先被伊特鲁里亚人借去：希腊 Γ 在那边读 /k/，' +
       '于是成了拉丁 C；希腊 Χ 与 Ψ 照西方希腊的读法给了伊特鲁里亚的 /ks/ 与 /kʰ/。' +
@@ -47,6 +51,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Ox head → A',
     mode: 'chain',
     source: 'Wikipedia《Proto-Sinaitic script》《Phoenician alphabet》：F1 牛头 → ʾalp 的通说',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Proto-Sinaitic_script',
+      'https://en.wikipedia.org/wiki/Phoenician_alphabet',
+    ],
     description:
       '字母表最著名的一条血统：埃及圣书体的"牛头"符号被西奈半岛的闪米特人借去表音，' +
       '经腓尼基、希腊一路演变，最终成为拉丁字母 A。约四千年间，它从一幅图画变成了一组笔画。',
@@ -112,6 +120,10 @@ export const lineages: Lineage[] = [
     nameEn: "Aramaic ʾālep → Arabic alif",
     mode: 'chain',
     source: 'Wikipedia《Nabataean script》《Arabic alphabet》：阿拉米 → 纳巴泰 → 阿拉伯',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Nabataean_script',
+      'https://en.wikipedia.org/wiki/Arabic_alphabet',
+    ],
     description:
       '阿拉伯字母并不是无源之水：它的字形可沿纳巴泰、阿拉米一路追到腓尼基。' +
       '这条轨道只走北方主线，展示同一个辅音 ʾ 如何从西奈—黎凡特的古老字母，' +
@@ -130,6 +142,9 @@ export const lineages: Lineage[] = [
     nameEn: 'Aramaic ʾālep → Hebrew alef',
     mode: 'chain',
     source: 'Wikipedia《Hebrew alphabet》：方形希伯来字母承自阿拉米字母',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Hebrew_alphabet',
+    ],
     description:
       '今天写的方形希伯来字母并不是古希伯来字母的直系延续。巴比伦之囚以后，' +
       '流亡社群改用阿拉米字母抄写经文，字母名与音值照旧，字形却整体换成了' +
@@ -146,6 +161,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Phoenician ʾālep → Samaritan alaf',
     mode: 'chain',
     source: 'Wikipedia《Samaritan script》《Paleo-Hebrew alphabet》',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Samaritan_script',
+      'https://en.wikipedia.org/wiki/Paleo-Hebrew_alphabet',
+    ],
     description:
       '撒玛利亚人没有跟着改用方形希伯来字母，而是守着古希伯来书体一路写下来，' +
       '成为后来的撒玛利亚字母——《撒玛利亚五经》到今天仍用它抄写。' +
@@ -166,6 +185,9 @@ export const lineages: Lineage[] = [
     nameEn: 'Aramaic ʾālep → Mandaic a',
     mode: 'chain',
     source: 'Wikipedia《Mandaic alphabet》：承自阿拉米字母',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Mandaic_alphabet',
+    ],
     description:
       '阿拉米字母东传的一支在美索不达米亚南部发展为曼达字母。' +
       '第一个字母仍对应 /a/，字形却已变成弯曲的 halqa——' +
@@ -182,6 +204,12 @@ export const lineages: Lineage[] = [
     nameEn: 'Aramaic ʾālep → western branches',
     mode: 'cognate',
     source: 'Wikipedia《Palmyrene alphabet》《Hatran alphabet》《Syriac alphabet》《Manichaean alphabet》',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Palmyrene_alphabet',
+      'https://en.wikipedia.org/wiki/Hatran_alphabet',
+      'https://en.wikipedia.org/wiki/Syriac_alphabet',
+      'https://en.wikipedia.org/wiki/Manichaean_alphabet',
+    ],
     description:
       '阿拉米字母西传后，帕尔米拉、哈特拉和叙利亚各自发展出地方字母，' +
       '叙利亚字母又长出了摩尼字母。五站都以 ʾālep 为祖形，却分别收束成不同骨架：' +
@@ -202,6 +230,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Aramaic ʾālep → Pahlavi branch',
     mode: 'cognate',
     source: 'Wikipedia《Avestan alphabet》：阿维斯陀字母以巴列维为底，𐬀 近书体巴列维',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Pahlavi_scripts',
+      'https://en.wikipedia.org/wiki/Avestan_alphabet',
+    ],
     description:
       '阿拉米字母进入伊朗高原后笔画被压扁、粘连，成了书写中古波斯语的巴列维字母。' +
       '同一套骨架下分出几支后身：萨珊王朝石壁上的碑铭体、吐鲁番写本里的诗篇体，' +
@@ -220,6 +252,12 @@ export const lineages: Lineage[] = [
     nameEn: 'Aramaic ʾālep → Middle Iranian & Central Asian alphabets',
     mode: 'cognate',
     source: 'Wikipedia《Parthian script》《Elymaic script》《Chorasmian script》《Sogdian alphabet》',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Parthian_script',
+      'https://en.wikipedia.org/wiki/Elymaic_script',
+      'https://en.wikipedia.org/wiki/Chorasmian_script',
+      'https://en.wikipedia.org/wiki/Sogdian_alphabet',
+    ],
     description:
       '阿拉米字母东传之后，帕提亚、埃利迈、花剌子模与粟特各自把这套字母搬进本地语言，' +
       '字母名从 aleph 一路排到 taw 都没改。格子按字母名对齐：' +
@@ -240,6 +278,11 @@ export const lineages: Lineage[] = [
     nameEn: "Aramaic aleph → Mongolian a",
     mode: 'chain',
     source: 'Wikipedia《Sogdian alphabet》《Old Uyghur alphabet》《Mongolian script》',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Sogdian_alphabet',
+      'https://en.wikipedia.org/wiki/Old_Uyghur_alphabet',
+      'https://en.wikipedia.org/wiki/Mongolian_script',
+    ],
     description:
       '字母沿丝绸之路向东传播的一条主干：阿拉米字母先在中亚落地成古粟特文，' +
       '再长成连写的粟特字母，回鹘人从粟特的草体接过它，最后进入蒙古字母。' +
@@ -262,6 +305,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek Α → Cyrillic А',
     mode: 'cognate',
     source: 'Wikipedia《Cyrillic script》：以希腊安色尔体为骨架',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Cyrillic_script',
+      'https://en.wikipedia.org/wiki/Greek_alphabet',
+    ],
     description:
       '九世纪末，保加利亚第一帝国的书手以希腊安色尔体为骨架、又参照格拉哥里字母，' +
       '拼出了西里尔字母。数字值暴露了这层血缘：И 占 8（Η）、Ѕ 占 6（Ϝ/Ϛ）、' +
@@ -279,6 +326,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek Α → Glagolitic and Cyrillic',
     mode: 'cognate',
     source: 'Wikipedia《Glagolitic script》《Cyrillic script》',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Glagolitic_script',
+      'https://en.wikipedia.org/wiki/Cyrillic_script',
+    ],
     description:
       '九世纪，君士坦丁—基里尔为斯拉夫语创制格拉哥里字母；不久，保加利亚第一帝国' +
       '以希腊安色尔体为骨架，并受格拉哥里影响形成西里尔字母。' +
@@ -296,6 +347,9 @@ export const lineages: Lineage[] = [
     nameEn: 'Cyrillic А → Old Permic 𐍐',
     mode: 'chain',
     source: 'Wikipedia《Old Permic script》：1372 年斯蒂芬为科米语创制，字母取自西里尔与希腊并掺入科米印记符号；字母表据 Lytkin 1952',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Old_Permic_script',
+    ],
     description:
       '1372 年，俄罗斯传教士彼尔姆的斯蒂芬为科米语造了一套字母，' +
       '头两枚读 an、bur，整套因此被叫作 Abur。它没有照搬现成字母，' +
@@ -314,6 +368,9 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek Α → Coptic Ⲁ',
     mode: 'chain',
     source: 'Wikipedia《Coptic alphabet》：科普特字形以希腊安色尔体为基础，另从世俗体补入六七枚字母',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Coptic_alphabet',
+    ],
     description:
       '尼罗河谷为了把埃及语写清楚，整套借走了希腊字母：二十四枚希腊字母原样进来，' +
       '再补上六七枚取自世俗体的旧符号，去记希腊语没有的音。' +
@@ -331,6 +388,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek Α → Armenian Ա',
     mode: 'chain',
     source: 'Wikipedia《Armenian alphabet》：多数意见认为亚美尼亚字母以希腊为模型，证据是字母顺序、数字值排法与 Θ/թ、Φ/փ、Β/բ 等形近对',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Armenian_alphabet',
+      'https://en.wikipedia.org/wiki/Greek_alphabet',
+    ],
     description:
       '405 年，梅斯罗布·马什托茨为亚美尼亚语造了一套字母，用到今天几乎没有改过。' +
       '字面是他重画过的，整张表的骨架却照着希腊来：字母顺序按希腊排，' +
@@ -349,6 +410,9 @@ export const lineages: Lineage[] = [
     nameEn: 'Armenian Ա → Caucasian Albanian 𐔰',
     mode: 'chain',
     source: 'Wikipedia《Caucasian Albanian script》《Caucasian Albania》：据科里温《马斯托茨传》，字母由梅斯罗布·马什托茨创制；52 枚字母的形式近格鲁吉亚、埃塞俄比亚与亚美尼亚',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Caucasian_Albanian_script',
+    ],
     description:
       '高加索阿尔巴尼亚文是东高加索的基督教地区为自己语言造的一套字母，' +
       '记的是今天乌迪人祖先讲的话。据弟子科里温写的《马斯托茨传》，' +
@@ -369,6 +433,11 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek alpha → Anatolian a',
     mode: 'cognate',
     source: 'Wikipedia《Lydian alphabet》《Lycian alphabet》《Carian alphabet》：安纳托利亚诸字母源自希腊',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Lydian_alphabet',
+      'https://en.wikipedia.org/wiki/Lycian_alphabet',
+      'https://en.wikipedia.org/wiki/Carian_alphabet',
+    ],
     description:
       '希腊字母向安纳托利亚传播后，吕底亚、吕基亚和卡里亚各自改造出一套地方字母。' +
       '三家的 alpha 都还读 /a/，笔画收束与书写方向却分道扬镳：吕底亚一行从右到左，' +
@@ -388,6 +457,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Greek \u{0391} \u2192 Gothic \u{10330}',
     mode: 'chain',
     source: 'Wikipedia《Gothic alphabet》：多数字母与希腊字母一一对应（形、音、数值相同）；乌尔菲拉 4 世纪创制',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Gothic_alphabet',
+      'https://en.wikipedia.org/wiki/Greek_alphabet',
+    ],
     description:
       '哥特字母是现存最早为日耳曼语定制的字母表：四世纪时，卡帕多西亚希腊裔主教乌尔菲拉' +
       '为把圣经译成哥特语而造了它，27 个字母排下来，顺序、音值与数字用法都对着希腊字母走。' +
@@ -406,6 +479,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Old Italic → Runic',
     mode: 'chain',
     source: 'Wikipedia《Runic alphabet》：多数意见认为承自古意大利一类字母',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Runic_alphabet',
+      'https://en.wikipedia.org/wiki/Old_Italic_scripts',
+    ],
     description:
       '阿尔卑斯山北麓的日耳曼人借走了一套古意大利—拉丁类型的字母：F 还是那根竖钩、' +
       'R 还是那个弯头、O 还是那个圈，骨架认得出，读音却按自己的语言重排了一遍，还添了' +
@@ -425,6 +502,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Old South Arabian alef → Ethiopic hä',
     mode: 'chain',
     source: 'Wikipedia《Geʽez script》《Ancient South Arabian script》',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Ge%CA%BDez_script',
+      'https://en.wikipedia.org/wiki/Ancient_South_Arabian_script',
+    ],
     description:
       '古南阿拉伯字母随商路越过红海，在阿克苏姆长成了吉兹字母。字形还能认出南阿拉伯的来路，' +
       '写法却换了一种思路：它不再只记辅音，而是把辅音与元音配成一个音节矩阵——' +
@@ -444,6 +525,11 @@ export const lineages: Lineage[] = [
     nameEn: 'ʾālep → South Semitic alphabets',
     mode: 'cognate',
     source: 'Wikipedia《Ugaritic alphabet》《Ancient South Arabian script》：与腓尼基字母同源并列',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Ugaritic_alphabet',
+      'https://en.wikipedia.org/wiki/Ancient_South_Arabian_script',
+      'https://en.wikipedia.org/wiki/Ancient_North_Arabian',
+    ],
     description:
       '腓尼基—阿拉米那条线把辅音并成了 22 个字母：西北闪米特的 ḫ 并进 ḥ、ḏ 并进 z、' +
       'ġ 并进 ʿ、ẓ 并进 ṣ、ḍ 并进 d。乌加里特与南、北阿拉伯却把这些音分写，' +
@@ -466,6 +552,11 @@ export const lineages: Lineage[] = [
     source:
       'Wikipedia《A (kana)》《Hiragana》《Man\'yōgana》：平假名「あ」由汉字「安」的草书简化而来；' +
       '平假名与片假名同出万叶假名，但母字并不一一相同。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/A_(kana)',
+      'https://en.wikipedia.org/wiki/Hiragana',
+      'https://en.wikipedia.org/wiki/Man%27y%C5%8Dgana',
+    ],
     description:
       '万叶假名借汉字记日语读音，「安」被借来写 a。进入平假名后，整字的草书不断简省，' +
       '成为今天的「あ」。这是一条母字到假名的借字记音关系；平假名与片假名是姐妹系统，' +
@@ -501,6 +592,11 @@ export const lineages: Lineage[] = [
       'Wikipedia《A (kana)》《Katakana》《Man\'yōgana》及 SLJ FAQ〈Origin of kana〉：' +
       '片假名「ア」经由万叶假名取自汉字「阿」的左侧部件；片假名与平假名是姐妹系统，' +
       '不是「あ」的后身。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/A_(kana)',
+      'https://en.wikipedia.org/wiki/Katakana',
+      'https://en.wikipedia.org/wiki/Man%27y%C5%8Dgana',
+    ],
     description:
       '「ア」的母字是「阿」，不是平假名「あ」。片假名多截取借字的局部笔画，' +
       '平假名多把整字草书化；两套假名都从万叶假名分出，走的是并列的两条路。' +
@@ -535,6 +631,9 @@ export const lineages: Lineage[] = [
     source:
       'Wikipedia《ʼPhags-pa script》：八思巴文承自藏文；字母 1–30 与藏文三十个基础字母' +
       '传统顺序对应；ꡀ 为 ka。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/%CA%BCPhags-pa_script',
+    ],
     description:
       '忽必烈命八思巴创制国字，字母框架承自藏文。八思巴文的前三十个字母按藏文三十个' +
       '基础辅音的传统顺序排列，藏文 ཀ 到八思巴文 ꡀ 因此可以逐字对上；' +
@@ -565,6 +664,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Brahmi ka → modern ka',
     mode: 'cognate',
     source: 'Wikipedia《Brahmi script》及各家现代文字的条目：婆罗米系共同后身',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Brahmi_script',
+      'https://en.wikipedia.org/wiki/Brahmic_scripts',
+    ],
     description:
       '同一个辅音音节 ka，从公元前三世纪的婆罗米文出发，' +
       '散落到天城文、尼瓦尔文、泰米尔文、藏文、高棉文、泰文、缅文……' +
@@ -600,6 +703,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Brahmi \u2192 Sinhala',
     mode: 'chain',
     source: 'Wikipedia《Sinhala script》：僧伽罗文是古印度婆罗米文的后裔，中世纪又与南印度格兰塔文合流',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Sinhala_script',
+      'https://en.wikipedia.org/wiki/Brahmi_script',
+    ],
     description:
       '僧伽罗语是印欧语，却写在印度系字母上——这层关系是公元前三世纪随佛教一起上岛的：' +
       '阿努拉德普勒的陶片与石刻上，婆罗米文被借来记僧伽罗语，此后一千多年里没有断过。' +
@@ -617,6 +724,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Brahmi → Sharada',
     mode: 'chain',
     source: 'Wikipedia《Gurmukhi》（婆罗米分出的西北支「Sharada-based」）《Sharada script》（八至十二世纪克什米尔）',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Sharada_script',
+      'https://en.wikipedia.org/wiki/Gurmukhi',
+    ],
     description:
       '西北印度这一支从笈多婆罗米里分出来，八世纪在克什米尔定型为夏拉达文，' +
       '用来写梵语和克什米尔语，随后沿旁遮普与喜马拉雅山麓铺开。' +
@@ -635,6 +746,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Siddham → Bengali-Assamese',
     mode: 'chain',
     source: 'Wikipedia《Odia script》：东印度的悉昙衍生出孟加拉-阿萨姆、提尔胡塔与奥里亚诸文',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Odia_script',
+      'https://en.wikipedia.org/wiki/Bengali_alphabet',
+    ],
     description:
       '悉昙文随佛教在东印度扎根，其后身在孟加拉与阿萨姆一带长成今天的孟加拉文。' +
       '最大的变化在头顶那条顶线：悉昙的直杠变成带弧度的罩子，' +
@@ -652,6 +767,9 @@ export const lineages: Lineage[] = [
     nameEn: 'Siddham → Odia',
     mode: 'chain',
     source: 'Wikipedia《Odia script》：奥里亚文由东印度的一支悉昙文发展而来',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Odia_script',
+    ],
     description:
       '奥里亚文出自东印度悉昙文的一支，早期称卡林加文，十一世纪留下奥里亚语最早的石刻。' +
       '棕榈叶上刻字不便落直角，笔画越写越圆，顶线最后收成一顶「伞盖」；' +
@@ -669,6 +787,11 @@ export const lineages: Lineage[] = [
     nameEn: 'Sharada a → Gurmukhi, Takri and Landa a',
     mode: 'cognate',
     source: 'Wikipedia《Takri script》（「承自夏拉达，与兰达诸文为姊妹」）《Landa script》《Gurmukhi》（果鲁穆奇上承夏拉达，中间书体尚有分歧）',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Takri_script',
+      'https://en.wikipedia.org/wiki/Landa_script',
+      'https://en.wikipedia.org/wiki/Gurmukhi',
+    ],
     description:
       '夏拉达文是八世纪克什米尔一带的书体，往下分出果鲁穆奇、塔克里一支与兰达一族。' +
       '果鲁穆奇是西北支里唯一活到今天的日常文字，旁遮普语与锡克教经典都用它；' +
@@ -699,6 +822,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Kawi ka → island scripts',
     mode: 'cognate',
     source: 'Wikipedia《Kawi script》（列出巴厘、爪哇、Lontara、Baybayin 等后身）《Lontara script》',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Kawi_script',
+      'https://en.wikipedia.org/wiki/Lontara_script',
+    ],
     description:
       '东南亚海岛的这几套字母表，多半从爪哇一带的卡维文散开：' +
       '布吉、巽他、哈努诺、布希德、塔格班瓦、望加锡各自把同一个 ka 写成了不同骨架。' +
@@ -722,6 +849,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Pallava ka → Southeast Asian ka',
     mode: 'cognate',
     source: 'Wikipedia《Pallava script》《Cham script》：占文「最先从帕拉瓦分出」（约 350 年）',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Pallava_script',
+      'https://en.wikipedia.org/wiki/Cham_script',
+    ],
     description:
       '南印度的帕拉瓦文（帕拉瓦格兰塔）是东南亚多数文字的直系祖先，四世纪起随僧侣、' +
       '学者与商人渡海：同一个 ka，占人、孟人、高棉人、爪哇人与巴厘人各写各的骨架——' +
@@ -756,6 +887,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Pallava \u2192 Grantha \u2192 Malayalam',
     mode: 'chain',
     source: 'Wikipedia《Grantha script》：格兰塔出自帕拉瓦文，「现代马拉雅拉姆文是格兰塔文的直系后裔」',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Grantha_script',
+      'https://en.wikipedia.org/wiki/Malayalam_script',
+    ],
     description:
       '喀拉拉这一支是南印度字母最清楚的一段传承：帕拉瓦文先分出一支格兰塔文，' +
       '专用来写梵语；八九世纪，东海岸的格兰塔字母被带到马拉巴尔海岸，' +
@@ -787,6 +922,12 @@ export const lineages: Lineage[] = [
     nameEn: 'Oracle bone → seal → clerical → regular',
     mode: 'chain',
     source: '汉字通行流变：甲骨文 → 小篆 → 隶书 → 楷书',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Oracle_bone_script',
+      'https://en.wikipedia.org/wiki/Seal_script',
+      'https://en.wikipedia.org/wiki/Clerical_script',
+      'https://en.wikipedia.org/wiki/Regular_script',
+    ],
     description:
       '汉字三千多年的主线，用一个「日」字走一遍：商代刻在龟甲兽骨上的甲骨文，' +
       '笔画瘦硬、象形直白；秦统一文字后的小篆把字形拉长、线条匀圆；' +
@@ -818,6 +959,11 @@ export const lineages: Lineage[] = [
     nameEn: 'Hieroglyphs → hieratic → demotic → Coptic',
     mode: 'chain',
     source: 'Wikipedia《Coptic alphabet》字母表：šay 一栏列出圣书体 → 僧侣体 → 世俗体 → Ϣ',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Coptic_alphabet',
+      'https://en.wikipedia.org/wiki/Hieratic',
+      'https://en.wikipedia.org/wiki/Demotic_(Egyptian)',
+    ],
     description:
       '同一套埃及语，写了四千年的三种面孔：刻在神庙与墓碑上的圣书体，' +
       '祭司用芦苇笔写在纸草上的僧侣体，以及更晚、更潦草也更日常的世俗体。' +
@@ -861,6 +1007,10 @@ export const lineages: Lineage[] = [
     nameEn: 'Egyptian → Meroitic',
     mode: 'chain',
     source: 'Unicode 麦罗埃文提案 L2/09-250（N3665）字形对照表：𐦀 ← 𓀀（A1）',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2009/09250-n3665-meroitic.pdf',
+      'https://en.wikipedia.org/wiki/Meroitic_script',
+    ],
     description:
       '尼罗河上游的库施王国把埃及圣书体的符号借来，简化成一套自己的音节文字：' +
       '碑铭体刻在神庙与石碑上，草书体写在纸草与陶片上。这条轨道走麦罗埃字母表的第 1 个字母，' +
@@ -881,6 +1031,12 @@ export const lineages: Lineage[] = [
     nameEn: 'Cretan hieroglyphs → Linear A → Linear B → Cypriot',
     mode: 'chain',
     source: 'Wikipedia《Linear A》《Linear B》《Cypriot syllabary》：A／B 两系 AB 08 的轮廓可对合',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Cretan_hieroglyphs',
+      'https://en.wikipedia.org/wiki/Linear_A',
+      'https://en.wikipedia.org/wiki/Linear_B',
+      'https://en.wikipedia.org/wiki/Cypriot_syllabary',
+    ],
     description:
       '爱琴海是字母表之外另一处独立发明文字的地方。克里特岛上的克里特象形文字' +
       '（约公元前两千年）往下派生出线形文字 A，米诺斯人用它记账；' +

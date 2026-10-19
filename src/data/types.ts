@@ -168,10 +168,10 @@ export interface Lineage {
    */
   source: string;
   /**
-   * 轨道级参考链接。站点没有自己的 sourceRef 时继承这里；站点有更具体的
-   * 证据时仍以站点 sourceRef 为准。
+   * 轨道级参考链接，至少一条。站点没有自己的 sourceRef 时继承这里；
+   * 站点有更具体的证据时仍以站点 sourceRef 为准。
    */
-  sourceRefs?: string[];
+  sourceRefs: string[];
   /** 站点顺序：chain 按时间，cognate / pair 按叙事顺序 */
   stops: GlyphStop[];
   /**
