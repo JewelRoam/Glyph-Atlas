@@ -569,4 +569,31 @@ export const lineages: Lineage[] = [
       { script: 'balinese', char: 'ᬓ', label: '巴厘文 ka', phonetic: 'ka' },
     ],
   },
+  {
+    id: 'aegean-line',
+    nameZh: '克里特象形文字 → 线形文字 A → 线形文字 B → 塞浦路斯',
+    nameEn: 'Cretan hieroglyphs → Linear A → Linear B → Cypriot',
+    mode: 'chain',
+    description:
+      '爱琴海是字母表之外另一处独立发明文字的地方。克里特岛上的克里特象形文字' +
+      '（约公元前两千年）往下派生出线形文字 A，米诺斯人用它记账；' +
+      '迈锡尼人把这套符号借去写希腊语，就是线形文字 B——' +
+      '它 1952 年被文特里斯破读，是这批文字里唯一留下可读文本的一支。' +
+      '同一个元音 a，线形文字 A 记作 AB 08、线形文字 B 记作 B 08，' +
+      '两边的字形到今天仍能严丝合缝地叠在一起（两支字库的轮廓可以直接对合）。' +
+      '末站塞浦路斯音节文字走的是另一条支流：线形文字 A 传到塞浦路斯先成了' +
+      '塞浦路斯-米诺斯文，再演成这套音节文字，一直用到古典时代，' +
+      '同一个 a 到那边已经改写成星形的骨架。' +
+      '克里特象形文字至今没有可用的字库，那一站放的是克诺索斯出土的印章实物。',
+    stops: [
+      {
+        script: 'rethra',
+        image: 'glyphs/rethra/knossos-144883.jpg',
+        label: '克里特象形文字（克诺索斯印章，约前 2100—1700 年）',
+      },
+      { script: 'linear-a', char: '𐘇', label: '线形文字 A（AB 08）', phonetic: 'a' },
+      { script: 'linear-b', char: '𐀀', label: '线形文字 B（B 08 a）', phonetic: 'a' },
+      { script: 'cypriot', char: '𐠀', label: '塞浦路斯音节文字 a', phonetic: 'a' },
+    ],
+  },
 ]

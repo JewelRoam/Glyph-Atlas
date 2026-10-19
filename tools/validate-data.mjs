@@ -266,7 +266,8 @@ if (autoMarkLetters.length)
   );
 if (unexpandedLetters.length)
   warn(
-    `[slots] ${unexpandedLetters.length} 个语素文字/非字母体系的手工表只取代表字形，不做整表铺开：` +
+    `[slots] ${unexpandedLetters.length} 个语素文字/非字母体系的手工表只取这一家的字母：` +
+      `语素文字取代表字形，表词符号 / 数字 / 度量衡不铺进字母场：` +
       unexpandedLetters.join('，'),
   );
 
