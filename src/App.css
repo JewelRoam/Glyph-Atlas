@@ -863,10 +863,24 @@ main {
   padding: 2px 8px;
   white-space: nowrap;
 }
+.walk-meta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
 .walk-desc {
   font-size: 12.5px;
   line-height: 1.9;
   color: var(--ink-dim);
+  margin: 0;
+}
+/* 轨道出处：比说明再退一层，不抢正文，但把可核对的出处留住 */
+.walk-source {
+  font-size: 11px;
+  line-height: 1.75;
+  color: var(--ink-dim);
+  opacity: 0.78;
   margin: 0;
 }
 

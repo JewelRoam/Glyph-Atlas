@@ -125,6 +125,12 @@ export interface Lineage {
   description: string;
   /** 轨道的性质；缺省视为 chain */
   mode?: LineageMode;
+  /**
+   * 史实依据：这条轨道凭什么成立——条目正文、Unicode 提案或字形对照表。
+   * MICRO 会把它印在说明下面一行。写不出出处的链条不该上线，
+   * tools/validate-data.mjs 把空 source 当错误。
+   */
+  source: string;
   /** 站点顺序：chain 按时间，cognate / pair 按叙事顺序 */
   stops: GlyphStop[];
 }

@@ -152,6 +152,8 @@ for (const s of writingSystems) {
 
 for (const l of lineages) {
   if (l.stops.length < 2) err(`[lineage] ${l.id} 少于两个站点，无法形成演变`);
+  // 每一条轨道都要能指出出处：核对不了的链条不上线，页面也就没得显示
+  if (!l.source?.trim()) err(`[lineage] ${l.id} 缺少出处 source`);
   let prev = -Infinity;
   l.stops.forEach((stop, i) => {
     const script = scriptById[stop.script];

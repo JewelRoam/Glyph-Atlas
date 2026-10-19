@@ -427,7 +427,11 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
         <span className="walk-mode" title={LINEAGE_MODE_HINT[mode]}>
           {LINEAGE_MODE_LABEL[mode]}
         </span>
-        <p className="walk-desc">{lineage.description}</p>
+        <div className="walk-meta-text">
+          <p className="walk-desc">{lineage.description}</p>
+          {/* 这条链凭什么算数：出处放在说明底下，读者能自己回去核对 */}
+          <p className="walk-source">依据 · {lineage.source}</p>
+        </div>
       </div>
 
       <div
