@@ -4,6 +4,7 @@ import {
   lineageEntryFor,
   lineagesByScript,
   scriptContextFor,
+  scriptById,
   stopRefFromParams,
   stopRefFor,
   writingSystems,
@@ -25,6 +26,7 @@ import { GlyphBoard } from './GlyphBoard';
 import { LineageStage } from './LineageStage';
 
 export interface FocusLocation {
+  /** 用户进入的体系焦点。轨道向前行走进入其他体系时保持不变。 */
   scriptId: string;
   lineageId?: string;
   stopId?: string;
@@ -206,6 +208,8 @@ export function FocusView({
 }: FocusViewProps) {
   const focusRef = useRef<HTMLElement>(null);
 
+  // 只有从全图、检索或关系入口切换到另一体系焦点时才回到页首；
+  // 同一条轨道内前后换站必须留在用户当前观看的位置。
   useEffect(() => {
     focusRef.current?.scrollTo({ top: 0 });
   }, [location.scriptId]);
@@ -214,10 +218,17 @@ export function FocusView({
   if (!context) return null;
 
   const requested = stopRefFromParams(location.lineageId, location.stopId);
-  const requestedTrack = requested?.stop.script === location.scriptId ? requested : undefined;
+  const requestedTrack = requested?.lineage.stops.some(
+    (stop) => stop.script === location.scriptId,
+  )
+    ? requested
+    : undefined;
   const fallbackTrack = lineageEntryFor(location.scriptId)?.track;
   const activeTrack = requestedTrack ?? fallbackTrack;
+  const stationSystem = activeTrack ? scriptById[activeTrack.stop.script] : undefined;
   const tracks = lineagesByScript.get(location.scriptId) ?? [];
+  const hasGraphRelations =
+    context.graph.parentNeighbors.length + context.graph.childNeighbors.length > 0;
   const system = context.system;
   const graphNumber = String(writingSystems.findIndex((item) => item.id === system.id) + 1).padStart(
     3,
@@ -281,50 +292,48 @@ export function FocusView({
         </dl>
       </header>
 
-      <div className={`focus-workspace ${activeTrack ? '' : 'without-track'}`}>
-        <section className="focus-stage-column" aria-labelledby="lineage-heading">
-          <header className="stage-heading">
-            <div>
-              <span>字形演变</span>
-              <h2 id="lineage-heading">
-                {activeTrack?.lineage.nameZh ?? '尚未建立连续字形轨道'}
-              </h2>
-            </div>
-            {activeTrack?.lineage.mode ? (
-              <span className="lineage-mode">
-                {LINEAGE_MODE_LABEL[activeTrack.lineage.mode]}
-              </span>
-            ) : null}
-          </header>
-
-          {tracks.length > 0 && (
-            <div className="track-switcher" aria-label="选择字形轨道">
-              {tracks.map((track, index) => {
-                const active = track.id === activeTrack?.lineage.id;
-                return (
-                  <button
-                    key={track.id}
-                    className={active ? 'active' : ''}
-                    aria-pressed={active}
-                    onClick={() => {
-                      const stop =
-                        track.stops.find((candidate) => candidate.script === system.id) ??
-                        track.stops[0];
-                      const ref = stopRefFor(track.id, stop);
-                      if (ref) onOpenTrack(ref);
-                    }}
-                    title={track.description}
-                  >
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    <strong>{track.nameZh}</strong>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
+      {(activeTrack || hasGraphRelations) && (
+        <div className={`focus-workspace ${activeTrack ? '' : 'without-track'}`}>
           {activeTrack ? (
-            <>
+            <section className="focus-stage-column" aria-labelledby="lineage-heading">
+              <header className="stage-heading">
+                <div>
+                  <span>字形演变</span>
+                  <h2 id="lineage-heading">{activeTrack.lineage.nameZh}</h2>
+                </div>
+                {activeTrack.lineage.mode ? (
+                  <span className="lineage-mode">
+                    {LINEAGE_MODE_LABEL[activeTrack.lineage.mode]}
+                  </span>
+                ) : null}
+              </header>
+
+              {tracks.length > 0 && (
+                <div className="track-switcher" aria-label="选择字形轨道">
+                  {tracks.map((track, index) => {
+                    const active = track.id === activeTrack.lineage.id;
+                    return (
+                      <button
+                        key={track.id}
+                        className={active ? 'active' : ''}
+                        aria-pressed={active}
+                        onClick={() => {
+                          const stop =
+                            track.stops.find((candidate) => candidate.script === system.id) ??
+                            track.stops[0];
+                          const ref = stopRefFor(track.id, stop);
+                          if (ref) onOpenTrack(ref);
+                        }}
+                        title={track.description}
+                      >
+                        <span>{String(index + 1).padStart(2, '0')}</span>
+                        <strong>{track.nameZh}</strong>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               <LineageStage
                 lineage={activeTrack.lineage}
                 stationId={activeTrack.stop.id}
@@ -345,32 +354,23 @@ export function FocusView({
                   </a>
                 </div>
               </footer>
-            </>
-          ) : (
-            <div className="track-empty">
-              <span className="track-empty-mark" aria-hidden="true">
-                ○
-              </span>
-              <h3>没有可核实的连续字形</h3>
-              <p>
-                现存材料只支持确认这套文字的形式与来源，尚不足以把逐字演变连成轨道。
-                下方字表展示可靠字形，空缺不以现代字体补画。
-              </p>
-            </div>
-          )}
-        </section>
-
-        <aside className="focus-dossier" aria-label={`${system.nameZh}档案`}>
-          {activeTrack ? (
-            <StationDossier
-              system={system}
-              track={activeTrack}
-              onOpenTrack={onOpenTrack}
-            />
+            </section>
           ) : null}
-          <GraphRelations context={context} onOpenScript={onOpenScript} />
-        </aside>
-      </div>
+
+          {hasGraphRelations ? (
+            <aside className="focus-dossier" aria-label={`${system.nameZh}档案`}>
+              {activeTrack ? (
+                <StationDossier
+                  system={stationSystem ?? system}
+                  track={activeTrack}
+                  onOpenTrack={onOpenTrack}
+                />
+              ) : null}
+              <GraphRelations context={context} onOpenScript={onOpenScript} />
+            </aside>
+          ) : null}
+        </div>
+      )}
 
       <GlyphBoard system={system} />
     </article>

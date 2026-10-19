@@ -248,12 +248,53 @@ async function openCatalog(page) {
 async function inspectWalk(page) {
   const next = page.getByRole('button', { name: '下一个' });
   if (!(await next.count())) throw new Error('焦点页没有“下一个”按钮');
-  await next.click();
-  await page.waitForTimeout(1250);
   const range = page.locator('.walk-street input[type=range]');
   if (!(await range.count())) throw new Error('焦点页没有站点尺');
-  const value = Number(await range.inputValue());
-  if (!(value > 0)) throw new Error('“下一个”没有推进站点');
+
+  const heading = page.locator('.focus-heading h1');
+  const focusSystem = (await heading.textContent())?.trim();
+  const stationBefore = Number(await range.inputValue());
+  await page.locator('.focus').evaluate((el) => {
+    const controls = el.querySelector('.walk-controls');
+    if (!controls) throw new Error('找不到字形轨道按键');
+    const offset = controls.getBoundingClientRect().top - el.getBoundingClientRect().top;
+    // 测试定位需要精确落点；页面连接中的平滑滚动会让记录值仍在变化。
+    el.style.scrollBehavior = 'auto';
+    el.scrollTop = Math.max(0, el.scrollTop + offset - 220);
+  });
+  await page.waitForTimeout(120);
+  const scrollBefore = await page.locator('.focus').evaluate((el) => el.scrollTop);
+  if (scrollBefore < 20) throw new Error('回归测试没有把字形轨道滚入视口');
+
+  await next.click();
+  await page.waitForTimeout(1250);
+  const stationAfter = Number(await range.inputValue());
+  const scrollAfter = await page.locator('.focus').evaluate((el) => {
+    const top = el.scrollTop;
+    el.style.removeProperty('scroll-behavior');
+    return top;
+  });
+  const focusSystemAfter = (await heading.textContent())?.trim();
+
+  if (stationAfter <= stationBefore) throw new Error('“下一个”没有推进站点');
+  if (focusSystemAfter !== focusSystem) {
+    throw new Error(`沿线换站时体系焦点从“${focusSystem}”跳成了“${focusSystemAfter}”`);
+  }
+  if (Math.abs(scrollAfter - scrollBefore) > 3) {
+    throw new Error(`沿线换站时页面从 ${scrollBefore}px 跳到了 ${scrollAfter}px`);
+  }
+  if (new URL(page.url()).searchParams.get('script') !== 'greek') {
+    throw new Error('沿线换站时深链的体系焦点被改写');
+  }
+}
+
+async function inspectNoTrack(page) {
+  if (await page.getByText('尚未建立连续字形轨道', { exact: true }).count()) {
+    throw new Error('无连续轨道的体系仍渲染了空轨道提示');
+  }
+  if (await page.locator('.focus-stage-column').count()) {
+    throw new Error('无连续轨道的体系仍渲染了空舞台栏');
+  }
 }
 
 async function resetFocusScroll(page) {
@@ -421,7 +462,7 @@ try {
     width: 1024,
     height: 768,
     query: '?script=jurchen',
-    steps: [async (page) => scrollFocusTo(page, '.detail-board')],
+    steps: [inspectNoTrack, async (page) => scrollFocusTo(page, '.detail-board')],
     checkBoard: true,
     expectImages: true,
   });
@@ -456,6 +497,16 @@ try {
     query: '?script=greek&lineage=aleph&stop=greek',
     steps: [async (page) => scrollFocusTo(page, '.alpha-field')],
     expectWalk: true,
+  });
+  await shoot('27-focus-no-track-1440', {
+    query: '?script=jurchen',
+    steps: [inspectNoTrack],
+  });
+  await shoot('28-focus-no-track-mobile', {
+    width: 420,
+    height: 860,
+    query: '?script=jurchen',
+    steps: [inspectNoTrack],
   });
 } finally {
   await browser.close();

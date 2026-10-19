@@ -44,6 +44,11 @@ export default function App() {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [atlasView, setAtlasView] = useState<AtlasViewport | null>(null);
   const catalogTriggerRef = useRef<HTMLButtonElement>(null);
+  const focusScriptRef = useRef<string | null>(focus?.scriptId ?? null);
+
+  useEffect(() => {
+    focusScriptRef.current = focus?.scriptId ?? null;
+  }, [focus?.scriptId]);
 
   const openScript = useCallback((scriptId: string) => {
     const entry = lineageEntryFor(scriptId)?.track;
@@ -65,8 +70,10 @@ export default function App() {
   }, []);
 
   const moveToStation = useCallback((track: LineageStopRef) => {
+    // 沿线行走只改变当前站点；页头仍属于用户进入的体系焦点。
+    const scriptId = focusScriptRef.current ?? track.stop.script;
     const next: FocusLocation = {
-      scriptId: track.stop.script,
+      scriptId,
       lineageId: track.lineage.id,
       stopId: track.stop.id,
     };
@@ -75,7 +82,7 @@ export default function App() {
       '',
       focusUrl(next),
     );
-    setFocus(next);
+    setFocus((previous) => (previous ? { ...previous, ...next } : next));
   }, []);
 
   const returnToAtlas = useCallback(() => {
