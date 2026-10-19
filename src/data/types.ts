@@ -83,8 +83,22 @@ export interface WritingSystem {
   sample?: string;
   /** Google Fonts 家族名，缺省则用系统字体 */
   fontFamily?: string;
-  /** 一句话说明 */
+  /**
+   * 一句话说明。
+   */
   note?: string;
+  /**
+   * 节点进入血统视图时的首选站点。
+   *
+   * 一个书写体系可能出现在多条轨道里。缺省时使用 lineages.ts 中第一条包含
+   * 该体系的轨道及其第一个站点；需要指定更合适的入口时再填写这里。
+   */
+  lineageEntry?: {
+    lineageId: string;
+    stopId: string;
+  };
+  /** 这个书写体系的通用参考链接（字体、Unicode 提案、条目等） */
+  sourceRefs?: string[];
 }
 
 /** 字形素材的来源与授权信息，随站点一起保存，避免素材与谱系脱节。 */
@@ -101,10 +115,12 @@ export interface GlyphAsset {
 /** 血统轨道上的一个站点 */
 export interface GlyphStop {
   /**
-   * 轨道内的稳定站点 id。缺省时以 script 作为键；同一轨道出现同一书写体系
-   * 的多个站点时必须显式填写，供详情页、反向索引与未来图谱节点跳转使用。
+   * 轨道内的稳定站点 id。
+   *
+   * 这是站点在轨道内的持久标识，供详情页、反向索引与未来图谱节点跳转使用。
+   * 一旦发布就不要改名；同一轨道出现同一书写体系时更必须各自独立。
    */
-  id?: string;
+  id: string;
   /** 对应书写体系 id */
   script: string;
   /** 用于字体渲染的字符 */
@@ -151,6 +167,11 @@ export interface Lineage {
    * tools/validate-data.mjs 把空 source 当错误。
    */
   source: string;
+  /**
+   * 轨道级参考链接。站点没有自己的 sourceRef 时继承这里；站点有更具体的
+   * 证据时仍以站点 sourceRef 为准。
+   */
+  sourceRefs?: string[];
   /** 站点顺序：chain 按时间，cognate / pair 按叙事顺序 */
   stops: GlyphStop[];
   /**

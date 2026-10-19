@@ -10,6 +10,8 @@
     "lint": "oxlint",
     "typecheck": "tsc -b",
     "validate": "node tools/validate-data.mjs && node --import ./tools/register-ts.mjs tools/audit-rosters.mjs && node --import ./tools/register-ts.mjs tools/audit-glyph-sources.mjs && node --import ./tools/register-ts.mjs tools/audit-font-verdicts.mjs",
+    "audit:coverage": "node --import ./tools/register-ts.mjs tools/audit-lineage-coverage.mjs",
+    "audit:coverage:json": "node --import ./tools/register-ts.mjs tools/audit-lineage-coverage.mjs --json",
     "check": "npm run validate && npm run lint && npm run typecheck",
     "shots": "node tools/screenshot.mjs"
   },

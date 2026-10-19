@@ -8,13 +8,18 @@ export {
   adjacentStops,
   allStopRefs,
   lineageById,
+  lineageEntryFor,
+  lineageHref,
+  lineageStatusFor,
   lineagesByScript,
+  neighboringStopRefs,
   stopKey,
   stopRefByKey,
   stopRefFor,
+  stopRefFromParams,
   stopsByScript,
 } from './lineageIndex';
-export type { LineageStopRef } from './lineageIndex';
+export type { LineageEntry, LineageStopRef, ScriptLineageStatus } from './lineageIndex';
 
 /**
  * 演化图使用的节点集合。

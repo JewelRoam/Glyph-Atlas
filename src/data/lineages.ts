@@ -34,10 +34,10 @@ export const lineages: Lineage[] = [
       '走到那一站时 omega 会消失。最后一站是罗马从南伊特鲁里亚一支定下来的拉丁' +
       '字母表——半岛各家添的那些字，它又收了回去。',
     stops: [
-      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'etruscan', char: '𐌀', label: '伊特鲁里亚 a', phonetic: 'a' },
-      { script: 'old-italic', char: '𐌀', label: '古意大利字母 a', phonetic: 'a' },
-      { script: 'latin', char: 'A', label: '拉丁 A', phonetic: 'a' },
+      { id: 'greek', script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { id: 'etruscan', script: 'etruscan', char: '𐌀', label: '伊特鲁里亚 a', phonetic: 'a' },
+      { id: 'old-italic', script: 'old-italic', char: '𐌀', label: '古意大利字母 a', phonetic: 'a' },
+      { id: 'latin', script: 'latin', char: 'A', label: '拉丁 A', phonetic: 'a' },
     ],
   },
 
@@ -52,6 +52,7 @@ export const lineages: Lineage[] = [
       '经腓尼基、希腊一路演变，最终成为拉丁字母 A。约四千年间，它从一幅图画变成了一组笔画。',
     stops: [
       {
+        id: 'egyptian',
         script: 'egyptian',
         label: '牛头（圣书体 F1）',
         phonetic: 'pr / 牛',
@@ -60,8 +61,10 @@ export const lineages: Lineage[] = [
           'C15 52 17 70 25 84 C31 94 40 97 50 94 C60 97 69 94 75 84 ' +
           'C83 70 85 52 81 39 C91 36 97 26 92 16 C84 12 75 15 70 21 ' +
           'C66 13 58 8 50 8 Z',
+        asset: { kind: 'path', credit: 'Glyph Atlas 示意性重绘（非精确摹本）' },
       },
       {
+        id: 'proto-sinaitic',
         script: 'proto-sinaitic',
         label: 'ʾalp（牛）',
         phonetic: 'ʔ',
@@ -70,28 +73,35 @@ export const lineages: Lineage[] = [
           'C17 54 20 72 28 84 C34 93 42 96 50 93 C58 96 66 93 72 84 ' +
           'C80 72 83 54 79 41 C88 38 94 29 90 20 C82 15 73 17 67 23 ' +
           'C63 15 57 10 50 10 Z',
+        asset: { kind: 'path', credit: 'Glyph Atlas 示意性重绘（非精确摹本）' },
       },
       {
+        id: 'phoenician',
         script: 'phoenician',
         label: 'ʾālep',
         phonetic: 'ʔ',
         path:
           'M30 8 L48 8 L48 38 L78 8 L94 24 L58 52 L94 80 L78 96 L48 66 ' +
           'L48 92 L30 92 Z',
+        asset: { kind: 'path', credit: 'Glyph Atlas 示意性重绘（非精确摹本）' },
       },
       {
+        id: 'greek',
         script: 'greek',
         label: 'alpha（早期）',
         phonetic: 'a',
         path: 'M50 8 L94 94 L72 94 L50 46 L28 94 L6 94 Z',
+        asset: { kind: 'path', credit: 'Glyph Atlas 示意性重绘（非精确摹本）' },
       },
       {
+        id: 'latin',
         script: 'latin',
         label: 'A',
         phonetic: 'a',
         path:
           'M50 4 L98 96 L74 96 L62 76 L38 76 L26 96 L2 96 Z ' +
           'M50 28 L58 66 L42 66 Z',
+        asset: { kind: 'path', credit: 'Glyph Atlas 示意性重绘（非精确摹本）' },
       },
     ],
   },
@@ -107,10 +117,10 @@ export const lineages: Lineage[] = [
       '这条轨道只走北方主线，展示同一个辅音 ʾ 如何从西奈—黎凡特的古老字母，' +
       '收束成今天阿拉伯文的 ا。',
     stops: [
-      { script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
-      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
-      { script: 'nabataean', char: '𐢀', label: '纳巴泰 ʾālep', phonetic: 'ʔ' },
-      { script: 'arabic', char: 'ا', label: '阿拉伯 ʾalif', phonetic: 'ʔ / aː' },
+      { id: 'phoenician', script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
+      { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { id: 'nabataean', script: 'nabataean', char: '𐢀', label: '纳巴泰 ʾālep', phonetic: 'ʔ' },
+      { id: 'arabic', script: 'arabic', char: 'ا', label: '阿拉伯 ʾalif', phonetic: 'ʔ / aː' },
     ],
   },
 
@@ -125,8 +135,8 @@ export const lineages: Lineage[] = [
       '流亡社群改用阿拉米字母抄写经文，字母名与音值照旧，字形却整体换成了' +
       '另一套骨架。',
     stops: [
-      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
-      { script: 'hebrew', char: 'א', label: '希伯来 alef', phonetic: 'ʔ' },
+      { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { id: 'hebrew', script: 'hebrew', char: 'א', label: '希伯来 alef', phonetic: 'ʔ' },
     ],
   },
 
@@ -144,9 +154,9 @@ export const lineages: Lineage[] = [
       '走到撒玛利亚字母，字面才换成圆转的连写体——二十二字位一脉相承，' +
       '元音另外用标号记，不进字母表。',
     stops: [
-      { script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
-      { script: 'paleo-hebrew', char: '𐤀', label: '古希伯来 ʾālep', phonetic: 'ʔ' },
-      { script: 'samaritan', char: 'ࠀ', label: '撒玛利亚 alaf', phonetic: 'ʔ' },
+      { id: 'phoenician', script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
+      { id: 'paleo-hebrew', script: 'paleo-hebrew', char: '𐤀', label: '古希伯来 ʾālep', phonetic: 'ʔ' },
+      { id: 'samaritan', script: 'samaritan', char: 'ࠀ', label: '撒玛利亚 alaf', phonetic: 'ʔ' },
     ],
   },
 
@@ -161,8 +171,8 @@ export const lineages: Lineage[] = [
       '第一个字母仍对应 /a/，字形却已变成弯曲的 halqa——' +
       '同一条字母血统，在宗教写本里留下了另一种走向。',
     stops: [
-      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
-      { script: 'mandaic', char: 'ࡀ', label: '曼达 halqa', phonetic: 'a' },
+      { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { id: 'mandaic', script: 'mandaic', char: 'ࡀ', label: '曼达 halqa', phonetic: 'a' },
     ],
   },
 
@@ -178,11 +188,11 @@ export const lineages: Lineage[] = [
       '帕尔米拉与哈特拉留下石刻的棱角，叙利亚字母生出连写与变体传统，' +
       '摩尼字母为记录中古伊朗语的辅音，在叙利亚的 22 个字母之外另造了 14 个分音字面。',
     stops: [
-      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
-      { script: 'palmyrene', char: '𐡠', label: '帕尔米拉 ʾālep', phonetic: 'ʔ' },
-      { script: 'hatran', char: '𐣠', label: '哈特拉 ʾālep', phonetic: 'ʔ' },
-      { script: 'syriac', char: 'ܐ', label: '叙利亚 ʾālep', phonetic: 'ʔ' },
-      { script: 'manichaean', char: '𐫀', label: '摩尼 ʾālep', phonetic: 'ʔ' },
+      { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { id: 'palmyrene', script: 'palmyrene', char: '𐡠', label: '帕尔米拉 ʾālep', phonetic: 'ʔ' },
+      { id: 'hatran', script: 'hatran', char: '𐣠', label: '哈特拉 ʾālep', phonetic: 'ʔ' },
+      { id: 'syriac', script: 'syriac', char: 'ܐ', label: '叙利亚 ʾālep', phonetic: 'ʔ' },
+      { id: 'manichaean', script: 'manichaean', char: '𐫀', label: '摩尼 ʾālep', phonetic: 'ʔ' },
     ],
   },
 
@@ -197,10 +207,10 @@ export const lineages: Lineage[] = [
       '同一套骨架下分出几支后身：萨珊王朝石壁上的碑铭体、吐鲁番写本里的诗篇体，' +
       '以及借它记经书的阿维斯陀字母——到最后一站，ʾālep 已经收成一个规整的 /a/。',
     stops: [
-      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
-      { script: 'inscriptional-pahlavi', char: '𐭠', label: '碑铭巴列维 aleph', phonetic: 'ʔ' },
-      { script: 'psalter-pahlavi', char: '𐮀', label: '诗篇巴列维 aleph', phonetic: 'ʔ' },
-      { script: 'avestan', char: '𐬀', label: '阿维斯陀 a', phonetic: 'a' },
+      { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { id: 'inscriptional-pahlavi', script: 'inscriptional-pahlavi', char: '𐭠', label: '碑铭巴列维 aleph', phonetic: 'ʔ' },
+      { id: 'psalter-pahlavi', script: 'psalter-pahlavi', char: '𐮀', label: '诗篇巴列维 aleph', phonetic: 'ʔ' },
+      { id: 'avestan', script: 'avestan', char: '𐬀', label: '阿维斯陀 a', phonetic: 'a' },
     ],
   },
 
@@ -216,11 +226,11 @@ export const lineages: Lineage[] = [
       '花剌子模丢了 teth、sadhe、qoph 三个，粟特丢了 teth 和 qoph，' +
       '走到那两站时对应的格子会把字母送出去，其余的原地变形。',
     stops: [
-      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
-      { script: 'parthian', char: '𐭀', label: '帕提亚 aleph', phonetic: 'ʔ' },
-      { script: 'elymaic', char: '𐿠', label: '埃利迈 aleph', phonetic: 'ʔ' },
-      { script: 'chorasmian', char: '𐾰', label: '花剌子模 aleph', phonetic: 'ʔ' },
-      { script: 'old-sogdian', char: '𐼀', label: '古粟特 aleph', phonetic: 'ʔ' },
+      { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { id: 'parthian', script: 'parthian', char: '𐭀', label: '帕提亚 aleph', phonetic: 'ʔ' },
+      { id: 'elymaic', script: 'elymaic', char: '𐿠', label: '埃利迈 aleph', phonetic: 'ʔ' },
+      { id: 'chorasmian', script: 'chorasmian', char: '𐾰', label: '花剌子模 aleph', phonetic: 'ʔ' },
+      { id: 'old-sogdian', script: 'old-sogdian', char: '𐼀', label: '古粟特 aleph', phonetic: 'ʔ' },
     ],
   },
 
@@ -238,11 +248,11 @@ export const lineages: Lineage[] = [
       '粟特自己添的 feth 与 leš 则从下方飞入。语言换了，音值也变了，' +
       '但纵向书写的骨架仍能一路辨认。',
     stops: [
-      { script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
-      { script: 'old-sogdian', char: '𐼀', label: '古粟特 ʾālep', phonetic: 'ʔ' },
-      { script: 'sogdian', char: '𐼰', label: '粟特 ʾālep', phonetic: 'ʔ' },
-      { script: 'old-uyghur', char: '𐽰', label: '回鹘 aleph', phonetic: 'a / ʔ' },
-      { script: 'mongolian', char: 'ᠠ', label: '蒙古 a', phonetic: 'a' },
+      { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
+      { id: 'old-sogdian', script: 'old-sogdian', char: '𐼀', label: '古粟特 ʾālep', phonetic: 'ʔ' },
+      { id: 'sogdian', script: 'sogdian', char: '𐼰', label: '粟特 ʾālep', phonetic: 'ʔ' },
+      { id: 'old-uyghur', script: 'old-uyghur', char: '𐽰', label: '回鹘 aleph', phonetic: 'a / ʔ' },
+      { id: 'mongolian', script: 'mongolian', char: 'ᠠ', label: '蒙古 a', phonetic: 'a' },
     ],
   },
 
@@ -258,8 +268,8 @@ export const lineages: Lineage[] = [
       'У 占 400（Υ）、Ф 占 500（Φ）、Ѡ 占 800（Ω），都和希腊字母表一一对上。' +
       '斯拉夫语特有的音——ж ц ч ш щ ъ ы ь ѣ ю ѧ ѫ——则另立新字，在字母场里飞入。',
     stops: [
-      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
+      { id: 'greek', script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { id: 'cyrillic', script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
     ],
   },
 
@@ -274,9 +284,9 @@ export const lineages: Lineage[] = [
       '以希腊安色尔体为骨架，并受格拉哥里影响形成西里尔字母。' +
       '两套字母都从希腊 Α 的模型出发，却各自长成不同的笔画秩序。',
     stops: [
-      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'glagolitic', char: 'Ⰰ', label: '格拉哥里 azъ', phonetic: 'a' },
-      { script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
+      { id: 'greek', script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { id: 'glagolitic', script: 'glagolitic', char: 'Ⰰ', label: '格拉哥里 azъ', phonetic: 'a' },
+      { id: 'cyrillic', script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
     ],
   },
 
@@ -293,8 +303,8 @@ export const lineages: Lineage[] = [
       '记号是刻出来的、不是写出来的，笔画自然跟 А 不像。' +
       '这套字母用到十七世纪被西里尔取代，此后还被俄国人拿去当密码写俄语。',
     stops: [
-      { script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
-      { script: 'old-permic', char: '𐍐', label: '古彼尔姆 an', phonetic: 'a' },
+      { id: 'cyrillic', script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
+      { id: 'old-permic', script: 'old-permic', char: '𐍐', label: '古彼尔姆 an', phonetic: 'a' },
     ],
   },
 
@@ -310,8 +320,8 @@ export const lineages: Lineage[] = [
       '同一个 /a/，科普特的 alfa Ⲁ 与希腊 alpha 几乎不用改形，' +
       '是希腊字母往南传出去的一支里字面保留得最完整的一个。',
     stops: [
-      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'coptic', char: 'Ⲁ', label: '科普特 alfa', phonetic: 'a' },
+      { id: 'greek', script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { id: 'coptic', script: 'coptic', char: 'Ⲁ', label: '科普特 alfa', phonetic: 'a' },
     ],
   },
 
@@ -328,8 +338,8 @@ export const lineages: Lineage[] = [
       '常被举出来的形近例子是三对——希腊 Θ 与亚美尼亚 թ、Φ 与 փ、Β 与 բ；' +
       '整表头一枚 ayb Ա 与希腊 alpha 同占第一格、同读 /a/，这条线就从它开头。',
     stops: [
-      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'armenian', char: 'Ա', label: '亚美尼亚 ayb', phonetic: 'a' },
+      { id: 'greek', script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { id: 'armenian', script: 'armenian', char: 'Ա', label: '亚美尼亚 ayb', phonetic: 'a' },
     ],
   },
 
@@ -348,8 +358,8 @@ export const lineages: Lineage[] = [
       '一样占第一格。字面本身与格鲁吉亚、埃塞俄比亚、亚美尼亚三家都有几分像，' +
       '来路不止一条，这一站走的是最硬的那条：同一批人、同一个世纪、同一种教会文字传统。',
     stops: [
-      { script: 'armenian', char: 'Ա', label: '亚美尼亚 ayb', phonetic: 'a' },
-      { script: 'caucasian-albanian', char: '𐔰', label: '高加索阿尔巴尼亚 a', phonetic: 'a' },
+      { id: 'armenian', script: 'armenian', char: 'Ա', label: '亚美尼亚 ayb', phonetic: 'a' },
+      { id: 'caucasian-albanian', script: 'caucasian-albanian', char: '𐔰', label: '高加索阿尔巴尼亚 a', phonetic: 'a' },
     ],
   },
 
@@ -365,10 +375,10 @@ export const lineages: Lineage[] = [
       '吕基亚与卡里亚另有自己的取舍。吕底亚、吕基亚两站能接出整套字母表的对照，' +
       '卡里亚与希腊的音值对应至今没有定论，所以最后一站只做单字形展示。',
     stops: [
-      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'lydian', char: '𐤠', label: '吕底亚 a', phonetic: 'a' },
-      { script: 'lycian', char: '𐊀', label: '吕基亚 a', phonetic: 'a' },
-      { script: 'carian', char: '𐊠', label: '卡里亚 a', phonetic: 'a' },
+      { id: 'greek', script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { id: 'lydian', script: 'lydian', char: '𐤠', label: '吕底亚 a', phonetic: 'a' },
+      { id: 'lycian', script: 'lycian', char: '𐊀', label: '吕基亚 a', phonetic: 'a' },
+      { id: 'carian', script: 'carian', char: '𐊠', label: '卡里亚 a', phonetic: 'a' },
     ],
   },
 
@@ -385,8 +395,8 @@ export const lineages: Lineage[] = [
       '争议在少数几个字：r、s、f 更像拉丁字母，q、h、o 的来路各家说法不一，' +
       '卢恩字母到底有没有参与，学界至今没有定论。这条轨道走的是对应关系最没有疑问的第一对。',
     stops: [
-      { script: 'greek', char: '\u{0391}', label: '希腊 alpha', phonetic: 'a' },
-      { script: 'gothic', char: '\u{10330}', label: '哥特 a', phonetic: 'a' },
+      { id: 'greek', script: 'greek', char: '\u{0391}', label: '希腊 alpha', phonetic: 'a' },
+      { id: 'gothic', script: 'gothic', char: '\u{10330}', label: '哥特 a', phonetic: 'a' },
     ],
   },
 
@@ -404,8 +414,8 @@ export const lineages: Lineage[] = [
       'younger futhark、中世纪加点的卢恩，Unicode 把各代的字面都收在 U+16A0 一节的' +
       '83 个字母里，走到卢恩这一站时整批飞入，字母表一次补成一个全。',
     stops: [
-      { script: 'old-italic', char: '𐌀', label: '古意大利字母 a', phonetic: 'a' },
-      { script: 'runic', char: 'ᚨ', label: '卢恩 ansuz a', phonetic: 'a' },
+      { id: 'old-italic', script: 'old-italic', char: '𐌀', label: '古意大利字母 a', phonetic: 'a' },
+      { id: 'runic', script: 'runic', char: 'ᚨ', label: '卢恩 ansuz a', phonetic: 'a' },
     ],
   },
 
@@ -423,8 +433,8 @@ export const lineages: Lineage[] = [
       'p 在吉兹里擦化成 f；南阿拉伯的 ġ ḏ ṯ ẓ 与 š 没有留下后代，走到这里飞出，' +
       '边音 ś、强音 p̣ 与为外来词添的 p 三个新字母飞入。',
     stops: [
-      { script: 'old-south-arabian', char: '𐩱', label: '古南阿拉伯 alef', phonetic: 'ʔ' },
-      { script: 'geez', char: 'ሀ', label: '吉兹 hä', phonetic: 'h' },
+      { id: 'old-south-arabian', script: 'old-south-arabian', char: '𐩱', label: '古南阿拉伯 alef', phonetic: 'ʔ' },
+      { id: 'geez', script: 'geez', char: 'ሀ', label: '吉兹 hä', phonetic: 'h' },
     ],
   },
 
@@ -440,9 +450,9 @@ export const lineages: Lineage[] = [
       '字母表停在 29 到 30 个字母上，南阿拉伯还多保留一个边音 s¹。' +
       '三站是同一祖形的平行后身，不是互相演变的链条。',
     stops: [
-      { script: 'ugaritic', char: '𐎀', label: '乌加里特 alpa', phonetic: 'ʔ' },
-      { script: 'old-south-arabian', char: '𐩱', label: '古南阿拉伯 alef', phonetic: 'ʔ' },
-      { script: 'old-north-arabian', char: '𐪑', label: '古北阿拉伯 alef', phonetic: 'ʔ' },
+      { id: 'ugaritic', script: 'ugaritic', char: '𐎀', label: '乌加里特 alpa', phonetic: 'ʔ' },
+      { id: 'old-south-arabian', script: 'old-south-arabian', char: '𐩱', label: '古南阿拉伯 alef', phonetic: 'ʔ' },
+      { id: 'old-north-arabian', script: 'old-north-arabian', char: '𐪑', label: '古北阿拉伯 alef', phonetic: 'ʔ' },
     ],
   },
 
@@ -560,27 +570,27 @@ export const lineages: Lineage[] = [
       '散落到天城文、尼瓦尔文、泰米尔文、藏文、高棉文、泰文、缅文……' +
       '两千三百年后，它们仍共享同一个音值和一个隐约可辨的骨架。',
     stops: [
-      { script: 'brahmi', char: '𑀓', label: '婆罗米文', phonetic: 'ka' },
-      { script: 'siddham', char: '𑖎', label: '悉昙文', phonetic: 'ka' },
-      { script: 'grantha', char: '𑌕', label: '格兰塔文', phonetic: 'ka' },
-      { script: 'devanagari', char: 'क', label: '天城文', phonetic: 'ka' },
-      { script: 'newa', char: '𑐎', label: '尼瓦尔文', phonetic: 'ka' },
-      { script: 'bengali', char: 'ক', label: '孟加拉文', phonetic: 'ka' },
-      { script: 'gujarati', char: 'ક', label: '古吉拉特文', phonetic: 'ka' },
-      { script: 'gurmukhi', char: 'ਕ', label: '果鲁穆奇文', phonetic: 'ka' },
-      { script: 'odia', char: 'କ', label: '奥里亚文', phonetic: 'ka' },
-      { script: 'tamil', char: 'க', label: '泰米尔文', phonetic: 'ka' },
-      { script: 'telugu', char: 'క', label: '泰卢固文', phonetic: 'ka' },
-      { script: 'kannada', char: 'ಕ', label: '卡纳达文', phonetic: 'ka' },
-      { script: 'malayalam', char: 'ക', label: '马拉雅拉姆文', phonetic: 'ka' },
-      { script: 'sinhala', char: 'ක', label: '僧伽罗文', phonetic: 'ka' },
-      { script: 'tibetan', char: 'ཀ', label: '藏文', phonetic: 'ka' },
-      { script: 'java', char: 'ꦏ', label: '爪哇文', phonetic: 'ka' },
-      { script: 'balinese', char: 'ᬓ', label: '巴厘文', phonetic: 'ka' },
-      { script: 'khmer', char: 'ក', label: '高棉文', phonetic: 'ka' },
-      { script: 'thai', char: 'ก', label: '泰文', phonetic: 'ka' },
-      { script: 'lao', char: 'ກ', label: '老挝文', phonetic: 'ka' },
-      { script: 'burmese', char: 'က', label: '缅文', phonetic: 'ka' },
+      { id: 'brahmi', script: 'brahmi', char: '𑀓', label: '婆罗米文', phonetic: 'ka' },
+      { id: 'siddham', script: 'siddham', char: '𑖎', label: '悉昙文', phonetic: 'ka' },
+      { id: 'grantha', script: 'grantha', char: '𑌕', label: '格兰塔文', phonetic: 'ka' },
+      { id: 'devanagari', script: 'devanagari', char: 'क', label: '天城文', phonetic: 'ka' },
+      { id: 'newa', script: 'newa', char: '𑐎', label: '尼瓦尔文', phonetic: 'ka' },
+      { id: 'bengali', script: 'bengali', char: 'ক', label: '孟加拉文', phonetic: 'ka' },
+      { id: 'gujarati', script: 'gujarati', char: 'ક', label: '古吉拉特文', phonetic: 'ka' },
+      { id: 'gurmukhi', script: 'gurmukhi', char: 'ਕ', label: '果鲁穆奇文', phonetic: 'ka' },
+      { id: 'odia', script: 'odia', char: 'କ', label: '奥里亚文', phonetic: 'ka' },
+      { id: 'tamil', script: 'tamil', char: 'க', label: '泰米尔文', phonetic: 'ka' },
+      { id: 'telugu', script: 'telugu', char: 'క', label: '泰卢固文', phonetic: 'ka' },
+      { id: 'kannada', script: 'kannada', char: 'ಕ', label: '卡纳达文', phonetic: 'ka' },
+      { id: 'malayalam', script: 'malayalam', char: 'ക', label: '马拉雅拉姆文', phonetic: 'ka' },
+      { id: 'sinhala', script: 'sinhala', char: 'ක', label: '僧伽罗文', phonetic: 'ka' },
+      { id: 'tibetan', script: 'tibetan', char: 'ཀ', label: '藏文', phonetic: 'ka' },
+      { id: 'java', script: 'java', char: 'ꦏ', label: '爪哇文', phonetic: 'ka' },
+      { id: 'balinese', script: 'balinese', char: 'ᬓ', label: '巴厘文', phonetic: 'ka' },
+      { id: 'khmer', script: 'khmer', char: 'ក', label: '高棉文', phonetic: 'ka' },
+      { id: 'thai', script: 'thai', char: 'ก', label: '泰文', phonetic: 'ka' },
+      { id: 'lao', script: 'lao', char: 'ກ', label: '老挝文', phonetic: 'ka' },
+      { id: 'burmese', script: 'burmese', char: 'က', label: '缅文', phonetic: 'ka' },
     ],
   },
 
@@ -596,8 +606,8 @@ export const lineages: Lineage[] = [
       '岛上写字的笔一路圆转下去，到中世纪又受南印度格兰塔文影响，把婆罗米那种方硬的骨架' +
       '改成了一圈圈贴近棕榈叶纹理的弧线。字母表里 ka 的位置从头到尾没动，笔画却已经换了一副样子。',
     stops: [
-      { script: 'brahmi', char: '\u{11013}', label: '婆罗米 ka', phonetic: 'ka' },
-      { script: 'sinhala', char: '\u{0D9A}', label: '僧伽罗 ka', phonetic: 'ka' },
+      { id: 'brahmi', script: 'brahmi', char: '\u{11013}', label: '婆罗米 ka', phonetic: 'ka' },
+      { id: 'sinhala', script: 'sinhala', char: '\u{0D9A}', label: '僧伽罗 ka', phonetic: 'ka' },
     ],
   },
 
@@ -614,8 +624,8 @@ export const lineages: Lineage[] = [
       '肩头多了一道弯。夏拉达往下又分出果鲁穆奇、塔克里与兰达一大家子，' +
       '是北印度文字谱系里承上启下的一站。',
     stops: [
-      { script: 'brahmi', char: '𑀓', label: '婆罗米 ka', phonetic: 'ka' },
-      { script: 'sharada', char: '𑆑', label: '夏拉达 ka', phonetic: 'ka' },
+      { id: 'brahmi', script: 'brahmi', char: '𑀓', label: '婆罗米 ka', phonetic: 'ka' },
+      { id: 'sharada', script: 'sharada', char: '𑆑', label: '夏拉达 ka', phonetic: 'ka' },
     ],
   },
 
@@ -631,8 +641,8 @@ export const lineages: Lineage[] = [
       '笔画也因棕榈叶上刻写而转圆；ka 的骨架还在，钩与肩换了写法。' +
       '今天孟加拉国与印度西孟加拉邦用它写孟加拉语，阿萨姆语也用这一系字母。',
     stops: [
-      { script: 'siddham', char: '𑖎', label: '悉昙 ka', phonetic: 'ka' },
-      { script: 'bengali', char: 'ক', label: '孟加拉 ka', phonetic: 'ka' },
+      { id: 'siddham', script: 'siddham', char: '𑖎', label: '悉昙 ka', phonetic: 'ka' },
+      { id: 'bengali', script: 'bengali', char: 'ক', label: '孟加拉 ka', phonetic: 'ka' },
     ],
   },
 
@@ -648,8 +658,8 @@ export const lineages: Lineage[] = [
       'ka 的竖笔与左侧钩还看得出悉昙的骨架。' +
       '今天它是印度奥里亚语的官方文字，写起来一圈圈连得很紧。',
     stops: [
-      { script: 'siddham', char: '𑖎', label: '悉昙 ka', phonetic: 'ka' },
-      { script: 'odia', char: 'କ', label: '奥里亚 ka', phonetic: 'ka' },
+      { id: 'siddham', script: 'siddham', char: '𑖎', label: '悉昙 ka', phonetic: 'ka' },
+      { id: 'odia', script: 'odia', char: 'କ', label: '奥里亚 ka', phonetic: 'ka' },
     ],
   },
 
@@ -672,14 +682,14 @@ export const lineages: Lineage[] = [
       '记账体马哈贾尼图快，把 ya 与三个咝音连同 nga 一起丢掉了，' +
       '走到那一站时这四格会消失，下一站又飞回来。',
     stops: [
-      { script: 'sharada', char: '𑆃', label: '夏拉达 a', phonetic: 'a' },
-      { script: 'gurmukhi', char: 'ਅ', label: '果鲁穆奇 a', phonetic: 'a' },
-      { script: 'takri', char: '𑚀', label: '塔克里 a', phonetic: 'a' },
-      { script: 'mahajani', char: '𑅐', label: '马哈贾尼 a', phonetic: 'a' },
-      { script: 'dogra', char: '𑠀', label: '多格拉 a', phonetic: 'a' },
-      { script: 'khojki', char: '𑈀', label: '霍杰基 a', phonetic: 'a' },
-      { script: 'multani', char: '𑊀', label: '穆尔塔尼 a', phonetic: 'a' },
-      { script: 'khudawadi', char: '𑊰', label: '胡达瓦迪 a', phonetic: 'a' },
+      { id: 'sharada', script: 'sharada', char: '𑆃', label: '夏拉达 a', phonetic: 'a' },
+      { id: 'gurmukhi', script: 'gurmukhi', char: 'ਅ', label: '果鲁穆奇 a', phonetic: 'a' },
+      { id: 'takri', script: 'takri', char: '𑚀', label: '塔克里 a', phonetic: 'a' },
+      { id: 'mahajani', script: 'mahajani', char: '𑅐', label: '马哈贾尼 a', phonetic: 'a' },
+      { id: 'dogra', script: 'dogra', char: '𑠀', label: '多格拉 a', phonetic: 'a' },
+      { id: 'khojki', script: 'khojki', char: '𑈀', label: '霍杰基 a', phonetic: 'a' },
+      { id: 'multani', script: 'multani', char: '𑊀', label: '穆尔塔尼 a', phonetic: 'a' },
+      { id: 'khudawadi', script: 'khudawadi', char: '𑊰', label: '胡达瓦迪 a', phonetic: 'a' },
     ],
   },
 
@@ -696,13 +706,13 @@ export const lineages: Lineage[] = [
       '菲律宾的哈努诺、布希德、塔格班瓦如今在岛上被重新使用，' +
       '布吉与巽他则仍是各自语言的日常文字。',
     stops: [
-      { script: 'kawi', char: '𑼄', label: '卡维文', phonetic: 'ka' },
-      { script: 'buginese', char: 'ᨀ', label: '布吉文', phonetic: 'ka' },
-      { script: 'sundanese', char: 'ᮊ', label: '巽他文', phonetic: 'ka' },
-      { script: 'hanunoo', char: 'ᜣ', label: '哈努诺文', phonetic: 'ka' },
-      { script: 'buhid', char: 'ᝃ', label: '布希德文', phonetic: 'ka' },
-      { script: 'tagbanwa', char: 'ᝣ', label: '塔格班瓦文', phonetic: 'ka' },
-      { script: 'makasar', char: '𑻠', label: '望加锡文', phonetic: 'ka' },
+      { id: 'kawi', script: 'kawi', char: '𑼄', label: '卡维文', phonetic: 'ka' },
+      { id: 'buginese', script: 'buginese', char: 'ᨀ', label: '布吉文', phonetic: 'ka' },
+      { id: 'sundanese', script: 'sundanese', char: 'ᮊ', label: '巽他文', phonetic: 'ka' },
+      { id: 'hanunoo', script: 'hanunoo', char: 'ᜣ', label: '哈努诺文', phonetic: 'ka' },
+      { id: 'buhid', script: 'buhid', char: 'ᝃ', label: '布希德文', phonetic: 'ka' },
+      { id: 'tagbanwa', script: 'tagbanwa', char: 'ᝣ', label: '塔格班瓦文', phonetic: 'ka' },
+      { id: 'makasar', script: 'makasar', char: '𑻠', label: '望加锡文', phonetic: 'ka' },
     ],
   },
 
@@ -720,12 +730,23 @@ export const lineages: Lineage[] = [
       '同期同出南印度的卡丹巴文不是帕拉瓦的后代：它是另一支，长成了后来的卡纳达与泰卢固文，' +
       '所以这条轨道不收它。帕拉瓦文没有独立字库，首站放的是有登记的字母表图版。',
     stops: [
-      { script: 'pallava', image: 'glyphs/pallava/aksharamala.png', label: '帕拉瓦字母表（南印度，7 世纪）' },
-      { script: 'cham', char: 'ꨆ', label: '占文 ka', phonetic: 'ka' },
-      { script: 'mon', char: 'က', label: '孟文 ka', phonetic: 'ka' },
-      { script: 'khmer', char: 'ក', label: '高棉文 ka', phonetic: 'ka' },
-      { script: 'java', char: 'ꦏ', label: '爪哇文 ka', phonetic: 'ka' },
-      { script: 'balinese', char: 'ᬓ', label: '巴厘文 ka', phonetic: 'ka' },
+      {
+        id: 'pallava',
+        script: 'pallava',
+        image: 'glyphs/pallava/aksharamala.png',
+        label: '帕拉瓦字母表（南印度，7 世纪）',
+        asset: {
+          kind: 'image',
+          credit: 'Symphonicallyu / Wikimedia Commons',
+          license: 'CC0 1.0',
+          home: 'https://commons.wikimedia.org/wiki/File:Pallava_aksharamala.png',
+        },
+      },
+      { id: 'cham', script: 'cham', char: 'ꨆ', label: '占文 ka', phonetic: 'ka' },
+      { id: 'mon', script: 'mon', char: 'က', label: '孟文 ka', phonetic: 'ka' },
+      { id: 'khmer', script: 'khmer', char: 'ក', label: '高棉文 ka', phonetic: 'ka' },
+      { id: 'java', script: 'java', char: 'ꦏ', label: '爪哇文 ka', phonetic: 'ka' },
+      { id: 'balinese', script: 'balinese', char: 'ᬓ', label: '巴厘文 ka', phonetic: 'ka' },
     ],
   },
 
@@ -743,9 +764,20 @@ export const lineages: Lineage[] = [
       '十九世纪中叶，传教士格温特又补上长短 e、o 的分别，才是今天这副样子。' +
       '字母表上 ka 到 nga 一排排对得严丝合缝，正是这段关系的底气。',
     stops: [
-      { script: 'pallava', image: 'glyphs/pallava/aksharamala.png', label: '帕拉瓦字母表（南印度，7 世纪）' },
-      { script: 'grantha', char: '\u{11315}', label: '格兰塔 ka', phonetic: 'ka' },
-      { script: 'malayalam', char: '\u{0D15}', label: '马拉雅拉姆 ka', phonetic: 'ka' },
+      {
+        id: 'pallava',
+        script: 'pallava',
+        image: 'glyphs/pallava/aksharamala.png',
+        label: '帕拉瓦字母表（南印度，7 世纪）',
+        asset: {
+          kind: 'image',
+          credit: 'Symphonicallyu / Wikimedia Commons',
+          license: 'CC0 1.0',
+          home: 'https://commons.wikimedia.org/wiki/File:Pallava_aksharamala.png',
+        },
+      },
+      { id: 'grantha', script: 'grantha', char: '\u{11315}', label: '格兰塔 ka', phonetic: 'ka' },
+      { id: 'malayalam', script: 'malayalam', char: '\u{0D15}', label: '马拉雅拉姆 ka', phonetic: 'ka' },
     ],
   },
 
@@ -762,14 +794,21 @@ export const lineages: Lineage[] = [
       '楷书再磨平波磔，成为沿用至今的标准体。隶书没有授权明确、字形可靠的' +
       '字库，这一站放的是东汉《裴岑碑》拓本，不用现代字体顶替。',
     stops: [
-      { script: 'chinese-oracle', char: '日', label: '甲骨文「日」', phonetic: 'ri' },
-      { script: 'chinese-seal', char: '日', label: '小篆「日」', phonetic: 'ri' },
+      { id: 'chinese-oracle', script: 'chinese-oracle', char: '日', label: '甲骨文「日」', phonetic: 'ri' },
+      { id: 'chinese-seal', script: 'chinese-seal', char: '日', label: '小篆「日」', phonetic: 'ri' },
       {
+        id: 'chinese-clerical',
         script: 'chinese-clerical',
         image: 'glyphs/chinese-clerical/peicen-stele-rubbing.jpg',
         label: '隶书（东汉《裴岑碑》拓本）',
+        asset: {
+          kind: 'image',
+          credit: 'Wikimedia Commons（佚名）',
+          license: '公有领域',
+          home: 'https://commons.wikimedia.org/wiki/File:%E8%A3%B4%E5%B2%91%E7%A2%91%E6%8B%93%E6%9C%AC.jpg',
+        },
       },
-      { script: 'chinese-regular', char: '日', label: '楷书「日」', phonetic: 'ri' },
+      { id: 'chinese-regular', script: 'chinese-regular', char: '日', label: '楷书「日」', phonetic: 'ri' },
     ],
   },
 
@@ -787,18 +826,32 @@ export const lineages: Lineage[] = [
       '僧侣体与世俗体没有独立的 Unicode 编码，也没有可靠的开源字库，' +
       '两站放的是同期纸草的实物图版，不用现代字体顶替。',
     stops: [
-      { script: 'egyptian', char: '𓋴', label: '圣书体「折叠布」（S29）', phonetic: 's' },
+      { id: 'egyptian', script: 'egyptian', char: '𓋴', label: '圣书体「折叠布」（S29）', phonetic: 's' },
       {
+        id: 'hieratic',
         script: 'hieratic',
         image: 'glyphs/hieratic/edwin-smith-papyrus.jpg',
         label: '僧侣体（《艾德温·史密斯纸草》）',
+        asset: {
+          kind: 'image',
+          credit: 'Jeff Dahl / Wikimedia Commons',
+          license: '公有领域',
+          home: 'https://commons.wikimedia.org/wiki/File:Edwin_Smith_Papyrus_v2.jpg',
+        },
       },
       {
+        id: 'demotic',
         script: 'demotic',
         image: 'glyphs/demotic/turin-payment-contracts.jpg',
         label: '世俗体（都灵纸草）',
+        asset: {
+          kind: 'image',
+          credit: 'Museo Egizio, Torino',
+          license: 'CC0 1.0',
+          home: 'https://commons.wikimedia.org/wiki/File:Demotic_papyrus_containing_two_payment_contracts_-_Museo_Egizio_Turin_S_6074_p01.jpg',
+        },
       },
-      { script: 'coptic', char: 'Ϣ', label: '科普特 šay（世俗体来）', phonetic: 'ʃ' },
+      { id: 'coptic', script: 'coptic', char: 'Ϣ', label: '科普特 šay（世俗体来）', phonetic: 'ʃ' },
     ],
   },
 
@@ -816,9 +869,9 @@ export const lineages: Lineage[] = [
       '麦罗埃文是撒哈拉以南非洲最早的本地书写体系之一，至今没有完全读通，' +
       '已知的音值主要靠与埃及文对照。',
     stops: [
-      { script: 'egyptian', char: '𓀀', label: '圣书体「人」（A1）', phonetic: 'a' },
-      { script: 'meroitic', char: '𐦀', label: '麦罗埃碑铭体', phonetic: 'a' },
-      { script: 'meroitic-cursive', char: '𐦠', label: '麦罗埃草书体', phonetic: 'a' },
+      { id: 'egyptian', script: 'egyptian', char: '𓀀', label: '圣书体「人」（A1）', phonetic: 'a' },
+      { id: 'meroitic', script: 'meroitic', char: '𐦀', label: '麦罗埃碑铭体', phonetic: 'a' },
+      { id: 'meroitic-cursive', script: 'meroitic-cursive', char: '𐦠', label: '麦罗埃草书体', phonetic: 'a' },
     ],
   },
 
@@ -841,13 +894,20 @@ export const lineages: Lineage[] = [
       '克里特象形文字至今没有可用的字库，那一站放的是克诺索斯出土的印章实物。',
     stops: [
       {
+        id: 'rethra',
         script: 'rethra',
         image: 'glyphs/rethra/knossos-144883.jpg',
         label: '克里特象形文字（克诺索斯印章，约前 2100—1700 年）',
+        asset: {
+          kind: 'image',
+          credit: 'Zde / Wikimedia Commons',
+          license: 'CC BY-SA 4.0',
+          home: 'https://commons.wikimedia.org/wiki/File:Cretan_hieroglyphs,_Knossos_2100-1700_BC,_AMH,_144883.jpg',
+        },
       },
-      { script: 'linear-a', char: '𐘇', label: '线形文字 A（AB 08）', phonetic: 'a' },
-      { script: 'linear-b', char: '𐀀', label: '线形文字 B（B 08 a）', phonetic: 'a' },
-      { script: 'cypriot', char: '𐠀', label: '塞浦路斯音节文字 a', phonetic: 'a' },
+      { id: 'linear-a', script: 'linear-a', char: '𐘇', label: '线形文字 A（AB 08）', phonetic: 'a' },
+      { id: 'linear-b', script: 'linear-b', char: '𐀀', label: '线形文字 B（B 08 a）', phonetic: 'a' },
+      { id: 'cypriot', script: 'cypriot', char: '𐠀', label: '塞浦路斯音节文字 a', phonetic: 'a' },
     ],
   },
 ]

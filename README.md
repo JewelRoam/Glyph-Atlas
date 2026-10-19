@@ -46,6 +46,8 @@ npm run validate     # 只跑数据校验（新增书写体系后先跑这个）
 npm run lint         # oxlint
 npm run typecheck    # tsc -b
 npm run check        # validate + lint + typecheck，提交前一键跑
+npm run audit:coverage      # 血统入口覆盖报告（不阻塞构建）
+npm run audit:coverage:json # 同一份报告，输出 JSON
 npm run shots        # 视觉校对：把三屏 + 移动端拍成图（按需装 Playwright，见下）
 ```
 
@@ -102,6 +104,7 @@ Glyph-Atlas/
 │   ├── validate-data.mjs       数据校验器（构建前置检查）
 │   ├── audit-rosters.mjs       字母表体检：字表整张进字母场，且每个槽位都有轮廓
 │   ├── audit-glyph-sources.mjs 字形来源体检：每个字都能落到字体 / 图版 / 轮廓
+│   ├── audit-lineage-coverage.mjs 血统入口覆盖审计：列出有轨道与待补节点
 │   ├── unicode-block-ranges.json  Unicode 18.0 区块索引（校验名称与码位）
 │   ├── screenshot.mjs          视觉校对：拍下每一屏（Playwright 按需装，不进依赖）
 │   ├── dump-lineage-stops.mjs  导出所有血统站点的 script / char 元数据
@@ -236,6 +239,8 @@ Glyph-Atlas/
   sample: '𐤀',                   // 渲染用的样本字符
   fontFamily: 'Noto Sans Phoenician',
   note: '希腊、拉丁、阿拉伯诸系的共同祖先。',
+  lineageEntry: { lineageId: 'aleph', stopId: 'phoenician' }, // 可选：首选入口
+  sourceRefs: ['https://en.wikipedia.org/wiki/Phoenician_alphabet'], // 可选：通用参考
 }
 ```
 
@@ -248,6 +253,8 @@ Glyph-Atlas/
 | `family` | 泳道 + 配色 | 必须是 `Family` 联合类型里的值 |
 | `type` | 类型学分类 | `nonscript` 的记录系统不会进入演化图 |
 | `sample` / `fontFamily` | 字形渲染 | 没有 Web 字体时会显示码位名片（见下） |
+| `lineageEntry` | 从节点进入血统视图的首选轨道与站点 | 可省略；省略时取第一条经过该体系的轨道 |
+| `sourceRefs` | 体系级参考链接 | 字体、Unicode 提案、条目等通用出处 |
 
 ### Lineage —— 一条可以"往前走"的街
 
@@ -278,12 +285,12 @@ Glyph-Atlas/
 }
 ```
 
-站点键写作 `${lineageId}:${stop.id ?? stop.script}`。同一轨道重复经过同一书写体系
-（例如同一体系的不同书体阶段）时，每个站点都必须给 `id`；否则站点键会相撞，
-校验器会拦下。`stopsByScript` 与 `lineagesByScript` 把“书写体系 → 轨道 / 站点”
-反过来建索引，供未来从任意图谱节点进入对应的前后演变；目前先作为数据层的入口，
-尚未接入界面。`sourceRef` 记单站证据，`asset` 记这一站实际使用的轮廓、图版或
-字体的来源与授权，二者随站点保存，避免换素材时与谱系脱节。
+站点键写作 `${lineageId}:${stop.id}`。`id` 在轨道内必填且发布后不改；同一轨道
+重复经过同一书写体系（例如同一体系的不同书体阶段）时，每个阶段各自有独立的
+`id`。`stopsByScript` 与 `lineagesByScript` 把“书写体系 → 轨道 / 站点”反过来
+建索引，供从任意图谱节点进入对应的前后演变。`sourceRef` 记单站证据，轨道级
+`sourceRefs` 记整条线的参考，站点自己的证据优先；`asset` 记这一站实际使用的
+轮廓、图版或字体的来源与授权。三者随站点保存，避免换素材时与谱系脱节。
 
 `mode` 决定"往前一步"意味着什么，也决定校验规则：
 
@@ -292,6 +299,38 @@ Glyph-Atlas/
 | `chain` | 单线传承（牛头 → A） | 按年代递增 | 会检查年代是否倒退 |
 | `cognate` | 同源辐射（婆罗米 ka → 各国 ka） | 按叙事顺序，年代会来回跳 | 不检查年代 |
 | `pair` | 借字记音（汉字 → 假名） | 母字与借字成对出现 | 不检查年代 |
+
+### 从任意节点进入血统视图（数据契约）
+
+未来的目标不是再造一套详情页，而是让 MACRO 里的任意节点都能打开同一条
+“前后演变”界面。数据层已经为此准备好稳定入口，但**目前还没有接入界面**：
+
+```ts
+lineageEntryFor(scriptId)      // 默认轨道与站点；无轨道时返回 undefined
+lineageHref(scriptId, track?)  // 生成 ?script=…&lineage=…&stop=…
+stopRefFromParams(lineage, stop) // 从 URL 参数恢复站点，无效参数返回 undefined
+neighboringStopRefs(scriptId)  // 默认入口的前后邻站
+lineageStatusFor(system)       // neighbors | standalone | isolated
+```
+
+入口优先读 `WritingSystem.lineageEntry`，没有指定时取 `lineages` 中第一条经过
+该体系的轨道。三种状态都是合法的：有前后邻站（`neighbors`）、只有单站
+（`standalone`）、没有轨道（`isolated`）。最后一种应打开单体系详情，而不是
+为了覆盖率伪造链条。URL 参数只用稳定的 `script`、`lineage`、`stop` id；后续
+若需要播放位置，可以再加 `t`，不会改动已有站点键。
+
+### 覆盖审计
+
+```bash
+npm run audit:coverage       # 人类可读报告
+npm run audit:coverage:json  # 交给脚本或 CI 的 JSON
+```
+
+它把“还缺什么”列成补链队列：哪些节点已有可前后行走的入口、哪些只能先以单
+体系打开、哪些站点缺来源或素材登记。当前 193 个图谱节点中，96 个已有可前后
+行走的入口，97 个尚无轨道入口；12 个独立起源中 3 个已有入口。无轨道不等于
+漏数据，尤其对未破译或独立起源体系，必须先有可靠证据才补链。覆盖率达标后可
+用 `npm run audit:coverage -- --strict` 把它升级为 CI 门禁。
 
 ### 字母场 —— 一整套字母表的形变
 
@@ -1073,12 +1112,20 @@ npm run build && ls dist/
 
 - **2026-10-19 · 稳定血统站点与反向索引**：`GlyphStop` 新增轨道内稳定的 `id`、
   单站 `sourceRef` 与素材授权 `asset`；新增 `lineageIndex.ts`，以
-  `${lineageId}:${stop.id ?? stop.script}` 为键，建立“书写体系 → 轨道 / 站点”的
+  `${lineageId}:${stop.id}` 为键，建立“书写体系 → 轨道 / 站点”的
   反向索引与前后邻站查询。假名拆成「安 → あ」与「阿 → ア」两条并列母字链，
   新增「藏文 ཀ → 八思巴文 ꡀ」，三条都只展示已核实的单字关系，整表映射尚未
   核清的部分不铺字母场。血统轨道由 35 条增至 37 条，轨道站点 136 → 139。
   这一层是为未来把 MICRO 与详情页整合、从任意血缘节点进入前后演变预留的数据契约，
   本轮不改变页面入口。
+
+- **2026-10-19 · 任意节点入口与覆盖审计**：139 个轨道站点全部补齐稳定 `id`，
+  站点键统一为 `${lineageId}:${stop.id}`；`WritingSystem` 增加首选入口与体系级
+  来源，`Lineage` 增加轨道级来源。新增 `lineageEntryFor`、`lineageHref`、
+  `stopRefFromParams`、`neighboringStopRefs` 与 `lineageStatusFor`，把“节点 →
+  轨道站点 → 前后邻站”的契约固定下来，并让校验器检查入口是否指向真实站点。
+  新增 `npm run audit:coverage`，当前 193 个节点中 96 个可进入前后演变，
+  其余进入补链或单体系详情队列；本轮仍不改页面入口。
 
 ---
 

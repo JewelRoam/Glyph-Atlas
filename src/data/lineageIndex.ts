@@ -1,16 +1,17 @@
 import { lineages } from './lineages';
-import type { GlyphStop, Lineage } from './types';
+import { scriptById } from './writingSystems';
+import type { GlyphStop, Lineage, WritingSystem } from './types';
 
 /**
  * 轨道站点的稳定键。
  *
  * 未来 MACRO 的任意书写体系节点要能直接进入它所在的轨道，并继续前后行走，
  * 因而不能只拿 writingSystem.id 定位：同一体系可以在不同轨道里出现，
- * 同一条轨道也可能因年代或书体不同而出现多次。站点 id 缺省时以 script
- * 作为键；出现重复 script 时，validate-data 会要求数据显式补 id。
+ * 同一条轨道也可能因年代或书体不同而出现多次。每个站点都有必填且稳定的
+ * id，校验器会拒绝缺失、重复或格式不合法的站点键。
  */
 export function stopKey(lineageId: string, stop: GlyphStop): string {
-  return `${lineageId}:${stop.id ?? stop.script}`;
+  return `${lineageId}:${stop.id}`;
 }
 
 /** 一条轨道上的一个具体站点，以及它在轨道中的位置。 */
@@ -59,9 +60,88 @@ export const stopsByScript: ReadonlyMap<string, readonly LineageStopRef[]> = sto
 /** 全部站点，按轨道与站内顺序排列。 */
 export const allStopRefs: readonly LineageStopRef[] = [...stopRefs.values()];
 
-/** 按 `${lineageId}:${stopId ?? scriptId}` 取站点。 */
+/** 按 `${lineageId}:${stopId}` 取站点。 */
 export function stopRefByKey(key: string): LineageStopRef | undefined {
   return stopRefs.get(key);
+}
+
+/** 一个书写体系在血统视图中的默认入口。 */
+export interface LineageEntry {
+  /** 默认轨道与站点；有站点时可继续向前后行走 */
+  track?: LineageStopRef;
+  /** 该体系可进入的全部站点，默认入口排在最前 */
+  tracks: readonly LineageStopRef[];
+  /** 是否有经过已核实的前后邻站 */
+  hasNeighbors: boolean;
+}
+
+/**
+ * 取书写体系的默认血统入口。
+ *
+ * 优先使用 WritingSystem.lineageEntry 明确指定的站点；未指定时退回该体系
+ * 在 lineages 数组中的第一条站点。没有任何轨道的体系返回 undefined，调用方
+ * 应显示单体系详情，而不是伪造两站链条。
+ */
+export function lineageEntryFor(scriptId: string): LineageEntry | undefined {
+  const tracks = stopsByScript.get(scriptId);
+  if (!tracks?.length) return undefined;
+
+  const system = scriptById[scriptId];
+  const preferred = system?.lineageEntry;
+  let track: LineageStopRef | undefined;
+  if (preferred) {
+    const candidate = stopRefByKey(`${preferred.lineageId}:${preferred.stopId}`);
+    if (candidate?.stop.script === scriptId) track = candidate;
+  }
+  track ??= tracks[0];
+
+  return {
+    track,
+    tracks: [track, ...tracks.filter((candidate) => candidate.key !== track!.key)],
+    hasNeighbors: track.lineage.stops.length > 1,
+  };
+}
+
+/**
+ * 血统入口的站点深链键。URL 中使用脚本 id、轨道 id 和站点 id，避免把
+ * 会随素材替换而改变的字符码位写进地址。
+ */
+export function lineageHref(scriptId: string, track?: LineageStopRef): string {
+  const entry = track ?? lineageEntryFor(scriptId)?.track;
+  const params = new URLSearchParams({ script: scriptId });
+  if (entry) {
+    params.set('lineage', entry.lineage.id);
+    params.set('stop', entry.stop.id);
+  }
+  return `?${params.toString()}`;
+}
+
+/** 从查询参数恢复轨道站点；参数缺失或指向不存在的数据时返回 undefined。 */
+export function stopRefFromParams(
+  lineageId: string | null | undefined,
+  stopId: string | null | undefined,
+): LineageStopRef | undefined {
+  if (!lineageId || !stopId) return undefined;
+  return stopRefByKey(`${lineageId}:${stopId}`);
+}
+
+/**
+ * 某书写体系可用的全部相邻站点。仅用于节点入口摘要；单站轨道返回空数组。
+ */
+export function neighboringStopRefs(scriptId: string): readonly LineageStopRef[] {
+  const entry = lineageEntryFor(scriptId);
+  if (!entry?.track) return [];
+  const { previous, next } = adjacentStops(entry.track);
+  return [previous, next].filter((ref): ref is LineageStopRef => Boolean(ref));
+}
+
+/** 每个书写体系都有入口；有轨道的返回站点入口，无轨道的返回单体系占位。 */
+export type ScriptLineageStatus = 'neighbors' | 'standalone' | 'isolated';
+
+export function lineageStatusFor(system: WritingSystem): ScriptLineageStatus {
+  const entry = lineageEntryFor(system.id);
+  if (!entry) return 'isolated';
+  return entry.hasNeighbors ? 'neighbors' : 'standalone';
 }
 
 /** 在指定轨道中按站点对象取反向索引记录。 */

@@ -176,19 +176,17 @@ for (const l of lineages) {
   }
 
   const stopIds = new Set();
-  const scriptsInLineage = new Map();
   let prev = -Infinity;
   l.stops.forEach((stop, i) => {
     const script = scriptById[stop.script];
-    const key = `${l.id}:${stop.id ?? stop.script}`;
-    if (stopIds.has(key))
-      err(`[lineage] ${l.id}[${i}] 站点键重复：${key}；同一轨道内请给站点显式 id`);
+    if (!stop.id?.trim()) {
+      err(`[lineage] ${l.id}[${i}] 缺少稳定站点 id`);
+    } else if (!/^[a-z0-9][a-z0-9-]*$/.test(stop.id)) {
+      err(`[lineage] ${l.id}[${i}] 的站点 id「${stop.id}」只能使用小写字母、数字与连字符`);
+    }
+    const key = `${l.id}:${stop.id}`;
+    if (stopIds.has(key)) err(`[lineage] ${l.id}[${i}] 站点键重复：${key}`);
     stopIds.add(key);
-
-    const count = (scriptsInLineage.get(stop.script) ?? 0) + 1;
-    scriptsInLineage.set(stop.script, count);
-    if (count > 1 && !stop.id)
-      err(`[lineage] ${l.id}[${i}] 同一轨道重复出现 ${stop.script}，必须给每个站点显式 id`);
 
     if (!script) err(`[lineage] ${l.id}[${i}] 指向不存在的书写体系 "${stop.script}"`);
     else {
@@ -209,7 +207,36 @@ for (const l of lineages) {
       err(`[lineage] ${l.id}[${i}] 的 sourceRef 不能为空字符串`);
     if (stop.asset && !['path', 'image', 'font'].includes(stop.asset.kind))
       err(`[lineage] ${l.id}[${i}] 的 asset.kind 只能是 path / image / font`);
+    if (stop.sourceRef && !/^https?:\/\//.test(stop.sourceRef))
+      warn(`[lineage] ${l.id}[${i}] 的 sourceRef 不是 http(s) 链接：${stop.sourceRef}`);
   });
+  for (const ref of l.sourceRefs ?? []) {
+    if (!/^https?:\/\//.test(ref))
+      warn(`[lineage] ${l.id} 的 sourceRefs 不是 http(s) 链接：${ref}`);
+  }
+}
+
+// ── 7b. 任意节点的血统入口 ─────────────────────────────────────
+// 这里只验证“入口指向真实站点”。没有轨道的节点是合法状态：它们以单体系
+// 详情打开，不能为了覆盖率造一条假链。报告由 tools/audit-lineage-coverage.mjs
+// 生成，作为后续补链的队列。
+for (const s of writingSystems) {
+  if (!s.lineageEntry) continue;
+  const { lineageId, stopId } = s.lineageEntry;
+  const track = lineages.find((l) => l.id === lineageId);
+  if (!track) {
+    err(`[entry] ${s.id} 指向不存在的轨道 "${lineageId}"`);
+    continue;
+  }
+  const stop = track.stops.find((candidate) => candidate.id === stopId);
+  if (!stop) {
+    err(`[entry] ${s.id} 指向 ${lineageId} 中不存在的站点 "${stopId}"`);
+  } else if (stop.script !== s.id) {
+    err(`[entry] ${s.id} 的入口站点 ${lineageId}:${stopId} 属于 ${stop.script}`);
+  }
+}
+for (const ref of writingSystems.flatMap((s) => s.sourceRefs ?? [])) {
+  if (!/^https?:\/\//.test(ref)) warn(`[sourceRefs] 不是 http(s) 链接：${ref}`);
 }
 
 // ── 10. 字形来源覆盖 ────────────────────────────────────────────
