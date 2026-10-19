@@ -95,6 +95,12 @@ export interface GlyphStop {
   char?: string;
   /** 用于矢量形变的 SVG path（viewBox 0 0 100 100） */
   path?: string;
+  /**
+   * 只能看图版的站点：public/ 下的相对路径（隶书、僧侣体、世俗体这类
+   * 没有可靠字库的历史书体）。有 path 时优先 path，其次是 image，
+   * 再其次是字体，都没有才留空。
+   */
+  image?: string;
   /** 该字形的名称，如 "ʾālep / 牛头" */
   label?: string;
   /** 音值 */

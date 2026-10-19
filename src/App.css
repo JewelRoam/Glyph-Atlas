@@ -816,8 +816,10 @@ main {
 }
 .walk-fade {
   position: relative;
-  width: 300px;
-  height: 300px;
+  /* 跟中央舞台一样大，字形才会真正居中在"展签带之上"的那块地方。
+     之前固定 300px，比舞台高时整块往下溢，字形会被推到展签上。 */
+  width: 100%;
+  height: 100%;
   display: grid;
   place-items: center;
 }
@@ -1402,18 +1404,23 @@ main {
 
 /* 图版字形：保留拓片、碑帖和摹本原来的墨色与留白 */
 .image-glyph {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
   overflow: hidden;
   padding: 2px;
   border-radius: 1px;
   background: color-mix(in srgb, var(--paper) 94%, transparent);
 }
+/* 竖长的碑帖拓本不能撑破方框：按宽高两边同时收，等比装进去。
+   之前写死 width/height:100%，竖向拓片会把方框撑高、溢出到展签上。 */
 .image-glyph img {
   display: block;
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   mix-blend-mode: multiply;
   user-select: none;

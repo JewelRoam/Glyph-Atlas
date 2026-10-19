@@ -7,6 +7,7 @@ import type { GlyphStop, Lineage } from '../data/types';
 import { FontGlyph, ImageGlyph, PathGlyph } from './Glyph';
 import { AlphabetField } from './AlphabetField';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
+import { assetUrl } from '../lib/assets';
 import { hasRoster } from '../data/letterSlots';
 import { familyFor } from '../data/fontFallback';
 import { preloadAlphabetGroup, preloadAlphabetPaths } from '../lib/alphabetPaths';
@@ -606,6 +607,8 @@ function StopGlyph({ stop, size }: { stop: GlyphStop; size: number }) {
   const script = scriptById[stop.script];
   const d = resolveGlyphPath(stop);
   if (d) return <PathGlyph d={d} size={size} color="var(--ink-strong)" />;
+  // 站点自带图版（隶书、僧侣体、世俗体这类没有可靠字库的书体）
+  if (stop.image) return <ImageGlyph src={assetUrl(stop.image)} label={stop.label} size={size} />;
   const char = stop.char ?? script?.sample;
   const plate = script ? imageFor(glyphSourceFor(script), char ?? '') : undefined;
   if (plate) return <ImageGlyph src={plate} label={char} size={size} />;

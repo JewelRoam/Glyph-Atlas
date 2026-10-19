@@ -459,4 +459,92 @@ export const lineages: Lineage[] = [
       { script: 'dogra', char: '𑠀', label: '多格拉 a', phonetic: 'a' },
     ],
   },
+  {
+    id: 'chinese-evolution',
+    nameZh: '甲骨文 → 小篆 → 隶书 → 楷书',
+    nameEn: 'Oracle bone → seal → clerical → regular',
+    mode: 'chain',
+    description:
+      '汉字三千多年的主线，用一个「日」字走一遍：商代刻在龟甲兽骨上的甲骨文，' +
+      '笔画瘦硬、象形直白；秦统一文字后的小篆把字形拉长、线条匀圆；' +
+      '隶书把圆转改写成方折，横画末尾带一波磔，方块结构就在这一步定型；' +
+      '楷书再磨平波磔，成为沿用至今的标准体。隶书没有授权明确、字形可靠的' +
+      '字库，这一站放的是东汉《裴岑碑》拓本，不用现代字体顶替。',
+    stops: [
+      { script: 'chinese-oracle', char: '日', label: '甲骨文「日」', phonetic: 'ri' },
+      { script: 'chinese-seal', char: '日', label: '小篆「日」', phonetic: 'ri' },
+      {
+        script: 'chinese-clerical',
+        image: 'glyphs/chinese-clerical/peicen-stele-rubbing.jpg',
+        label: '隶书（东汉《裴岑碑》拓本）',
+      },
+      { script: 'chinese-regular', char: '日', label: '楷书「日」', phonetic: 'ri' },
+    ],
+  },
+
+  {
+    id: 'egypt-cursive',
+    nameZh: '圣书体 → 僧侣体 → 世俗体 → 科普特',
+    nameEn: 'Hieroglyphs → hieratic → demotic → Coptic',
+    mode: 'chain',
+    description:
+      '同一套埃及语，写了四千年的三种面孔：刻在神庙与墓碑上的圣书体，' +
+      '祭司用芦苇笔写在纸草上的僧侣体，以及更晚、更潦草也更日常的世俗体。' +
+      '公元前后，用希腊字母记埃及语的科普特字母出现，古埃及文字的传统就此收束。' +
+      '僧侣体与世俗体没有独立的 Unicode 编码，也没有可靠的开源字库，' +
+      '这两站放的是同期纸草的实物图版，不用现代字体顶替。',
+    stops: [
+      { script: 'egyptian', char: '𓂝', label: '圣书体「手臂」', phonetic: 'ʿ' },
+      {
+        script: 'hieratic',
+        image: 'glyphs/hieratic/edwin-smith-papyrus.jpg',
+        label: '僧侣体（《艾德温·史密斯纸草》）',
+      },
+      {
+        script: 'demotic',
+        image: 'glyphs/demotic/turin-payment-contracts.jpg',
+        label: '世俗体（都灵纸草）',
+      },
+      { script: 'coptic', char: 'Ⲁ', label: '科普特 alpha', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'meroitic-line',
+    nameZh: '圣书体 → 麦罗埃文',
+    nameEn: 'Egyptian → Meroitic',
+    mode: 'chain',
+    description:
+      '尼罗河上游的库施王国先借用埃及圣书体的符号，再把它简化成一套自己的音节文字：' +
+      '碑铭体刻在神庙与石碑上，草书体写在纸草与陶片上。' +
+      '麦罗埃文是撒哈拉以南非洲最早的本地书写体系之一，至今没有完全读通，' +
+      '已知的音值主要靠与埃及文对照。',
+    stops: [
+      { script: 'egyptian', char: '𓂝', label: '圣书体「手臂」', phonetic: 'ʿ' },
+      { script: 'meroitic', char: '𐦀', label: '麦罗埃碑铭体', phonetic: 'a' },
+      { script: 'meroitic-cursive', char: '𐦠', label: '麦罗埃草书体', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'islands-ka',
+    nameZh: '卡维 ka → 群岛诸文 ka',
+    nameEn: 'Kawi ka → island scripts',
+    mode: 'cognate',
+    description:
+      '东南亚海岛的这几套字母表，多半从爪哇一带的卡维文散开：' +
+      '布吉、巽他、哈努诺、布希德、塔格班瓦、望加锡各自把同一个 ka 写成了不同骨架。' +
+      '它们都是元音附标文字，基字自带 a 音，另加符号改写元音；' +
+      '菲律宾的哈努诺、布希德、塔格班瓦如今在岛上被重新使用，' +
+      '布吉与巽他则仍是各自语言的日常文字。',
+    stops: [
+      { script: 'kawi', char: '𑼄', label: '卡维文', phonetic: 'ka' },
+      { script: 'buginese', char: 'ᨀ', label: '布吉文', phonetic: 'ka' },
+      { script: 'sundanese', char: 'ᮊ', label: '巽他文', phonetic: 'ka' },
+      { script: 'hanunoo', char: 'ᜣ', label: '哈努诺文', phonetic: 'ka' },
+      { script: 'buhid', char: 'ᝃ', label: '布希德文', phonetic: 'ka' },
+      { script: 'tagbanwa', char: 'ᝣ', label: '塔格班瓦文', phonetic: 'ka' },
+      { script: 'makasar', char: '𑻠', label: '望加锡文', phonetic: 'ka' },
+    ],
+  },
 ]

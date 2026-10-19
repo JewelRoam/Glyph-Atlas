@@ -165,8 +165,9 @@ for (const l of lineages) {
         );
       prev = Math.max(prev, script.dateFrom);
     }
-    if (!stop.path && !(stop.char ?? script?.sample))
-      err(`[lineage] ${l.id}[${i}] 既没有 path 也没有可渲染字符`);
+    // 站点可以是 path / 字符 / 图版三者之一；图版的出处由 audit-glyph-sources 查
+    if (!stop.path && !stop.image && !(stop.char ?? script?.sample))
+      err(`[lineage] ${l.id}[${i}] 既没有 path、图版，也没有可渲染字符`);
     if (stop.path && !/^[MmLlHhVvCcSsQqTtAaZz0-9\s.,+-]+$/.test(stop.path))
       err(`[lineage] ${l.id}[${i}] path 含有可疑字符`);
   });

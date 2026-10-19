@@ -100,6 +100,16 @@ for (const lineage of lineages) {
       problems.push(`[轨道] ${lineage.id} / ${stop.script}：书写体系不存在`);
       continue;
     }
+    // 站点自带图版：文件要在，出处要登记（隶书、僧侣体、世俗体……）
+    if (stop.image) {
+      if (!existsSync(path.join(ROOT, 'public', stop.image))) {
+        problems.push(`[轨道] ${lineage.id} / ${stop.script}：图版文件不存在（${stop.image}）`);
+      }
+      if (!credits.includes(stop.image)) {
+        problems.push(`[轨道] ${lineage.id} / ${stop.script}：图版没有登记在 CREDITS.md（${stop.image}）`);
+      }
+      continue;
+    }
     if (!char) continue; // 站点只是一段描述，画布上留空
     if (glyphPaths[`${stop.script}:${char}`]) continue;
     const source = glyphSourceFor(system);
