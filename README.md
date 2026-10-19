@@ -66,6 +66,25 @@ npm run shots
 
 优先用本机已有的 Edge / Chrome，找不到才用 Playwright 自带的 Chromium。
 
+### 字体审看台（可选）
+
+"这款字画的是不是这套文字"机器判不了：字族名对得上、覆盖表里也有这些码位，
+字面仍可能是另一套文字的写法。`tools/font-sheet.mjs` 把每个体系按它真正会用的
+字族铺成对照表，一行一个体系（字母表铺前若干格，没有字库的体系贴图版），人工
+过一眼：
+
+```bash
+npm run build
+node --import ./tools/register-ts.mjs tools/font-sheet.mjs work/font-sheet
+# → work/font-sheet/tile-01.png …，14 张图看完 194 个体系
+```
+
+看图得出的结论写进 `tools/font-verdicts.tsv`：一行一个体系，记 id、结论
+（`ok` / `wrong` / `blank` / `todo`）、当前字族、以及需要交代时的理由。
+`tools/audit-font-verdicts.mjs` 已挂在 `npm run validate` 上：新增体系不补一行
+就报错，`wrong`（已知画错）直接让构建失败——不允许"知道错了还发布"；第三列的
+字族和代码里实际用的不一致也报错，换了字体就得重新过一遍审看台。
+
 截图不看 `vite preview`：构建产物挂在仓库名前缀下（`vite.config.ts` 的 `base`），
 而 `vite preview` 只把 `dist` 挂在根路径，`/Glyph-Atlas/assets/*.js` 会落到单页
 回退、以 HTML 返回，页面白屏。`tools/screenshot.mjs` 自己起一个静态服务，照
@@ -459,6 +478,11 @@ path B ─→ splitSubpaths ─→ 每条子路径沿弧长采样 N+1 个点 ─
 字面。兜底字族表只留一份（`src/data/fontFallback.ts`），Python 侧现场读它。
 
 缺字形这件事本身，也是这些文字流传现状的一部分，值得被看见。
+
+字面的**设计**对不对，是另一回事：覆盖表只能说"这款字族里有这些码位"，说不
+出"画的是不是这套文字"。这一层由人工核实，结论落在 `tools/font-verdicts.tsv`
+（一行一个体系，见上文"字体审看台"），并由 `npm run validate` 守着——新体系
+必须补记录，已知画错的字体会直接让构建失败。
 
 想为某种文字补上字形，有两条路：
 打包一个自带子集的 `woff2`（注意字体许可），

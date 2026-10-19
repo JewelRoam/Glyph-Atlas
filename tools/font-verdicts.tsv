@@ -1,0 +1,211 @@
+# 字体核实台账 —— 一行一个书写体系，人工核过才写 ok。
+#
+# 列：id <Tab> 结论 <Tab> 这一家用的字族 <Tab> 理由（只在需要交代时写）
+#
+# 结论取值：
+#   ok     已核：字族是这套文字自己的字体，审看台字面属这套文字
+#   wrong  已知画错，必须换字体 / 换图版 / 留空；体检会让构建失败
+#   blank  有意留空（没有可靠来源），理由写在第四列
+#   todo   还没核（新增体系先用这个值占位）
+#
+# 核的是什么：字号族名与文字名对应（或数据内已注明共用区块、等价关系）、
+# 覆盖表确认字表码位都在这款字族里、字体审看台（tools/font-sheet.mjs）里
+# 的字面确实是这套文字。第三列的字族由工具比对：改了字体而没更新这一行，
+# 体检会报错。
+#
+# 这份台账不管的：字表里该收哪些字母（同源槽位与自动补位另有一套体检），
+# 也不判断某个字母的写法是否与外部样本逐一相符。
+sumerian	ok	Noto Sans Cuneiform	
+egyptian	ok	Noto Sans Egyptian Hieroglyphs	
+indus	ok	-	只有图版：印度河印章实物与摹本，出处登记在 CREDITS
+chinese-oracle	ok	Glyph Atlas Oracle Bone	自托管字库（镜原甲骨文子集），字面为甲骨原刻写法
+proto-elamite	ok	-	只有图版：原始埃兰泥板实物与线摹
+olmec	ok	-	只有图版：卡斯卡哈尔石块摹本与圣安德烈斯器物
+rethra	ok	-	只有图版：克诺索斯印章与符号写法图
+rongorongo	ok	-	只有图版：朗格朗日木牌与 Guy 整理的符号表
+akkadian	ok	Noto Sans Cuneiform	与苏美尔共用 Noto Sans Cuneiform，楔形字面正确
+elamite-cuneiform	ok	Noto Sans Cuneiform	与苏美尔共用 Noto Sans Cuneiform，楔形字面正确
+hittite-cuneiform	ok	Noto Sans Cuneiform	与苏美尔共用 Noto Sans Cuneiform，楔形字面正确
+old-persian	ok	Noto Sans Old Persian	
+ugaritic	ok	Noto Sans Ugaritic	
+anatolian	ok	Noto Sans Anatolian Hieroglyphs	
+hieratic	ok	-	Unicode 未单独编码，用《艾德温·史密斯纸草》实物图版
+demotic	ok	-	Unicode 未单独编码，用都灵博物馆世俗体纸草图版
+coptic	ok	Noto Sans Coptic	
+meroitic	ok	Noto Sans Meroitic	Noto Sans Meroitic 同时覆盖碑铭体 U+10980 与草书体 U+109A0 两个区块
+meroitic-cursive	ok	Noto Sans Meroitic	与碑铭体共用 Noto Sans Meroitic
+proto-sinaitic	ok	-	只有图版：西奈 351 号铭文摹本
+phoenician	ok	Noto Sans Phoenician	
+paleo-hebrew	ok	Noto Sans Phoenician	与腓尼基共用 U+10900 区块，22 个字母同形，数据内已注明
+samaritan	ok	Noto Sans Samaritan	
+aramaic	ok	Noto Sans Imperial Aramaic	
+syriac	ok	Noto Sans Syriac	
+hebrew	ok	Noto Sans Hebrew	
+nabataean	ok	Noto Sans Nabataean	
+arabic	ok	Noto Sans Arabic	
+thaana	ok	Noto Sans Thaana	
+mandaic	ok	Noto Sans Mandaic	
+palmyrene	ok	Noto Sans Palmyrene	
+hatran	ok	Noto Sans Hatran	
+pahlavi	ok	-	无可靠字库，用十字架石刻与萨珊残石图版
+inscriptional-pahlavi	ok	Noto Sans Inscriptional Pahlavi	
+psalter-pahlavi	ok	Noto Sans Psalter Pahlavi	
+avestan	ok	Noto Sans Avestan	
+kharosthi	ok	Noto Sans Kharoshthi	字族名沿用 Noto 的 Kharoshthi 拼法，是这套文字的字体
+old-south-arabian	ok	Noto Sans Old South Arabian	
+old-north-arabian	ok	Noto Sans Old North Arabian	
+geez	ok	Noto Sans Ethiopic	字族名沿用 Noto 的 Ethiopic；Ethiopic 即吉兹字母
+greek	ok	Noto Sans	用通用 Noto Sans（覆盖表确认希腊区块在字族内）
+carian	ok	Noto Sans Carian	
+lydian	ok	Noto Sans Lydian	
+lycian	ok	Noto Sans Lycian	
+old-italic	ok	Noto Sans Old Italic	
+etruscan	ok	Noto Sans Old Italic	与古意大利字母共用 U+10300 区块
+latin	ok	Noto Sans	用通用 Noto Sans
+runic	ok	Noto Sans Runic	
+gothic	ok	Noto Sans Gothic	
+glagolitic	ok	Noto Sans Glagolitic	
+cyrillic	ok	Noto Sans	用通用 Noto Sans
+armenian	ok	Noto Sans Armenian	
+caucasian-albanian	ok	Noto Sans Caucasian Albanian	
+georgian	ok	Noto Sans Georgian	
+ogham	ok	Noto Sans Ogham	
+old-permic	ok	Noto Sans Old Permic	
+elbasan	ok	Noto Sans Elbasan	
+vithkuqi	ok	Noto Sans Vithkuqi	
+deseret	ok	Noto Sans Deseret	
+ipa	ok	Noto Sans	用通用 Noto Sans，IPA Extensions 在覆盖表内
+duployan	ok	Noto Sans Duployan	
+brahmi	ok	Noto Sans Brahmi	
+pallava	ok	-	无字库，用帕拉瓦字母表图（元音 9、辅音 35）
+kadamba	ok	-	无字库，用埃达卡尔铭文拓本图版
+siddham	ok	Noto Sans Siddham	
+nagari	ok	-	无字库，用城文辅音表图版
+devanagari	ok	Noto Sans Devanagari	
+nandinagari	ok	Noto Sans Nandinagari	
+modi	ok	Noto Sans Modi	
+kaithi	ok	Noto Sans Kaithi	
+tirhuta	ok	Noto Sans Tirhuta	
+bhaiksuki	ok	Noto Sans Bhaiksuki	
+newa	ok	Noto Sans Newa	
+bengali	ok	Noto Sans Bengali	
+gujarati	ok	Noto Sans Gujarati	
+gurmukhi	ok	Noto Sans Gurmukhi	
+sharada	ok	Noto Sans Sharada	
+takri	ok	Noto Sans Takri	
+dogra	ok	Noto Serif Dogra	
+odia	ok	Noto Sans Oriya	
+tamil	ok	Noto Sans Tamil	
+saurashtra	ok	Noto Sans Saurashtra	
+telugu	ok	Noto Sans Telugu	
+kannada	ok	Noto Sans Kannada	
+grantha	ok	Noto Sans Grantha	
+malayalam	ok	Noto Sans Malayalam	
+sinhala	ok	Noto Sans Sinhala	
+tibetan	ok	Noto Serif Tibetan	Noto 的藏文只有 Serif 一款，故与其余体系不同款
+phagspa	ok	Noto Sans Phags Pa	
+lepcha	ok	Noto Sans Lepcha	
+limbu	ok	Noto Sans Limbu	
+meitei	ok	Noto Sans Meetei Mayek	
+chakma	ok	Noto Sans Chakma	
+ol-chiki	ok	Noto Sans Ol Chiki	
+warang-citi	ok	Noto Sans Warang Citi	
+sora-sompeng	ok	Noto Sans Sora Sompeng	
+masaram-gondi	ok	Noto Sans Masaram Gondi	
+gunjala-gondi	ok	Noto Sans Gunjala Gondi	
+mro	ok	Noto Sans Mro	
+khojki	ok	Noto Sans Khojki	
+khudawadi	ok	Noto Sans Khudawadi	
+multani	ok	Noto Sans Multani	
+mahajani	ok	Noto Sans Mahajani	
+syloti-nagri	ok	Noto Sans Syloti Nagri	
+wancho	ok	Noto Sans Wancho	
+tangsa	ok	Noto Sans Tangsa	
+nag-mundari	ok	Noto Sans Nag Mundari	
+sunuwar	ok	Noto Sans Sunuwar	
+pau-cin-hau	ok	Noto Sans Pau Cin Hau	
+kawi	ok	Noto Sans Kawi	
+tagbanwa	ok	Noto Sans Tagbanwa	
+hanunoo	ok	Noto Sans Hanunoo	
+buhid	ok	Noto Sans Buhid	
+makasar	ok	Noto Serif Makasar	
+java	ok	Noto Sans Javanese	
+balinese	ok	Noto Sans Balinese	
+sundanese	ok	Noto Sans Sundanese	
+cham	ok	Noto Sans Cham	
+khmer	ok	Noto Sans Khmer	
+mon	ok	Noto Sans Myanmar	孟文用缅甸区块字形，Noto Sans Myanmar 覆盖孟文专有字母
+ahom	ok	Noto Serif Ahom	
+burmese	ok	Noto Sans Myanmar	与孟文共用 Noto Sans Myanmar
+thai	ok	Noto Sans Thai	
+lao	ok	Noto Sans Lao	
+tai-viet	ok	Noto Sans Tai Viet	
+tai-tham	ok	Noto Sans Tai Tham	
+tai-le	ok	Noto Sans Tai Le	
+new-tai-lue	ok	Noto Sans New Tai Lue	
+buginese	ok	Noto Sans Buginese	
+batak	ok	Noto Sans Batak	
+rejang	ok	Noto Sans Rejang	
+pahawh-hmong	ok	Noto Sans Pahawh Hmong	
+kayah-li	ok	Noto Sans Kayah Li	
+hanifi-rohingya	ok	Noto Sans Hanifi Rohingya	
+baybayin	ok	Noto Sans Tagalog	Baybayin 即他加禄字母，Noto Sans Tagalog 是它的字体
+soyombo	ok	Noto Sans Soyombo	
+zanabazar	ok	Noto Sans Zanabazar Square	
+marchen	ok	Noto Sans Marchen	
+chinese-seal	ok	Glyph Atlas Small Seal	自托管字库（開元小篆＋《說文》子集），字面为小篆
+chinese-clerical	ok	-	没有授权明确的隶书字库，用东汉《裴岑碑》拓本图版，不以现代字体顶替
+chinese-regular	ok	LXGW WenKai TC	用 LXGW WenKai TC（开源楷体），标准汉字字形
+hiragana	ok	Noto Serif JP	用 Noto Serif JP，与日文正文同源
+katakana	ok	Noto Serif JP	用 Noto Serif JP，与日文正文同源
+hangul	ok	Noto Serif KR	用 Noto Serif KR
+chunom	ok	Noto Serif SC	用 Noto Serif SC；样本取标准汉字代表字，喃字自造字另议
+sawndip	ok	Noto Serif SC	用 Noto Serif SC；样本取标准汉字代表字，方块壮字自造字另议
+tangut	ok	Noto Serif Tangut	
+khitan-large	ok	-	无字库，用辽《多里本墓志》拓本图版
+khitan-small	ok	Noto Serif Khitan Small Script	
+jurchen	ok	-	Unicode 已编码但无 Web 字库，用金代进士题名碑与女真摩崖图版
+nushu	ok	Noto Sans Nushu	
+yi	ok	Noto Sans Yi	
+miao	ok	Noto Sans Miao	
+lisu	ok	Noto Sans Lisu	
+dongba	ok	-	只有图版：丽江东巴文墙面
+old-sogdian	ok	Noto Sans Old Sogdian	
+sogdian	ok	Noto Sans Sogdian	
+manichaean	ok	Noto Sans Manichaean	
+parthian	ok	Noto Sans Inscriptional Parthian	
+elymaic	ok	Noto Sans Elymaic	
+chorasmian	ok	Noto Sans Chorasmian	
+old-uyghur	ok	Noto Serif Old Uyghur	
+mongolian	ok	Noto Sans Mongolian	蒙古、托忒、满文同在蒙古区块，共用 Noto Sans Mongolian
+todo-bichig	ok	Noto Sans Mongolian	托忒字母在蒙古区块 U+1843 起，Noto Sans Mongolian 覆盖
+manchu	ok	Noto Sans Mongolian	满文字母在蒙古区块 U+1820 起，与蒙古文共用字族
+old-turkic	ok	Noto Sans Old Turkic	
+old-hungarian	ok	Noto Sans Old Hungarian	
+linear-a	ok	Noto Sans Linear A	
+cypro-minoan	ok	Noto Sans Cypro Minoan	
+linear-b	ok	Noto Sans Linear B	
+cypriot	ok	Noto Sans Cypriot	
+zapotec	ok	-	只有图版：蒙特阿尔班石碑
+epi-olmec	ok	-	只有图版：拉莫哈拉石碑 1 号
+maya	ok	-	无字库，用《德累斯顿抄本》与科潘象形文字阶梯图版
+aztec	ok	-	无字库，用《门多萨抄本》图版
+mixtec	ok	-	无字库，用《科隆比诺抄本》图版
+tifinagh	ok	Noto Sans Tifinagh	
+nsibidi	ok	-	无字库，用竹简上的恩西比迪文图版
+vai	ok	Noto Sans Vai	
+mende-kikakui	ok	Noto Sans Mende Kikakui	
+bassa-vah	ok	Noto Sans Bassa Vah	
+bamum	ok	Noto Sans Bamum	
+osmanya	ok	Noto Sans Osmanya	
+nko	ok	Noto Sans NKo	
+medefaidrin	ok	Noto Sans Medefaidrin	
+adlam	ok	Noto Sans Adlam	
+mandombe	ok	-	无字库，用曼多姆贝识字课本图版
+cherokee	ok	Noto Sans Cherokee	
+canadian-syllabics	ok	Noto Sans Canadian Aboriginal	
+osage	ok	Noto Sans Osage	
+braille	ok	Noto Sans Symbols 2	Noto Sans Symbols 2 覆盖盲文点阵 U+2800
+signwriting	ok	Noto Sans SignWriting	Noto Sans SignWriting 是这套手语书写系统的字体
+shavian	ok	Noto Sans Shavian	
+khipu	ok	-	不是图形文字，用 Locke《古代奇普》图版
