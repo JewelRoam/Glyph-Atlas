@@ -48,6 +48,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'chinese-oracle', nameZh: '甲骨文', nameEn: 'Oracle Bone Script',
+    lineageEntry: { lineageId: 'chinese-evolution', stopId: 'chinese-oracle' },
     origin: 'independent', parents: [], dateFrom: -1250, dateTo: -1050,
     family: 'sinic', region: '黄河流域', countries: ['中国'],
     type: 'logographic', status: 'historical', direction: 'ttb',
@@ -79,6 +80,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'rethra', nameZh: '克里特象形文字', nameEn: 'Cretan Hieroglyphs',
+    lineageEntry: { lineageId: 'aegean-line', stopId: 'rethra' },
     origin: 'independent', parents: [], dateFrom: -1900, dateTo: -1700,
     family: 'other', region: '爱琴海', countries: ['希腊'],
     type: 'undeciphered', status: 'undeciphered',
@@ -133,6 +135,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'ugaritic', nameZh: '乌加里特字母', nameEn: 'Ugaritic',
+    lineageEntry: { lineageId: 'semitic-south', stopId: 'ugaritic' },
     origin: 'influence', parents: ['sumerian', 'proto-sinaitic'], dateFrom: -1400, dateTo: -1190,
     family: 'levant', region: '叙利亚海岸', countries: ['叙利亚'],
     type: 'abjad', status: 'extinct', direction: 'ltr',
@@ -157,6 +160,7 @@ export const writingSystems: WritingSystem[] = [
   // ─────────────────────────────────────────────
   {
     id: 'hieratic', nameZh: '僧侣体', nameEn: 'Hieratic',
+    lineageEntry: { lineageId: 'egypt-cursive', stopId: 'hieratic' },
     origin: 'derived', parents: ['egyptian'], dateFrom: -3200, dateTo: 300,
     family: 'egypt', region: '尼罗河谷', countries: ['埃及'],
     type: 'logographic', status: 'extinct',
@@ -164,6 +168,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'demotic', nameZh: '世俗体', nameEn: 'Demotic',
+    lineageEntry: { lineageId: 'egypt-cursive', stopId: 'demotic' },
     origin: 'derived', parents: ['hieratic'], dateFrom: -650, dateTo: 450,
     family: 'egypt', region: '尼罗河谷', countries: ['埃及'],
     type: 'logographic', status: 'extinct',
@@ -180,6 +185,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'meroitic', nameZh: '麦罗埃文', nameEn: 'Meroitic',
+    lineageEntry: { lineageId: 'meroitic-line', stopId: 'meroitic' },
     origin: 'derived', parents: ['egyptian'], dateFrom: -300, dateTo: 400,
     family: 'africa', region: '努比亚', countries: ['苏丹'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
@@ -187,6 +193,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'meroitic-cursive', nameZh: '麦罗埃草书体', nameEn: 'Meroitic Cursive',
+    lineageEntry: { lineageId: 'meroitic-line', stopId: 'meroitic-cursive' },
     origin: 'derived', parents: ['meroitic'], dateFrom: -300, dateTo: 400,
     family: 'africa', region: '努比亚', countries: ['苏丹'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
@@ -200,6 +207,7 @@ export const writingSystems: WritingSystem[] = [
   // ─────────────────────────────────────────────
   {
     id: 'proto-sinaitic', nameZh: '原始西奈字母', nameEn: 'Proto-Sinaitic',
+    lineageEntry: { lineageId: 'aleph', stopId: 'proto-sinaitic' },
     origin: 'derived', parents: ['egyptian'], dateFrom: -1800, dateTo: -1500,
     family: 'levant', region: '西奈半岛', countries: ['埃及', '以色列'],
     type: 'abjad', status: 'extinct',
@@ -216,6 +224,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'paleo-hebrew', nameZh: '古希伯来字母', nameEn: 'Paleo-Hebrew',
+    lineageEntry: { lineageId: 'samaritan-line', stopId: 'paleo-hebrew' },
     origin: 'derived', parents: ['phoenician'], dateFrom: -1000, dateTo: -200,
     family: 'levant', region: '黎凡特', countries: ['以色列'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -225,6 +234,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'samaritan', nameZh: '撒玛利亚字母', nameEn: 'Samaritan',
+    lineageEntry: { lineageId: 'samaritan-line', stopId: 'samaritan' },
     origin: 'derived', parents: ['paleo-hebrew'], dateFrom: -600, dateTo: null,
     family: 'levant', region: '黎凡特', countries: ['以色列', '巴勒斯坦'],
     type: 'abjad', status: 'liturgical', direction: 'rtl',
@@ -242,6 +252,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'syriac', nameZh: '叙利亚字母', nameEn: 'Syriac',
+    lineageEntry: { lineageId: 'aramaic-west', stopId: 'syriac' },
     origin: 'derived', parents: ['aramaic'], dateFrom: 100, dateTo: null,
     family: 'levant', region: '美索不达米亚', countries: ['叙利亚', '伊拉克', '土耳其'],
     type: 'abjad', status: 'liturgical', direction: 'rtl',
@@ -249,6 +260,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'hebrew', nameZh: '希伯来字母', nameEn: 'Hebrew',
+    lineageEntry: { lineageId: 'hebrew-squared', stopId: 'hebrew' },
     origin: 'derived', parents: ['aramaic'], dateFrom: -200, dateTo: null,
     family: 'levant', region: '黎凡特', countries: ['以色列'],
     type: 'abjad', status: 'living', direction: 'rtl',
@@ -257,6 +269,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'nabataean', nameZh: '纳巴泰字母', nameEn: 'Nabataean',
+    lineageEntry: { lineageId: 'arabic-alef', stopId: 'nabataean' },
     origin: 'derived', parents: ['aramaic'], dateFrom: -200, dateTo: 400,
     family: 'levant', region: '阿拉伯北部', countries: ['约旦', '沙特'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -265,6 +278,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'arabic', nameZh: '阿拉伯字母', nameEn: 'Arabic',
+    lineageEntry: { lineageId: 'arabic-alef', stopId: 'arabic' },
     origin: 'derived', parents: ['nabataean'], dateFrom: 400, dateTo: null,
     family: 'levant', region: '阿拉伯半岛', countries: ['沙特', '埃及', '伊朗', '巴基斯坦', '阿尔及利亚', '摩洛哥', '印尼', '马来西亚'],
     type: 'abjad', status: 'living', direction: 'rtl',
@@ -281,6 +295,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'mandaic', nameZh: '曼达字母', nameEn: 'Mandaic',
+    lineageEntry: { lineageId: 'aramaic-mandaic', stopId: 'mandaic' },
     origin: 'derived', parents: ['aramaic'], dateFrom: 200, dateTo: null,
     family: 'levant', region: '美索不达米亚', countries: ['伊拉克', '伊朗'],
     type: 'alphabet', status: 'liturgical', direction: 'rtl',
@@ -288,6 +303,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'palmyrene', nameZh: '帕尔米拉字母', nameEn: 'Palmyrene',
+    lineageEntry: { lineageId: 'aramaic-west', stopId: 'palmyrene' },
     origin: 'derived', parents: ['aramaic'], dateFrom: -100, dateTo: 300,
     family: 'levant', region: '叙利亚', countries: ['叙利亚'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -297,6 +313,7 @@ export const writingSystems: WritingSystem[] = [
 
   {
     id: 'hatran', nameZh: '哈特拉字母', nameEn: 'Hatran',
+    lineageEntry: { lineageId: 'aramaic-west', stopId: 'hatran' },
     origin: 'derived', parents: ['aramaic'], dateFrom: -100, dateTo: 300,
     family: 'levant', region: '美索不达米亚北部', countries: ['伊拉克'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -313,6 +330,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'inscriptional-pahlavi', nameZh: '碑铭巴列维字母', nameEn: 'Inscriptional Pahlavi',
+    lineageEntry: { lineageId: 'aramaic-pahlavi', stopId: 'inscriptional-pahlavi' },
     origin: 'derived', parents: ['pahlavi'], dateFrom: 200, dateTo: 400,
     family: 'centralasia', region: '伊朗高原', countries: ['伊朗'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -322,6 +340,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'psalter-pahlavi', nameZh: '诗篇巴列维字母', nameEn: 'Psalter Pahlavi',
+    lineageEntry: { lineageId: 'aramaic-pahlavi', stopId: 'psalter-pahlavi' },
     origin: 'derived', parents: ['pahlavi'], dateFrom: 500, dateTo: 700,
     family: 'centralasia', region: '伊朗高原', countries: ['伊朗'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -331,6 +350,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'avestan', nameZh: '阿维斯陀字母', nameEn: 'Avestan',
+    lineageEntry: { lineageId: 'aramaic-pahlavi', stopId: 'avestan' },
     origin: 'derived', parents: ['pahlavi'], dateFrom: 400, dateTo: 1000,
     family: 'centralasia', region: '伊朗高原', countries: ['伊朗'],
     type: 'alphabet', status: 'extinct', direction: 'rtl',
@@ -357,6 +377,7 @@ export const writingSystems: WritingSystem[] = [
 
   {
     id: 'old-north-arabian', nameZh: '古北阿拉伯字母', nameEn: 'Old North Arabian',
+    lineageEntry: { lineageId: 'semitic-south', stopId: 'old-north-arabian' },
     origin: 'influence', parents: ['old-south-arabian'], dateFrom: -800, dateTo: 400,
     family: 'levant', region: '阿拉伯半岛北部', countries: ['沙特阿拉伯', '约旦', '叙利亚'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -366,6 +387,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'geez', nameZh: '吉兹字母', nameEn: 'Geʽez',
+    lineageEntry: { lineageId: 'ethiopic-line', stopId: 'geez' },
     origin: 'derived', parents: ['old-south-arabian'], dateFrom: -800, dateTo: null,
     family: 'africa', region: '非洲之角', countries: ['埃塞俄比亚', '厄立特里亚'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -387,6 +409,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'carian', nameZh: '卡里亚字母', nameEn: 'Carian',
+    lineageEntry: { lineageId: 'anatolian-alpha', stopId: 'carian' },
     origin: 'derived', parents: ['greek'], dateFrom: -700, dateTo: -300,
     family: 'greek', region: '安纳托利亚西南部', countries: ['土耳其', '埃及'],
     type: 'alphabet', status: 'extinct', direction: 'mixed',
@@ -395,6 +418,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'lydian', nameZh: '吕底亚字母', nameEn: 'Lydian',
+    lineageEntry: { lineageId: 'anatolian-alpha', stopId: 'lydian' },
     origin: 'derived', parents: ['greek'], dateFrom: -700, dateTo: -200,
     family: 'greek', region: '安纳托利亚西部', countries: ['土耳其'],
     type: 'alphabet', status: 'extinct', direction: 'rtl',
@@ -403,6 +427,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'lycian', nameZh: '吕基亚字母', nameEn: 'Lycian',
+    lineageEntry: { lineageId: 'anatolian-alpha', stopId: 'lycian' },
     origin: 'derived', parents: ['greek'], dateFrom: -500, dateTo: -300,
     family: 'greek', region: '安纳托利亚西南部', countries: ['土耳其'],
     type: 'alphabet', status: 'extinct', direction: 'ltr',
@@ -420,6 +445,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'etruscan', nameZh: '伊特鲁里亚字母', nameEn: 'Etruscan',
+    lineageEntry: { lineageId: 'italy', stopId: 'etruscan' },
     origin: 'derived', parents: ['old-italic'], dateFrom: -700, dateTo: -100,
     family: 'greek', region: '意大利半岛', countries: ['意大利'],
     type: 'alphabet', status: 'extinct', direction: 'ltr',
@@ -437,6 +463,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'runic', nameZh: '卢恩字母', nameEn: 'Runic',
+    lineageEntry: { lineageId: 'northern-runes', stopId: 'runic' },
     origin: 'influence', parents: ['old-italic'], dateFrom: 150, dateTo: 1500,
     family: 'greek', region: '北欧',
     countries: ['瑞典', '丹麦', '挪威', '德国', '英国', '冰岛'],
@@ -447,6 +474,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'gothic', nameZh: '哥特字母', nameEn: 'Gothic',
+    lineageEntry: { lineageId: 'greek-gothic', stopId: 'gothic' },
     origin: 'derived', parents: ['greek'], dateFrom: 350, dateTo: 600,
     family: 'greek', region: '巴尔干', countries: ['保加利亚', '乌克兰'],
     type: 'alphabet', status: 'extinct', direction: 'ltr',
@@ -454,6 +482,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'glagolitic', nameZh: '格拉哥里字母', nameEn: 'Glagolitic',
+    lineageEntry: { lineageId: 'slavic-alphabet', stopId: 'glagolitic' },
     origin: 'influence', parents: ['greek'], dateFrom: 863, dateTo: 1100,
     family: 'greek', region: '巴尔干', countries: ['克罗地亚', '保加利亚'],
     type: 'alphabet', status: 'historical', direction: 'ltr',
@@ -480,6 +509,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'caucasian-albanian', nameZh: '高加索阿尔巴尼亚字母', nameEn: 'Caucasian Albanian',
+    lineageEntry: { lineageId: 'armenian-albanian', stopId: 'caucasian-albanian' },
     origin: 'influence', parents: ['greek', 'armenian'], dateFrom: 405, dateTo: 1200,
     family: 'greek', region: '高加索东部', countries: ['阿塞拜疆', '格鲁吉亚', '俄罗斯'],
     type: 'alphabet', status: 'extinct', direction: 'ltr',
@@ -505,6 +535,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'old-permic', nameZh: '古彼尔姆字母', nameEn: 'Old Permic',
+    lineageEntry: { lineageId: 'cyrillic-permic', stopId: 'old-permic' },
     origin: 'derived', parents: ['cyrillic', 'greek'], dateFrom: 1372, dateTo: 1700,
     family: 'greek', region: '乌拉尔北部', countries: ['俄罗斯'],
     type: 'alphabet', status: 'historical', direction: 'ltr',
@@ -595,6 +626,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'devanagari', nameZh: '天城文', nameEn: 'Devanagari',
+    lineageEntry: { lineageId: 'ka', stopId: 'devanagari' },
     origin: 'derived', parents: ['nagari'], dateFrom: 900, dateTo: null,
     family: 'indic', region: '南亚', countries: ['印度', '尼泊尔'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -648,6 +680,7 @@ export const writingSystems: WritingSystem[] = [
 
   {
     id: 'newa', nameZh: '尼瓦尔文', nameEn: 'Newa',
+    lineageEntry: { lineageId: 'ka', stopId: 'newa' },
     origin: 'derived', parents: ['nagari'], dateFrom: 1000, dateTo: null,
     family: 'indic', region: '喜马拉雅南麓', countries: ['尼泊尔', '印度'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -664,6 +697,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'gujarati', nameZh: '古吉拉特文', nameEn: 'Gujarati',
+    lineageEntry: { lineageId: 'ka', stopId: 'gujarati' },
     origin: 'derived', parents: ['nagari'], dateFrom: 1300, dateTo: null,
     family: 'indic', region: '南亚', countries: ['印度'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -689,6 +723,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'takri', nameZh: '塔克里文', nameEn: 'Takri',
+    lineageEntry: { lineageId: 'sharada-branch', stopId: 'takri' },
     origin: 'derived', parents: ['sharada'], dateFrom: 1000, dateTo: 1900,
     family: 'indic', region: '喜马拉雅西麓', countries: ['印度', '巴基斯坦'],
     type: 'abugida', status: 'historical', direction: 'ltr',
@@ -697,6 +732,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'dogra', nameZh: '多格拉文', nameEn: 'Dogra',
+    lineageEntry: { lineageId: 'sharada-branch', stopId: 'dogra' },
     origin: 'derived', parents: ['takri'], dateFrom: 1800, dateTo: 1950,
     family: 'indic', region: '查谟', countries: ['印度', '巴基斯坦'],
     type: 'abugida', status: 'historical', direction: 'ltr',
@@ -713,6 +749,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'tamil', nameZh: '泰米尔文', nameEn: 'Tamil',
+    lineageEntry: { lineageId: 'ka', stopId: 'tamil' },
     origin: 'derived', parents: ['brahmi'], dateFrom: -300, dateTo: null,
     family: 'indic', region: '南印度', countries: ['印度', '斯里兰卡', '新加坡', '马来西亚'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -730,6 +767,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'telugu', nameZh: '泰卢固文', nameEn: 'Telugu',
+    lineageEntry: { lineageId: 'ka', stopId: 'telugu' },
     origin: 'derived', parents: ['kadamba'], dateFrom: 600, dateTo: null,
     family: 'indic', region: '南印度', countries: ['印度'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -737,6 +775,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'kannada', nameZh: '卡纳达文', nameEn: 'Kannada',
+    lineageEntry: { lineageId: 'ka', stopId: 'kannada' },
     origin: 'derived', parents: ['kadamba'], dateFrom: 500, dateTo: null,
     family: 'indic', region: '南印度', countries: ['印度'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -778,6 +817,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'phagspa', nameZh: '八思巴文', nameEn: 'Phags-pa',
+    lineageEntry: { lineageId: 'tibetan-phagspa', stopId: 'phagspa-ka' },
     origin: 'derived', parents: ['tibetan'], dateFrom: 1269, dateTo: 1360,
     family: 'sinic', region: '元朝', countries: ['中国', '蒙古'],
     type: 'abugida', status: 'extinct', direction: 'ttb',
@@ -870,6 +910,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'khojki', nameZh: '霍杰基文', nameEn: 'Khojki',
+    lineageEntry: { lineageId: 'sharada-branch', stopId: 'khojki' },
     origin: 'derived', parents: ['sharada'], dateFrom: 1500, dateTo: 1900,
     family: 'indic', region: '信德与旁遮普', countries: ['印度', '巴基斯坦'],
     type: 'abugida', status: 'historical', direction: 'ltr',
@@ -878,6 +919,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'khudawadi', nameZh: '胡达瓦迪文', nameEn: 'Khudawadi',
+    lineageEntry: { lineageId: 'sharada-branch', stopId: 'khudawadi' },
     origin: 'derived', parents: ['sharada'], dateFrom: 1800, dateTo: 1950,
     family: 'indic', region: '信德', countries: ['巴基斯坦', '印度'],
     type: 'abugida', status: 'historical', direction: 'ltr',
@@ -887,6 +929,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'multani', nameZh: '穆尔塔尼文', nameEn: 'Multani',
+    lineageEntry: { lineageId: 'sharada-branch', stopId: 'multani' },
     origin: 'derived', parents: ['sharada'], dateFrom: 1700, dateTo: 1950,
     family: 'indic', region: '旁遮普与北信德', countries: ['巴基斯坦', '印度'],
     type: 'abjad', status: 'historical', direction: 'ltr',
@@ -896,6 +939,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'mahajani', nameZh: '马哈贾尼文', nameEn: 'Mahajani',
+    lineageEntry: { lineageId: 'sharada-branch', stopId: 'mahajani' },
     origin: 'influence', parents: ['sharada'], dateFrom: 1200, dateTo: 2000,
     family: 'indic', region: '北印度商路', countries: ['印度', '尼泊尔'],
     type: 'abugida', status: 'historical', direction: 'ltr',
@@ -952,6 +996,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'kawi', nameZh: '卡维文', nameEn: 'Kawi (Old Javanese)',
+    lineageEntry: { lineageId: 'islands-ka', stopId: 'kawi' },
     origin: 'derived', parents: ['pallava'], dateFrom: 700, dateTo: 1500,
     family: 'seasia', region: '爪哇', countries: ['印度尼西亚'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
@@ -960,6 +1005,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'tagbanwa', nameZh: '塔格班瓦文', nameEn: 'Tagbanwa',
+    lineageEntry: { lineageId: 'islands-ka', stopId: 'tagbanwa' },
     origin: 'derived', parents: ['kawi'], dateFrom: 1300, dateTo: null,
     family: 'seasia', region: '巴拉望岛', countries: ['菲律宾'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -968,6 +1014,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'hanunoo', nameZh: '哈努诺文', nameEn: 'Hanunoo',
+    lineageEntry: { lineageId: 'islands-ka', stopId: 'hanunoo' },
     origin: 'derived', parents: ['kawi'], dateFrom: 1300, dateTo: null,
     family: 'seasia', region: '民都洛岛', countries: ['菲律宾'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -976,6 +1023,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'buhid', nameZh: '布希德文', nameEn: 'Buhid',
+    lineageEntry: { lineageId: 'islands-ka', stopId: 'buhid' },
     origin: 'derived', parents: ['kawi'], dateFrom: 1300, dateTo: null,
     family: 'seasia', region: '民都洛岛', countries: ['菲律宾'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -984,6 +1032,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'makasar', nameZh: '望加锡文', nameEn: 'Makasar',
+    lineageEntry: { lineageId: 'islands-ka', stopId: 'makasar' },
     origin: 'derived', parents: ['kawi'], dateFrom: 1600, dateTo: 1700,
     family: 'seasia', region: '苏拉威西岛', countries: ['印度尼西亚'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
@@ -1008,6 +1057,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'sundanese', nameZh: '巽他文', nameEn: 'Sundanese',
+    lineageEntry: { lineageId: 'islands-ka', stopId: 'sundanese' },
     origin: 'derived', parents: ['kawi'], dateFrom: 1300, dateTo: null,
     family: 'seasia', region: '西爪哇', countries: ['印度尼西亚'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -1016,6 +1066,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'cham', nameZh: '占文', nameEn: 'Cham',
+    lineageEntry: { lineageId: 'pallava-branch', stopId: 'cham' },
     origin: 'derived', parents: ['pallava'], dateFrom: 400, dateTo: null,
     family: 'seasia', region: '中南半岛', countries: ['越南', '柬埔寨'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -1032,6 +1083,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'mon', nameZh: '孟文', nameEn: 'Mon',
+    lineageEntry: { lineageId: 'pallava-branch', stopId: 'mon' },
     origin: 'derived', parents: ['pallava'], dateFrom: 500, dateTo: null,
     family: 'seasia', region: '中南半岛', countries: ['缅甸', '泰国'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -1048,6 +1100,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'burmese', nameZh: '缅文', nameEn: 'Myanmar (Burmese)',
+    lineageEntry: { lineageId: 'ka', stopId: 'burmese' },
     origin: 'derived', parents: ['mon'], dateFrom: 1050, dateTo: null,
     family: 'seasia', region: '中南半岛', countries: ['缅甸'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -1055,6 +1108,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'thai', nameZh: '泰文', nameEn: 'Thai',
+    lineageEntry: { lineageId: 'ka', stopId: 'thai' },
     origin: 'derived', parents: ['khmer'], dateFrom: 1283, dateTo: null,
     family: 'seasia', region: '中南半岛', countries: ['泰国'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -1063,6 +1117,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'lao', nameZh: '老挝文', nameEn: 'Lao',
+    lineageEntry: { lineageId: 'ka', stopId: 'lao' },
     origin: 'derived', parents: ['thai'], dateFrom: 1350, dateTo: null,
     family: 'seasia', region: '中南半岛', countries: ['老挝'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -1101,6 +1156,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'buginese', nameZh: '布吉文', nameEn: 'Lontara (Buginese)',
+    lineageEntry: { lineageId: 'islands-ka', stopId: 'buginese' },
     origin: 'derived', parents: ['kawi'], dateFrom: 1400, dateTo: null,
     family: 'seasia', region: '苏拉威西', countries: ['印度尼西亚'],
     type: 'abugida', status: 'living', direction: 'ltr',
@@ -1187,6 +1243,7 @@ export const writingSystems: WritingSystem[] = [
   // ─────────────────────────────────────────────
   {
     id: 'chinese-seal', nameZh: '篆书', nameEn: 'Chinese Seal Script',
+    lineageEntry: { lineageId: 'chinese-evolution', stopId: 'chinese-seal' },
     origin: 'derived', parents: ['chinese-oracle'], dateFrom: -800, dateTo: -200,
     family: 'sinic', region: '中国', countries: ['中国'],
     type: 'logographic', status: 'historical', direction: 'ttb',
@@ -1195,6 +1252,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'chinese-clerical', nameZh: '隶书', nameEn: 'Chinese Clerical Script',
+    lineageEntry: { lineageId: 'chinese-evolution', stopId: 'chinese-clerical' },
     origin: 'derived', parents: ['chinese-seal'], dateFrom: -200, dateTo: 200,
     family: 'sinic', region: '中国', countries: ['中国'],
     type: 'logographic', status: 'historical', direction: 'ttb',
@@ -1211,6 +1269,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'hiragana', nameZh: '平假名', nameEn: 'Hiragana',
+    lineageEntry: { lineageId: 'hiragana-source', stopId: 'hiragana-a' },
     origin: 'derived', parents: ['chinese-regular'], dateFrom: 800, dateTo: null,
     family: 'sinic', region: '日本', countries: ['日本'],
     type: 'syllabary', status: 'living', direction: 'mixed',
@@ -1219,6 +1278,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'katakana', nameZh: '片假名', nameEn: 'Katakana',
+    lineageEntry: { lineageId: 'katakana-source', stopId: 'katakana-a' },
     origin: 'derived', parents: ['chinese-regular'], dateFrom: 800, dateTo: null,
     family: 'sinic', region: '日本', countries: ['日本'],
     type: 'syllabary', status: 'living', direction: 'mixed',
@@ -1343,6 +1403,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'sogdian', nameZh: '粟特字母', nameEn: 'Sogdian',
+    lineageEntry: { lineageId: 'silk-road', stopId: 'sogdian' },
     origin: 'derived', parents: ['old-sogdian'], dateFrom: 100, dateTo: 1000,
     family: 'centralasia', region: '中亚', countries: ['乌兹别克斯坦', '塔吉克斯坦'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -1352,6 +1413,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'manichaean', nameZh: '摩尼字母', nameEn: 'Manichaean',
+    lineageEntry: { lineageId: 'aramaic-west', stopId: 'manichaean' },
     origin: 'derived', parents: ['syriac'], dateFrom: 300, dateTo: 1000,
     family: 'centralasia', region: '中亚', countries: ['伊朗', '中国'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -1361,6 +1423,7 @@ export const writingSystems: WritingSystem[] = [
 
   {
     id: 'parthian', nameZh: '帕提亚字母', nameEn: 'Inscriptional Parthian',
+    lineageEntry: { lineageId: 'iranian-aramaic', stopId: 'parthian' },
     origin: 'derived', parents: ['aramaic'], dateFrom: -250, dateTo: 300,
     family: 'centralasia', region: '伊朗高原', countries: ['伊朗', '伊拉克', '土库曼斯坦'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -1371,6 +1434,7 @@ export const writingSystems: WritingSystem[] = [
 
   {
     id: 'elymaic', nameZh: '埃利迈字母', nameEn: 'Elymaic',
+    lineageEntry: { lineageId: 'iranian-aramaic', stopId: 'elymaic' },
     origin: 'derived', parents: ['aramaic'], dateFrom: -200, dateTo: 300,
     family: 'centralasia', region: '伊朗西南部', countries: ['伊朗'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -1381,6 +1445,7 @@ export const writingSystems: WritingSystem[] = [
 
   {
     id: 'chorasmian', nameZh: '花剌子模文', nameEn: 'Chorasmian',
+    lineageEntry: { lineageId: 'iranian-aramaic', stopId: 'chorasmian' },
     origin: 'derived', parents: ['aramaic'], dateFrom: -200, dateTo: 800,
     family: 'centralasia', region: '阿姆河下游', countries: ['乌兹别克斯坦', '土库曼斯坦', '哈萨克斯坦'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
@@ -1390,6 +1455,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'old-uyghur', nameZh: '回鹘字母', nameEn: 'Old Uyghur',
+    lineageEntry: { lineageId: 'silk-road', stopId: 'old-uyghur' },
     origin: 'derived', parents: ['sogdian'], dateFrom: 700, dateTo: 1300,
     family: 'centralasia', region: '西域', countries: ['中国', '蒙古'],
     type: 'alphabet', status: 'extinct', direction: 'ttb',
@@ -1398,6 +1464,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'mongolian', nameZh: '蒙古字母', nameEn: 'Mongolian',
+    lineageEntry: { lineageId: 'silk-road', stopId: 'mongolian' },
     origin: 'derived', parents: ['old-uyghur'], dateFrom: 1200, dateTo: null,
     family: 'centralasia', region: '蒙古高原', countries: ['蒙古', '中国（内蒙古）'],
     type: 'alphabet', status: 'living', direction: 'ttb',
@@ -1445,6 +1512,7 @@ export const writingSystems: WritingSystem[] = [
   // ─────────────────────────────────────────────
   {
     id: 'linear-a', nameZh: '线形文字 A', nameEn: 'Linear A',
+    lineageEntry: { lineageId: 'aegean-line', stopId: 'linear-a' },
     origin: 'derived', parents: ['rethra'], dateFrom: -1800, dateTo: -1450,
     family: 'other', region: '克里特', countries: ['希腊'],
     type: 'undeciphered', status: 'undeciphered', direction: 'ltr',
@@ -1464,6 +1532,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'linear-b', nameZh: '线形文字 B', nameEn: 'Linear B',
+    lineageEntry: { lineageId: 'aegean-line', stopId: 'linear-b' },
     origin: 'derived', parents: ['linear-a'], dateFrom: -1450, dateTo: -1200,
     family: 'other', region: '爱琴海', countries: ['希腊'],
     type: 'syllabary', status: 'extinct', direction: 'ltr',
@@ -1473,6 +1542,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'cypriot', nameZh: '塞浦路斯音节文字', nameEn: 'Cypriot Syllabary',
+    lineageEntry: { lineageId: 'aegean-line', stopId: 'cypriot' },
     origin: 'derived', parents: ['linear-a'], dateFrom: -1100, dateTo: -300,
     family: 'other', region: '塞浦路斯', countries: ['塞浦路斯'],
     type: 'syllabary', status: 'extinct', direction: 'rtl',

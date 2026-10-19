@@ -87,6 +87,7 @@ const multiTrackWithoutExplicitEntry = multiTrack.filter(
   (entry) => entry.entryMode !== 'explicit',
 );
 const fallbackEntries = entries.filter((entry) => entry.entryMode === 'fallback');
+const linkedWithoutExplicitEntry = entries.filter((entry) => entry.entryMode === 'fallback');
 
 // 节点上下文是未来 MACRO 详情与 MICRO 合流时共用的读模型。这里把它与
 // writingSystems.parents、轨道反向索引逐项对照，防止两套查询在界面合流后分叉。
@@ -182,6 +183,7 @@ const result = {
     systemsWithMultipleTracks: multiTrack.length,
     multiTrackWithoutExplicitEntry: multiTrackWithoutExplicitEntry.length,
     systemsUsingFallbackEntry: fallbackEntries.length,
+    linkedSystemsWithoutExplicitEntry: linkedWithoutExplicitEntry.length,
     contextMismatches: contextMismatches.length,
     independentSystems: independent.length,
     independentSystemsWithEntry: independent.length - independentIsolated.length,
@@ -259,6 +261,9 @@ if (json) {
       `多轨道节点 ${multiTrack.length} · 未定首选入口 ${multiTrackWithoutExplicitEntry.length}`,
   );
   console.log(
+    `  已入轨但未明确首选入口 ${linkedWithoutExplicitEntry.length}`,
+  );
+  console.log(
     `  节点上下文一致性 ${contextMismatches.length ? `✘ ${contextMismatches.length} 处不一致` : '✔'}`,
   );
   console.log(
@@ -280,6 +285,13 @@ if (json) {
     console.log('\n多轨道节点尚未指定首选入口：');
     for (const entry of multiTrackWithoutExplicitEntry) {
       console.log(`  · ${entry.id}  ${entry.nameZh} (${entry.tracks} 个站点)`);
+    }
+  }
+
+  if (linkedWithoutExplicitEntry.length) {
+    console.log('\n已入轨但尚未明确首选入口：');
+    for (const entry of linkedWithoutExplicitEntry) {
+      console.log(`  · ${entry.id}  ${entry.nameZh} → ${entry.entry.lineageId}:${entry.entry.stopId}`);
     }
   }
 
