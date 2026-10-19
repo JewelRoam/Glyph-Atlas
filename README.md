@@ -381,6 +381,11 @@ graphChildrenByScript          // scriptId → 图上的直接子节点
 {
   system,                       // 当前书写体系
   href,                         // 默认详情 / MICRO 入口的稳定链接
+  route: {                      // 统一节点入口的首选路线
+    mode,                       // lineage | graph | detail
+    href,                       // 与节点默认入口一致
+    materialReady,              // 是否真有可渲染的字体、逐字图或图版
+  },
   graph: {                      // 体系级血统，不含字形轨道
     parents, children,           // 直接前后关系（兼容字段）
     parentRelations,             // 每条直接父系边的 kind / evidence
@@ -392,6 +397,7 @@ graphChildrenByScript          // scriptId → 图上的直接子节点
   materials: {                  // 节点详情与字母场共用的素材关联
     source,                     // font | image | none，及授权与出处
     glyphSet,                   // Unicode 推导或手工整理的代表字形集
+    materialReady,              // 字体 / 逐字图 / 图版至少存在一种
     letterSlots: {              // 没有可铺字表时整段省略
       hasManualMap,             // 是否有手工核过的跨体系同源槽位
       roster,                   // 槽位 → 该体系中的字符
@@ -412,9 +418,15 @@ graphChildrenByScript          // scriptId → 图上的直接子节点
 `scriptPortalFor()` 是其中不展开图邻居的轻量版本；`parentNeighbors` 与
 `childNeighbors` 复用它，所以一份节点上下文不会递归复制整张图。每个邻居条目
 包含原始 `relation`、`direction`（`parent` / `child`）以及另一端的
-`system / href / materials / lineage`。未来 MACRO 详情要在血缘总览里打开任一
+`system / href / route / materials / lineage`。未来 MACRO 详情要在血缘总览里打开任一
 父系或子系时，不需要再查 `lineageEntryFor()` 或另拼素材；沿邻居继续走时再取
 该邻居自己的 `scriptContextFor()` 即可。
+
+`route.mode` 把“点开一个节点后默认去哪”固定成三种合法结果：有已核实字形轨道
+走 `lineage`，没有轨道但图上有父系或子系走 `graph`，两者都没有则走 `detail`。
+它只是入口选择，不改变节点仍可同时读取完整图关系与素材。`materialReady` 不会
+因为存在字符清单就为真：必须有字体、逐字图或整幅图版，避免把“知道该显示哪些字”
+误当成“真的画得出来”。
 
 `graph` 和 `lineage` 刻意分成两层：前者回答“这套文字从哪些书写体系而来、又
 影响了谁”，后者回答“这个字位在这条已核实的字形链上如何变化”。两层不能互相
@@ -482,8 +494,10 @@ npm run audit:coverage:json  # 交给脚本或 CI 的 JSON
 入口，已入轨但依赖回退的节点为 0。体系级 `sourceRefs` 目前覆盖 13/194 个节点；38 条轨道
 都至少登记了一组参考链接，139 个站点均已有来源（站点专属或继承轨道）和素材
 登记。155 条图边展开成 310 个邻居门户，全部能解析到另一端节点；其中 230 个
-可直接进入 MICRO 轨道，80 个仍缺轨道，59 个不同节点构成下一步补链队列；308 个
-邻居已有字体、图版或代表字形，缺素材的只有利比亚—柏柏尔文字与提非纳文这一对。
+可直接进入 MICRO 轨道，80 个仍缺轨道，59 个不同节点构成下一步补链队列。194 个
+节点按首选入口分为 96 个 `lineage`、59 个 `graph`、39 个 `detail`；素材就绪
+194/194，310 个邻居门户也全部有可渲染字体或图版。利比亚—柏柏尔改用斯贝特拉
+墓碑实拍与道加双语铭文图录，提非纳文继续使用对应字体，两者不再互相冒充。
 轨道与图边计算出 83 条站点级关联：54 个相邻站对是直接连接（43 个直系、
 11 个借用 / 影响 / 模型），3 个是隔着未入轨节点的间接路径，44 个没有有向路径，
 0 个方向相反。另有 9 个 `chain` 相邻站对不是直接直系边，已按“直接其他关系 /
@@ -1319,8 +1333,20 @@ npm run build && ls dist/
   `parentNeighbors` / `childNeighbors` 现在为每条直接图边带上另一端的完整门户。
   轨道上下文补 `href`，图邻居与轨道入口统一由 `lineageHref()` 生成。覆盖审计
   新增 310 个邻居门户的一致性检查与缺口统计：230 个可进 MICRO、80 个待补轨道，
-  308 个已有素材；`npm run audit:coverage:json` 可直接导出下一步补链队列。本轮
+  当时 308 个已有素材；随后补齐利比亚—柏柏尔图版。`npm run audit:coverage:json`
+  可直接导出下一步补链队列。本轮
   仍不改页面入口。
+
+- **2026-10-19 · 统一节点路线契约与利比亚—柏柏尔素材**：节点门户新增
+  `route: { mode, href, materialReady }`，把任意节点的默认去向明确成
+  `lineage`（已核实字形轨道）、`graph`（暂无轨道但有图邻居）或 `detail`
+  （两者都没有），并让 `parentNeighbors` / `childNeighbors` 的每个邻居门户
+  携带同一份路线。素材判断不再把“有代表字形清单”算作可渲染；必须真有字体、
+  逐字图或整幅图版。覆盖审计新增路线模式、路线链接与素材状态一致性检查，并
+  输出未就绪节点清单。当前 194 个节点为 96 `lineage` / 59 `graph` / 39
+  `detail`，194/194 有可渲染素材；310 个邻居门户也全部就绪。利比亚—柏柏尔
+  补入斯贝特拉墓碑实拍与道加双语铭文图录，授权同步登记到素材清单与
+  `CREDITS.md`。本轮仍不改界面。
 
 - **2026-10-19 · 节点轨道上下文与间接谱系路径**：新增 `graphIndex.ts`，以
   `graphRelations` 为唯一来源提供确定性最短路径查询，把轨道邻接从

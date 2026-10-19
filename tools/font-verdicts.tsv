@@ -191,7 +191,7 @@ epi-olmec	ok	-	只有图版：拉莫哈拉石碑 1 号
 maya	ok	-	无字库，用《德累斯顿抄本》与科潘象形文字阶梯图版
 aztec	ok	-	无字库，用《门多萨抄本》图版
 mixtec	ok	-	无字库，用《科隆比诺抄本》图版
-libyco-berber	blank	-	Unicode 未编码，暂无可核实的开源字形；留空并等待可靠图版或字库
+libyco-berber	ok	-	无统一编码与可靠历史字库；用斯贝特拉墓碑实拍和道加双语铭文图录，不使用现代提非纳字体冒充
 tifinagh	ok	Noto Sans Tifinagh	
 nsibidi	ok	-	无字库，用竹简上的恩西比迪文图版
 vai	ok	Noto Sans Vai	

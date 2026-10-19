@@ -23,6 +23,22 @@ export interface GlyphPlate {
  * public/glyphs/CREDITS.md；来源不明或授权不清的图不进仓库。
  */
 export const glyphPlates: Record<string, GlyphPlate[]> = {
+  'libyco-berber': [
+    {
+      src: 'glyphs/libyco-berber/sbeitla-funerary-stele.jpg',
+      caption: '突尼斯西迪·阿里·巴赫卢勒出土的古代利比亚—柏柏尔墓碑，现存斯贝特拉博物馆。竖排刻文是提非纳文之前的古柏柏尔字母实例。',
+      credit: 'DrRachT / Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Libyco-berber_alphabet_funerary_stele_of_Tunisia_Sbeitla_Museum.jpg',
+    },
+    {
+      src: 'glyphs/libyco-berber/dougga-bilingual-plate.jpg',
+      caption: '道加（Dougga）利比亚—布匿双语铭文的早期图录（Gesenius, 1837）。上方是利比亚字母的摹写，可与下方布匿文对照。',
+      credit: 'Wilhelm Gesenius / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:Dougga_Libyan-Punic_inscription_in_Gesenius%27s_1837_Scripturae_Linguaeque_Phoeniciae_Monumenta.jpg',
+    },
+  ],
   indus: [
     {
       src: 'glyphs/indus/seal-bm.jpg',

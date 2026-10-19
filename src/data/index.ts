@@ -58,6 +58,8 @@ export type {
   ScriptLineageTrackContext,
   ScriptMaterialContext,
   ScriptNodePortal,
+  ScriptNodeRoute,
+  ScriptRouteMode,
 } from './scriptContext';
 
 /**

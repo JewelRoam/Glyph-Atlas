@@ -44,6 +44,7 @@ const stopRefs = lineages.flatMap((lineage) =>
 
 const entries = systems.map((system) => {
   const entry = lineageEntryFor(system.id);
+  const portal = scriptPortalFor(system.id);
   const neighbors = entry?.track ? adjacentStops(entry.track) : {};
   const graphAdjacency = entry?.track ? adjacentGraphLinks(entry.track) : {};
   return {
@@ -57,6 +58,8 @@ const entries = systems.map((system) => {
     sourceRefs: system.sourceRefs?.length ?? 0,
     tracks: entry?.tracks.length ?? 0,
     entryMode: !entry?.track ? 'none' : system.lineageEntry ? 'explicit' : 'fallback',
+    route: portal?.route ?? null,
+    materialReady: portal?.materials.materialReady ?? false,
     entry: entry?.track
       ? {
           lineageId: entry.track.lineage.id,
@@ -210,6 +213,14 @@ const isolated = entries.filter((entry) => !entry.entry);
 const withNeighbors = entries.filter(
   (entry) => entry.neighbors.previous || entry.neighbors.next,
 );
+const routeModeCounts = Object.fromEntries(
+  ['lineage', 'graph', 'detail'].map((mode) => [
+    mode,
+    entries.filter((entry) => entry.route?.mode === mode).length,
+  ]),
+);
+const systemsWithMaterials = entries.filter((entry) => entry.materialReady);
+const systemsWithoutMaterials = entries.filter((entry) => !entry.materialReady);
 
 const independent = entries.filter((entry) => entry.origin === 'independent');
 const independentIsolated = independent.filter((entry) => !entry.entry);
@@ -239,6 +250,13 @@ const graphNeighborCoverage = [];
 const sameIds = (left, right) =>
   left.length === right.length && left.every((id, index) => id === right[index]);
 const mismatch = (id, message) => contextMismatches.push({ id, message });
+const hasRenderableSource = (source) => {
+  if (source.kind === 'font') return Boolean(source.family);
+  if (source.kind === 'image') {
+    return Boolean(source.plates?.length || Object.keys(source.images ?? {}).length);
+  }
+  return false;
+};
 
 for (const system of systems) {
   const context = scriptContextFor(system.id);
@@ -262,6 +280,21 @@ for (const system of systems) {
   }
   if (!sameIds(mappedChildren, expectedChildren)) {
     mismatch(system.id, 'graphChildrenByScript 与 writingSystems.parents 不一致');
+  }
+
+  const expectedRouteMode = context.lineage
+    ? 'lineage'
+    : system.parents.length > 0 || expectedChildren.length > 0
+      ? 'graph'
+      : 'detail';
+  if (context.route.mode !== expectedRouteMode) {
+    mismatch(system.id, `节点路线应为 ${expectedRouteMode}，实际为 ${context.route.mode}`);
+  }
+  if (context.route.href !== context.href) {
+    mismatch(system.id, '节点路线链接与节点默认入口不一致');
+  }
+  if (context.route.materialReady !== context.materials.materialReady) {
+    mismatch(system.id, '节点路线素材状态与素材上下文不一致');
   }
 
   const expectedParentRelations = graphRelations.filter(
@@ -338,8 +371,20 @@ for (const system of systems) {
       if (neighbor.node.href !== expectedPortal.href) {
         mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 链接与统一入口不一致`);
       }
+      if (
+        neighbor.node.route.mode !== expectedPortal.route.mode ||
+        neighbor.node.route.href !== expectedPortal.route.href ||
+        neighbor.node.route.materialReady !== expectedPortal.route.materialReady
+      ) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 路线门户不一致`);
+      }
       if (neighbor.node.materials.source.kind !== expectedPortal.materials.source.kind) {
         mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 素材来源不一致`);
+      }
+      if (
+        neighbor.node.materials.materialReady !== expectedPortal.materials.materialReady
+      ) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 素材就绪状态不一致`);
       }
       if (neighbor.node.materials.glyphSet !== expectedPortal.materials.glyphSet) {
         mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 代表字形集不一致`);
@@ -376,9 +421,8 @@ for (const system of systems) {
         kind: neighbor.relation.kind,
         evidence: neighbor.relation.evidence,
         hasLineage: Boolean(neighbor.node.lineage),
-        hasMaterials:
-          neighbor.node.materials.source.kind !== 'none' ||
-          Boolean(neighbor.node.materials.glyphSet),
+        routeMode: neighbor.node.route.mode,
+        hasMaterials: neighbor.node.materials.materialReady,
       });
     }
   }
@@ -647,6 +691,9 @@ for (const system of systems) {
   if (context.materials.glyphSet !== expectedMaterials.glyphSet) {
     mismatch(system.id, 'materials.glyphSet 与样本集不一致');
   }
+  if (context.materials.materialReady !== hasRenderableSource(expectedMaterials.source)) {
+    mismatch(system.id, 'materials.materialReady 与实际可渲染来源不一致');
+  }
   if (Boolean(context.materials.letterSlots) !== expectedMaterials.hasRoster) {
     mismatch(system.id, 'materials.letterSlots 与字母表索引不一致');
   }
@@ -759,6 +806,9 @@ const result = {
     systemsUsingFallbackEntry: fallbackEntries.length,
     linkedSystemsWithoutExplicitEntry: linkedWithoutExplicitEntry.length,
     contextMismatches: contextMismatches.length,
+    routeModes: routeModeCounts,
+    systemsWithMaterials: systemsWithMaterials.length,
+    systemsWithoutMaterials: systemsWithoutMaterials.length,
     graphNeighborPortals,
     graphNeighborPortalsWithLineage,
     graphNeighborPortalsWithoutLineage,
@@ -815,6 +865,11 @@ const result = {
     entry: entry.entry,
   })),
   contextMismatches,
+  systemsWithoutMaterials: systemsWithoutMaterials.map((entry) => ({
+    id: entry.id,
+    nameZh: entry.nameZh,
+    routeMode: entry.route?.mode ?? null,
+  })),
   graphNeighborCoverage,
   graphNeighborPortalsWithoutLineage: graphNeighborCoverage
     .filter((neighbor) => !neighbor.hasLineage)
@@ -913,8 +968,13 @@ if (json) {
     `  节点上下文一致性 ${contextMismatches.length ? `✘ ${contextMismatches.length} 处不一致` : '✔'}`,
   );
   console.log(
+    `  节点路线 lineage ${routeModeCounts.lineage} · graph ${routeModeCounts.graph} · ` +
+      `detail ${routeModeCounts.detail} · 素材就绪 ${systemsWithMaterials.length}/${entries.length}`,
+  );
+  console.log(
     `  图邻居门户 ${graphNeighborPortals} · 可进 MICRO ${graphNeighborPortalsWithLineage} · ` +
-      `待补轨道 ${graphNeighborPortalsWithoutLineage} · 有素材 ${graphNeighborPortalsWithMaterials}`,
+      `待补轨道 ${graphNeighborPortalsWithoutLineage} · 有素材 ${graphNeighborPortalsWithMaterials}/` +
+      `${graphNeighborPortals}`,
   );
   console.log(
     `  图谱边 ${graphRelations.length} · 直系 ${relationsByKind.descent} · 借用 ${relationsByKind.borrowing} · ` +
@@ -1012,6 +1072,13 @@ if (json) {
     console.log('\n按数据顺序回退入口：');
     for (const entry of fallbackEntries) {
       console.log(`  · ${entry.id}  ${entry.nameZh} → ${entry.entry.lineageId}:${entry.entry.stopId}`);
+    }
+  }
+
+  if (systemsWithoutMaterials.length) {
+    console.log('\n节点素材尚未就绪：');
+    for (const entry of systemsWithoutMaterials) {
+      console.log(`  · ${entry.id}  ${entry.nameZh} (${entry.route?.mode ?? 'unknown'})`);
     }
   }
 

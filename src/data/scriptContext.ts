@@ -109,6 +109,28 @@ export interface ScriptMaterialContext {
     /** 槽位 → 该体系中的字符 */
     roster: Readonly<Record<string, string>>;
   };
+  /** 是否有可用于详情 / 字母场的可靠视觉素材 */
+  materialReady: boolean;
+}
+
+/**
+ * 节点进入演化视图时的首选路线。
+ *
+ * `lineage`：已有可核实的字形轨道，默认进入 MICRO；即使当前是单站轨道，
+ *   也保留轨道上下文，不能退化成图关系。
+ * `graph`：还没有已核实的字形轨道，但体系级有父系或子系，可先从 MACRO
+ *   图邻居前后浏览。
+ * `detail`：没有轨道也没有图邻居，只能打开单体系详情；不伪造链条。
+ */
+export type ScriptRouteMode = 'lineage' | 'graph' | 'detail';
+
+export interface ScriptNodeRoute {
+  /** 首选路线类型 */
+  mode: ScriptRouteMode;
+  /** 首选入口的稳定查询链接；三种模式都可用 */
+  href: string;
+  /** 该节点是否有可靠视觉素材 */
+  materialReady: boolean;
 }
 
 /**
@@ -122,6 +144,8 @@ export interface ScriptNodePortal {
   system: WritingSystem;
   /** 默认入口的稳定查询链接；没有轨道时仍可打开该节点的体系详情 */
   href: string;
+  /** 详情与 MICRO 合流后共用的首选路线 */
+  route: ScriptNodeRoute;
   /** 字体、字形清单与字母槽位的统一入口 */
   materials: ScriptMaterialContext;
   /** 没有任何已核实轨道的体系没有这一段，不伪造链条 */
@@ -180,11 +204,22 @@ function stepFor(parentId: string, childId: string): GraphStep | undefined {
 export const graphChildrenByScript: ReadonlyMap<string, readonly WritingSystem[]> =
   childrenByScript;
 
+function hasRenderableSource(source: GlyphSource): boolean {
+  if (source.kind === 'font') return Boolean(source.family);
+  if (source.kind === 'image') {
+    return Boolean(source.plates?.length || Object.keys(source.images ?? {}).length);
+  }
+  return false;
+}
+
 function materialContextFor(system: WritingSystem): ScriptMaterialContext {
   const glyphSet = glyphSets[system.id];
+  const source = glyphSourceFor(system);
   const materials: ScriptMaterialContext = {
-    source: glyphSourceFor(system),
+    source,
     glyphSet,
+    // 有字符清单不等于有可见字形：必须真有字体、逐字图或整幅图版。
+    materialReady: hasRenderableSource(source),
   };
   if (hasRoster(system.id)) {
     materials.letterSlots = {
@@ -234,9 +269,21 @@ export function scriptPortalFor(scriptId: string): ScriptNodePortal | undefined 
 
   const materials = materialContextFor(system);
   const lineage = lineageContextFor(system.id);
+  const hasGraphNeighbors =
+    system.parents.length > 0 || (childrenByScript.get(system.id)?.length ?? 0) > 0;
+  const routeMode: ScriptRouteMode = lineage
+    ? 'lineage'
+    : hasGraphNeighbors
+      ? 'graph'
+      : 'detail';
   return {
     system,
     href: lineageHref(system.id),
+    route: {
+      mode: routeMode,
+      href: lineageHref(system.id),
+      materialReady: materials.materialReady,
+    },
     materials,
     lineage,
   };

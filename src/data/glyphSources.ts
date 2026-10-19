@@ -82,6 +82,9 @@ const OVERRIDES: Record<string, GlyphSource> = {
   demotic: plateSource('demotic',
     '世俗体是僧侣体进一步草写的结果，Unicode 未单独编码；这里用真实的世俗体纸草代替逐字字表。',
   ),
+  'libyco-berber': plateSource('libyco-berber',
+    '古代利比亚—柏柏尔字母没有统一编码，也没有可靠的开源历史字库；这里用突尼斯出土墓碑实拍和道加双语铭文早期图录展示，不用现代提非纳字体冒充古书体。',
+  ),
   ...plateSources(
     'indus',
     'proto-elamite',
