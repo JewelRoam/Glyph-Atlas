@@ -17,6 +17,10 @@ export const writingSystems: WritingSystem[] = [
     type: 'logosyllabic', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Cuneiform U+12000', sample: '𒀭', fontFamily: 'Noto Sans Cuneiform',
     note: '已知最早的完整文字体系之一，由记账用的陶筹演变而来。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Cuneiform',
+      'https://www.unicode.org/charts/PDF/U12000.pdf',
+    ],
   },
   {
     id: 'egyptian', nameZh: '埃及圣书体', nameEn: 'Egyptian Hieroglyphs',
@@ -26,6 +30,11 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Egyptian Hieroglyphs U+13000', sample: '𓀀',
     fontFamily: 'Noto Sans Egyptian Hieroglyphs',
     note: '与苏美尔几乎同时出现，可能独立起源。',
+    lineageEntry: { lineageId: 'aleph', stopId: 'egyptian' },
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Egyptian_hieroglyphs',
+      'https://www.unicode.org/charts/PDF/U13000.pdf',
+    ],
   },
   {
     id: 'indus', nameZh: '印度河文字', nameEn: 'Indus Script',
@@ -33,6 +42,9 @@ export const writingSystems: WritingSystem[] = [
     family: 'indic', region: '印度河流域', countries: ['巴基斯坦', '印度'],
     type: 'undeciphered', status: 'undeciphered',
     note: '约 400 个符号，尚未破译，是否属完整文字仍有争议。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Indus_script',
+    ],
   },
   {
     id: 'chinese-oracle', nameZh: '甲骨文', nameEn: 'Oracle Bone Script',
@@ -41,6 +53,9 @@ export const writingSystems: WritingSystem[] = [
     type: 'logographic', status: 'historical', direction: 'ttb',
     sample: '日', fontFamily: 'Glyph Atlas Oracle Bone',
     note: '商代占卜刻辞，汉字已知最早的成熟形态；字形表用甲骨文字库渲染，字库里没有的字不列出。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Oracle_bone_script',
+    ],
   },
   {
     id: 'proto-elamite', nameZh: '原始埃兰文字', nameEn: 'Proto-Elamite',
@@ -48,6 +63,9 @@ export const writingSystems: WritingSystem[] = [
     family: 'mesopotamia', region: '伊朗高原', countries: ['伊朗'],
     type: 'undeciphered', status: 'undeciphered',
     note: '与苏美尔同期，可能独立起源，未破译。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Proto-Elamite',
+    ],
   },
   {
     id: 'olmec', nameZh: '奥尔梅克符号', nameEn: 'Olmec / Cascajal Symbols',
@@ -55,6 +73,9 @@ export const writingSystems: WritingSystem[] = [
     family: 'mesoamerica', region: '中美洲', countries: ['墨西哥'],
     type: 'undeciphered', status: 'undeciphered',
     note: '中美洲书写传统的可能源头，证据尚不充分。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Olmec_script',
+    ],
   },
   {
     id: 'rethra', nameZh: '克里特象形文字', nameEn: 'Cretan Hieroglyphs',
@@ -62,6 +83,9 @@ export const writingSystems: WritingSystem[] = [
     family: 'other', region: '爱琴海', countries: ['希腊'],
     type: 'undeciphered', status: 'undeciphered',
     note: '爱琴海最早的书写系统，未破译；是否独立起源仍有争议，此处按独立起源处理。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Cretan_hieroglyphs',
+    ],
   },
   {
     id: 'rongorongo', nameZh: '朗格朗格文', nameEn: 'Rongorongo',
@@ -69,6 +93,9 @@ export const writingSystems: WritingSystem[] = [
     family: 'other', region: '太平洋', countries: ['智利（复活节岛）'],
     type: 'undeciphered', status: 'undeciphered',
     note: '复活节岛的木板文字，可能为独立起源，未破译。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Rongorongo',
+    ],
   },
 
   // ─────────────────────────────────────────────
@@ -119,6 +146,10 @@ export const writingSystems: WritingSystem[] = [
     type: 'logosyllabic', status: 'extinct', direction: 'boustrophedon',
     unicodeBlock: 'Anatolian Hieroglyphs U+14400', sample: '𔐀',
     fontFamily: 'Noto Sans Anatolian Hieroglyphs',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Anatolian_hieroglyphs',
+      'https://www.unicode.org/charts/PDF/U14400.pdf',
+    ],
   },
 
   // ─────────────────────────────────────────────
@@ -145,6 +176,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'liturgical', direction: 'ltr',
     unicodeBlock: 'Coptic U+2C80', sample: 'Ⲁ', fontFamily: 'Noto Sans Coptic',
     note: '希腊字母 + 世俗体补充字母，今为埃及基督徒礼仪文字。',
+    lineageEntry: { lineageId: 'egypt-cursive', stopId: 'coptic' },
   },
   {
     id: 'meroitic', nameZh: '麦罗埃文', nameEn: 'Meroitic',
@@ -180,6 +212,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abjad', status: 'extinct', direction: 'rtl',
     unicodeBlock: 'Phoenician U+10900', sample: '𐤀', fontFamily: 'Noto Sans Phoenician',
     note: '22 个辅音字母，是希腊、拉丁、阿拉伯、希伯来乃至婆罗米的共同源头。',
+    lineageEntry: { lineageId: 'aleph', stopId: 'phoenician' },
   },
   {
     id: 'paleo-hebrew', nameZh: '古希伯来字母', nameEn: 'Paleo-Hebrew',
@@ -205,6 +238,7 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Imperial Aramaic U+10840', sample: '𐡀',
     fontFamily: 'Noto Sans Imperial Aramaic',
     note: '波斯帝国的通用文字，衍生出希伯来、阿拉伯、叙利亚、婆罗米等庞大支系。',
+    lineageEntry: { lineageId: 'arabic-alef', stopId: 'aramaic' },
   },
   {
     id: 'syriac', nameZh: '叙利亚字母', nameEn: 'Syriac',
@@ -318,6 +352,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abjad', status: 'extinct', direction: 'boustrophedon',
     unicodeBlock: 'Old South Arabian U+10A60', sample: '𐩠',
     fontFamily: 'Noto Sans Old South Arabian',
+    lineageEntry: { lineageId: 'ethiopic-line', stopId: 'old-south-arabian' },
   },
 
   {
@@ -348,6 +383,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'Greek and Coptic U+0370', sample: 'Α', fontFamily: 'Noto Sans',
     note: '首次为元音设立独立字母，是"全音素文字"的开端。',
+    lineageEntry: { lineageId: 'aleph', stopId: 'greek' },
   },
   {
     id: 'carian', nameZh: '卡里亚字母', nameEn: 'Carian',
@@ -380,6 +416,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Old Italic U+10300', sample: '𐌀',
     fontFamily: 'Noto Sans Old Italic',
+    lineageEntry: { lineageId: 'italy', stopId: 'old-italic' },
   },
   {
     id: 'etruscan', nameZh: '伊特鲁里亚字母', nameEn: 'Etruscan',
@@ -396,6 +433,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'Basic Latin U+0041', sample: 'A', fontFamily: 'Noto Sans',
     note: '当今使用最广的字母系统，覆盖几乎所有大洲。',
+    lineageEntry: { lineageId: 'aleph', stopId: 'latin' },
   },
   {
     id: 'runic', nameZh: '卢恩字母', nameEn: 'Runic',
@@ -429,6 +467,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'greek', region: '东欧', countries: ['俄罗斯', '乌克兰', '保加利亚', '塞尔维亚', '蒙古', '哈萨克斯坦'],
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'Cyrillic U+0400', sample: 'А', fontFamily: 'Noto Sans',
+    lineageEntry: { lineageId: 'cyrillic-line', stopId: 'cyrillic' },
   },
   {
     id: 'armenian', nameZh: '亚美尼亚字母', nameEn: 'Armenian',
@@ -437,6 +476,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'Armenian U+0530', sample: 'Ա', fontFamily: 'Noto Sans Armenian',
     note: '公元 405 年由圣梅斯罗布创制，至今几乎未变。',
+    lineageEntry: { lineageId: 'greek-armenian', stopId: 'armenian' },
   },
   {
     id: 'caucasian-albanian', nameZh: '高加索阿尔巴尼亚字母', nameEn: 'Caucasian Albanian',
@@ -522,6 +562,7 @@ export const writingSystems: WritingSystem[] = [
     unicodeBlock: 'Brahmi U+11000', sample: '𑀓',
     fontFamily: 'Noto Sans Brahmi',
     note: '南亚、东南亚几乎所有文字的祖先；起源仍存争议（阿拉米说与印度河说）。',
+    lineageEntry: { lineageId: 'ka', stopId: 'brahmi' },
   },
   {
     id: 'pallava', nameZh: '帕拉瓦文', nameEn: 'Pallava',
@@ -529,6 +570,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'indic', region: '南印度', countries: ['印度'],
     type: 'abugida', status: 'extinct',
     note: '南印度字体，随贸易与宗教传入东南亚，是高棉、爪哇等文字的直系祖先。',
+    lineageEntry: { lineageId: 'pallava-branch', stopId: 'pallava' },
   },
   {
     id: 'kadamba', nameZh: '卡丹巴文', nameEn: 'Kadamba',
@@ -543,6 +585,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Siddham U+11580', sample: '𑖎', fontFamily: 'Noto Sans Siddham',
     note: '随佛教东传，成为东亚密教书写咒语的特殊字体。',
+    lineageEntry: { lineageId: 'ka', stopId: 'siddham' },
   },
   {
     id: 'nagari', nameZh: '城文', nameEn: 'Nāgarī',
@@ -617,6 +660,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'indic', region: '南亚', countries: ['孟加拉国', '印度'],
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Bengali U+0980', sample: 'ক', fontFamily: 'Noto Sans Bengali',
+    lineageEntry: { lineageId: 'siddham-bengali', stopId: 'bengali' },
   },
   {
     id: 'gujarati', nameZh: '古吉拉特文', nameEn: 'Gujarati',
@@ -632,6 +676,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Gurmukhi U+0A00', sample: 'ਕ', fontFamily: 'Noto Sans Gurmukhi',
     note: '旁遮普语锡克教的经典文字。',
+    lineageEntry: { lineageId: 'sharada-branch', stopId: 'gurmukhi' },
   },
   {
     id: 'sharada', nameZh: '夏拉达文', nameEn: 'Sharada',
@@ -640,6 +685,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Sharada U+11180', sample: '𑆑',
     fontFamily: 'Noto Sans Sharada',
+    lineageEntry: { lineageId: 'brahmi-sharada', stopId: 'sharada' },
   },
   {
     id: 'takri', nameZh: '塔克里文', nameEn: 'Takri',
@@ -663,6 +709,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'indic', region: '南亚', countries: ['印度'],
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Oriya U+0B00', sample: 'କ', fontFamily: 'Noto Sans Oriya',
+    lineageEntry: { lineageId: 'siddham-odia', stopId: 'odia' },
   },
   {
     id: 'tamil', nameZh: '泰米尔文', nameEn: 'Tamil',
@@ -702,6 +749,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Grantha U+11300', sample: '𑌕',
     fontFamily: 'Noto Sans Grantha',
+    lineageEntry: { lineageId: 'grantha-malayalam', stopId: 'grantha' },
   },
   {
     id: 'malayalam', nameZh: '马拉雅拉姆文', nameEn: 'Malayalam',
@@ -709,6 +757,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'indic', region: '南印度', countries: ['印度'],
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Malayalam U+0D00', sample: 'ക', fontFamily: 'Noto Sans Malayalam',
+    lineageEntry: { lineageId: 'grantha-malayalam', stopId: 'malayalam' },
   },
   {
     id: 'sinhala', nameZh: '僧伽罗文', nameEn: 'Sinhala',
@@ -716,6 +765,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'indic', region: '南亚', countries: ['斯里兰卡'],
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Sinhala U+0D80', sample: 'ක', fontFamily: 'Noto Sans Sinhala',
+    lineageEntry: { lineageId: 'brahmi-sinhala', stopId: 'sinhala' },
   },
   {
     id: 'tibetan', nameZh: '藏文', nameEn: 'Tibetan',
@@ -724,6 +774,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Tibetan U+0F00', sample: 'ཀ', fontFamily: 'Noto Serif Tibetan',
     note: '公元 7 世纪据印度字体创制；不丹的宗喀语也使用。',
+    lineageEntry: { lineageId: 'ka', stopId: 'tibetan' },
   },
   {
     id: 'phagspa', nameZh: '八思巴文', nameEn: 'Phags-pa',
@@ -945,6 +996,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'seasia', region: '爪哇', countries: ['印度尼西亚'],
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Javanese U+A980', sample: 'ꦏ', fontFamily: 'Noto Sans Javanese',
+    lineageEntry: { lineageId: 'pallava-branch', stopId: 'java' },
   },
   {
     id: 'balinese', nameZh: '巴厘文', nameEn: 'Balinese',
@@ -952,6 +1004,7 @@ export const writingSystems: WritingSystem[] = [
     family: 'seasia', region: '巴厘岛', countries: ['印度尼西亚'],
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Balinese U+1B00', sample: 'ᬓ', fontFamily: 'Noto Sans Balinese',
+    lineageEntry: { lineageId: 'pallava-branch', stopId: 'balinese' },
   },
   {
     id: 'sundanese', nameZh: '巽他文', nameEn: 'Sundanese',
@@ -975,6 +1028,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abugida', status: 'living', direction: 'ltr',
     unicodeBlock: 'Khmer U+1780', sample: 'ក', fontFamily: 'Noto Sans Khmer',
     note: '已知最早的东南亚文字之一（611 年铭文），也是泰文、老挝文的直接祖先。',
+    lineageEntry: { lineageId: 'pallava-branch', stopId: 'khmer' },
   },
   {
     id: 'mon', nameZh: '孟文', nameEn: 'Mon',
@@ -1153,6 +1207,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'logographic', status: 'living', direction: 'ttb',
     unicodeBlock: 'CJK Unified Ideographs U+4E00', sample: '鹰', fontFamily: 'LXGW WenKai TC',
     note: '唯一从古至今连续使用的语素文字，字符量以万计。',
+    lineageEntry: { lineageId: 'chinese-evolution', stopId: 'chinese-regular' },
   },
   {
     id: 'hiragana', nameZh: '平假名', nameEn: 'Hiragana',
@@ -1242,6 +1297,10 @@ export const writingSystems: WritingSystem[] = [
     type: 'syllabary', status: 'living', direction: 'ltr',
     unicodeBlock: 'Yi Syllables U+A000', sample: 'ꀀ', fontFamily: 'Noto Sans Yi',
     note: '独立的音节文字，今规范为 1165 个音节符号。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Yi_script',
+      'https://www.unicode.org/charts/PDF/UA000.pdf',
+    ],
   },
   {
     id: 'miao', nameZh: '苗文（柏格理字母）', nameEn: 'Miao (Pollard)',
@@ -1265,6 +1324,9 @@ export const writingSystems: WritingSystem[] = [
     family: 'sinic', region: '云南', countries: ['中国（云南）'],
     type: 'logographic', status: 'living',
     note: '纳西族的图画象形文字，是仍在使用的象形文字之一；该文字尚未纳入 Unicode，总表中以缺字形名片表示。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Dongba_symbols',
+    ],
   },
 
   // ─────────────────────────────────────────────
@@ -1277,6 +1339,7 @@ export const writingSystems: WritingSystem[] = [
     type: 'abjad', status: 'extinct', direction: 'rtl',
     unicodeBlock: 'Old Sogdian U+10F00', sample: '𐼀', fontFamily: 'Noto Sans Old Sogdian',
     note: '阿拉米字母在中亚的早期分支；丝绸之路书写传统的重要源头。',
+    lineageEntry: { lineageId: 'silk-road', stopId: 'old-sogdian' },
   },
   {
     id: 'sogdian', nameZh: '粟特字母', nameEn: 'Sogdian',
@@ -1472,6 +1535,9 @@ export const writingSystems: WritingSystem[] = [
     family: 'africa', region: '西非', countries: ['尼日利亚'],
     type: 'logographic', status: 'living',
     note: '尼日利亚伊博等族的象形符号系统，可独立起源；该文字尚未纳入 Unicode，总表中以缺字形名片表示。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Nsibidi',
+    ],
   },
   {
     id: 'vai', nameZh: '瓦伊文', nameEn: 'Vai',

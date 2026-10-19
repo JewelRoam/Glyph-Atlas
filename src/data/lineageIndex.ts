@@ -69,7 +69,7 @@ export function stopRefByKey(key: string): LineageStopRef | undefined {
 export interface LineageEntry {
   /** 默认轨道与站点；有站点时可继续向前后行走 */
   track?: LineageStopRef;
-  /** 该体系可进入的全部站点，默认入口排在最前 */
+  /** 该体系可进入的轨道入口，默认入口排在最前；同一轨道只保留一个站点 */
   tracks: readonly LineageStopRef[];
   /** 是否有经过已核实的前后邻站 */
   hasNeighbors: boolean;
@@ -97,7 +97,13 @@ export function lineageEntryFor(scriptId: string): LineageEntry | undefined {
 
   return {
     track,
-    tracks: [track, ...tracks.filter((candidate) => candidate.key !== track!.key)],
+    tracks: [
+      track,
+      ...tracks.filter(
+        (candidate) =>
+          candidate.key !== track!.key && candidate.lineage.id !== track!.lineage.id,
+      ),
+    ],
     hasNeighbors: track.lineage.stops.length > 1,
   };
 }

@@ -20,6 +20,15 @@ export {
   stopsByScript,
 } from './lineageIndex';
 export type { LineageEntry, LineageStopRef, ScriptLineageStatus } from './lineageIndex';
+export {
+  graphChildrenByScript,
+  scriptContextFor,
+} from './scriptContext';
+export type {
+  ScriptContext,
+  ScriptGraphContext,
+  ScriptLineageContext,
+} from './scriptContext';
 
 /**
  * 演化图使用的节点集合。

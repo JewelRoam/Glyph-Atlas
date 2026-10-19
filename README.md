@@ -119,6 +119,7 @@ Glyph-Atlas/
     │   ├── writingSystems.ts   书写体系主数据
     │   ├── lineages.ts         血统轨道（字形演变路径）
     │   ├── lineageIndex.ts     站点稳定键与「书写体系 ↔ 轨道」反向索引
+    │   ├── scriptContext.ts    节点上下文：图上的亲缘 + 可选的默认血统入口
     │   ├── glyphPaths.ts       轨道站点的 100×100 矢量轮廓（生成物）
     │   └── index.ts            派生集合：graphSystems / independentSystems …
     ├── lib/                    ── 逻辑层
@@ -317,13 +318,42 @@ lineageHref(scriptId, track?)  // 生成 ?script=…&lineage=…&stop=…
 stopRefFromParams(lineage, stop) // 从 URL 参数恢复站点，无效参数返回 undefined
 neighboringStopRefs(scriptId)  // 默认入口的前后邻站
 lineageStatusFor(system)       // neighbors | standalone | isolated
+
+scriptContextFor(scriptId)     // 一个节点的图关系 + 默认血统上下文
+graphChildrenByScript          // scriptId → 图上的直接子节点
 ```
 
+`scriptContextFor()` 是给未来节点详情复用的统一读模型：
+
+```ts
+{
+  system,                       // 当前书写体系
+  graph: { parents, children }, // parents 有向图里的直接前后关系
+  lineage: {                    // 没有任何已核实轨道时整段省略
+    entry,                      // 默认轨道站点，可直接定位 MICRO
+    previous, next,             // 默认入口在轨道上的前后站
+    alternatives,               // 该体系出现的其他轨道入口
+  }
+}
+```
+
+`graph` 和 `lineage` 刻意分成两层：前者回答“这套文字从哪些书写体系而来、又
+影响了谁”，后者回答“这个字位在这条已核实的字形链上如何变化”。两层不能互相
+冒充，节点详情可以在同一份对象里分别展示，而不必再造第二套模型。`alternatives`
+已经按轨道去重，只保留每条轨道的默认站点；同一轨道上的其他书体阶段仍可通过
+`stopsByScript` 取得。
+
 入口优先读 `WritingSystem.lineageEntry`，没有指定时取 `lineages` 中第一条经过
-该体系的轨道。三种状态都是合法的：有前后邻站（`neighbors`）、只有单站
-（`standalone`）、没有轨道（`isolated`）。最后一种应打开单体系详情，而不是
-为了覆盖率伪造链条。URL 参数只用稳定的 `script`、`lineage`、`stop` id；后续
-若需要播放位置，可以再加 `t`，不会改动已有站点键。
+该体系的轨道。多轨道节点应明确首选入口，避免数组顺序无意中改变产品语义。
+三种状态都是合法的：有前后邻站（`neighbors`）、只有单站（`standalone`）、
+没有轨道（`isolated`）。最后一种应打开单体系详情，而不是为了覆盖率伪造链条。
+URL 参数只用稳定的 `script`、`lineage`、`stop` id；后续若需要播放位置，可以
+再加 `t`，不会改动已有站点键。
+
+等样本覆盖足够后，MACRO 节点详情可以直接消费这份上下文：用
+`lineage.entry` 进入对应的 MICRO 街景，用 `previous` / `next` 继续前后行走，
+用 `alternatives` 切换其他轨道；没有 `lineage` 的节点则只展示体系级资料。
+这样合流不需要迁移素材，也不需要给字形再编一套 id。
 
 ### 覆盖审计
 
@@ -333,11 +363,16 @@ npm run audit:coverage:json  # 交给脚本或 CI 的 JSON
 ```
 
 它把“还缺什么”列成补链队列：哪些节点已有可前后行走的入口、哪些只能先以单
-体系打开、哪些站点或轨道缺来源、哪些素材缺登记。当前 193 个图谱节点中，96 个
-已有可前后行走的入口，97 个尚无轨道入口；12 个独立起源中 3 个已有入口。
-37 条轨道都至少登记了一组参考链接，139 个站点均已有来源（站点专属或继承轨道）
-和素材登记。无轨道不等于漏数据，尤其对未破译或独立起源体系，必须先有可靠证据
-才补链。覆盖率达标后可用 `npm run audit:coverage -- --strict` 把它升级为 CI 门禁。
+体系打开、哪些站点或轨道缺来源、哪些素材缺登记。报告还区分首选入口是
+`explicit`（数据里明确指定）还是 `fallback`（按轨道数据顺序回退），并检查
+`scriptContextFor()` 返回的 parents / children / 邻站是否与源数据一致。
+
+当前 193 个图谱节点中，96 个已有可前后行走的入口，97 个尚无轨道入口；12 个
+独立起源中 3 个已有入口。26 个多轨道节点均已明确首选入口，另有 70 个单轨道
+节点使用合法的回退入口。体系级 `sourceRefs` 目前覆盖 12/193 个节点；37 条轨道
+都至少登记了一组参考链接，139 个站点均已有来源（站点专属或继承轨道）和素材
+登记。无轨道不等于漏数据，尤其对未破译或独立起源体系，必须先有可靠证据才补链。
+覆盖率达标后可用 `npm run audit:coverage -- --strict` 把它升级为 CI 门禁。
 
 ### 字母场 —— 一整套字母表的形变
 
@@ -1139,6 +1174,13 @@ npm run build && ls dist/
   单站为准。覆盖审计新增轨道级来源统计：当前 37/37 条轨道有来源，139 个站点
   缺来源 0、缺素材登记 0。这些链接完成了“可追溯”的底账，不等同于每一站的
   字形判断都已学术定稿，后续仍按站点继续核验。本轮不改界面。
+
+- **2026-10-19 · 节点上下文与首选入口**：新增 `scriptContextFor()`，把任意节点
+  的图关系（直接 parents / children）与默认血统上下文（入口、前后邻站、其他轨道）
+  收进同一读模型，同时保留“没有已核实轨道就不伪造链条”的边界。26 个出现在多条
+  轨道上的书写体系逐一指定首选站点，避免以后界面受轨道数组顺序影响；70 个单轨道
+  节点继续使用数据顺序回退。埃及、甲骨、克里特象形等 12 个体系补上体系级参考，
+  覆盖审计增加入口模式、来源覆盖与上下文一致性检查。本轮仍不改界面。
 
 ---
 

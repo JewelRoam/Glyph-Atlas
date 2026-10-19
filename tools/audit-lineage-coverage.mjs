@@ -13,7 +13,12 @@
  *
  * --strict 会把覆盖率不足当成失败，供未来覆盖率达标后的 CI 使用。
  */
-import { lineages, writingSystems } from '../src/data/index.ts';
+import {
+  graphChildrenByScript,
+  lineages,
+  scriptContextFor,
+  writingSystems,
+} from '../src/data/index.ts';
 import { adjacentStops, lineageEntryFor } from '../src/data/lineageIndex.ts';
 
 const json = process.argv.includes('--json');
@@ -35,7 +40,9 @@ const entries = systems.map((system) => {
     family: system.family,
     type: system.type,
     status: system.status,
+    sourceRefs: system.sourceRefs?.length ?? 0,
     tracks: entry?.tracks.length ?? 0,
+    entryMode: !entry?.track ? 'none' : system.lineageEntry ? 'explicit' : 'fallback',
     entry: entry?.track
       ? {
           lineageId: entry.track.lineage.id,
@@ -74,6 +81,85 @@ const withNeighbors = entries.filter(
 
 const independent = entries.filter((entry) => entry.origin === 'independent');
 const independentIsolated = independent.filter((entry) => !entry.entry);
+const systemsWithSourceRefs = entries.filter((entry) => entry.sourceRefs > 0);
+const multiTrack = entries.filter((entry) => entry.tracks > 1);
+const multiTrackWithoutExplicitEntry = multiTrack.filter(
+  (entry) => entry.entryMode !== 'explicit',
+);
+const fallbackEntries = entries.filter((entry) => entry.entryMode === 'fallback');
+
+// 节点上下文是未来 MACRO 详情与 MICRO 合流时共用的读模型。这里把它与
+// writingSystems.parents、轨道反向索引逐项对照，防止两套查询在界面合流后分叉。
+const contextMismatches = [];
+const sameIds = (left, right) =>
+  left.length === right.length && left.every((id, index) => id === right[index]);
+const mismatch = (id, message) => contextMismatches.push({ id, message });
+
+for (const system of systems) {
+  const context = scriptContextFor(system.id);
+  if (!context) {
+    mismatch(system.id, 'scriptContextFor() 没有返回节点');
+    continue;
+  }
+
+  const expectedChildren = systems
+    .filter((candidate) => candidate.parents.includes(system.id))
+    .map((candidate) => candidate.id);
+  const mappedChildren = (graphChildrenByScript.get(system.id) ?? []).map(
+    (candidate) => candidate.id,
+  );
+  const contextChildren = context.graph.children.map((candidate) => candidate.id);
+  if (!sameIds(context.graph.parents.map((candidate) => candidate.id), system.parents)) {
+    mismatch(system.id, '上下文 parents 与 writingSystems.parents 不一致');
+  }
+  if (!sameIds(contextChildren, expectedChildren)) {
+    mismatch(system.id, '上下文 children 与 writingSystems.parents 反向索引不一致');
+  }
+  if (!sameIds(mappedChildren, expectedChildren)) {
+    mismatch(system.id, 'graphChildrenByScript 与 writingSystems.parents 不一致');
+  }
+
+  const expectedEntry = lineageEntryFor(system.id);
+  if (!expectedEntry?.track) {
+    if (context.lineage) mismatch(system.id, '没有轨道却返回了 lineage 上下文');
+    continue;
+  }
+  if (!context.lineage) {
+    mismatch(system.id, '有轨道却没有返回 lineage 上下文');
+    continue;
+  }
+
+  const { entry, previous, next, alternatives } = context.lineage;
+  if (entry.key !== expectedEntry.track.key) {
+    mismatch(system.id, `lineage.entry 应为 ${expectedEntry.track.key}，实际为 ${entry.key}`);
+  }
+  if (entry.stop.script !== system.id) {
+    mismatch(system.id, `lineage.entry 指向其他体系 ${entry.stop.script}`);
+  }
+  const expectedNeighbors = adjacentStops(expectedEntry.track);
+  if (previous?.key !== expectedNeighbors.previous?.key) {
+    mismatch(system.id, 'lineage.previous 与轨道邻站不一致');
+  }
+  if (next?.key !== expectedNeighbors.next?.key) {
+    mismatch(system.id, 'lineage.next 与轨道邻站不一致');
+  }
+
+  const expectedAlternativeKeys = expectedEntry.tracks.slice(1).map((track) => track.key);
+  const alternativeKeys = alternatives.map((track) => track.key);
+  if (!sameIds(alternativeKeys, expectedAlternativeKeys)) {
+    mismatch(system.id, 'lineage.alternatives 与去重后的轨道入口不一致');
+  }
+  const seenLineages = new Set();
+  for (const alternative of alternatives) {
+    if (alternative.stop.script !== system.id) {
+      mismatch(system.id, `lineage.alternatives 含其他体系的站点 ${alternative.key}`);
+    }
+    if (seenLineages.has(alternative.lineage.id)) {
+      mismatch(system.id, `lineage.alternatives 重复轨道 ${alternative.lineage.id}`);
+    }
+    seenLineages.add(alternative.lineage.id);
+  }
+}
 
 const tracksWithoutSourceRefs = lineages.filter((lineage) => !lineage.sourceRefs?.length);
 const incompleteStops = stopRefs.filter(
@@ -91,6 +177,12 @@ const result = {
     systemsWithEntry: linked.length,
     systemsWithNeighbors: withNeighbors.length,
     systemsIsolated: isolated.length,
+    systemsWithSourceRefs: systemsWithSourceRefs.length,
+    systemsWithoutSourceRefs: entries.length - systemsWithSourceRefs.length,
+    systemsWithMultipleTracks: multiTrack.length,
+    multiTrackWithoutExplicitEntry: multiTrackWithoutExplicitEntry.length,
+    systemsUsingFallbackEntry: fallbackEntries.length,
+    contextMismatches: contextMismatches.length,
     independentSystems: independent.length,
     independentSystemsWithEntry: independent.length - independentIsolated.length,
     independentSystemsIsolated: independentIsolated.length,
@@ -102,6 +194,25 @@ const result = {
     id: entry.id,
     nameZh: entry.nameZh,
   })),
+  systemsWithoutSourceRefs: entries
+    .filter((entry) => entry.sourceRefs === 0)
+    .map((entry) => ({
+      id: entry.id,
+      nameZh: entry.nameZh,
+      origin: entry.origin,
+      family: entry.family,
+    })),
+  multiTrackWithoutExplicitEntry: multiTrackWithoutExplicitEntry.map((entry) => ({
+    id: entry.id,
+    nameZh: entry.nameZh,
+    tracks: entry.tracks,
+  })),
+  fallbackEntries: fallbackEntries.map((entry) => ({
+    id: entry.id,
+    nameZh: entry.nameZh,
+    entry: entry.entry,
+  })),
+  contextMismatches,
   isolated: isolated.map((entry) => ({
     id: entry.id,
     nameZh: entry.nameZh,
@@ -144,6 +255,13 @@ if (json) {
       `待补 ${independentIsolated.length}`,
   );
   console.log(
+    `  体系级来源 ${systemsWithSourceRefs.length}/${entries.length} · ` +
+      `多轨道节点 ${multiTrack.length} · 未定首选入口 ${multiTrackWithoutExplicitEntry.length}`,
+  );
+  console.log(
+    `  节点上下文一致性 ${contextMismatches.length ? `✘ ${contextMismatches.length} 处不一致` : '✔'}`,
+  );
+  console.log(
     `  站点 ${stopRefs.length} · 缺来源 ${incompleteStops.length} · 缺素材登记 ${undocumentedAssets.length}`,
   );
   console.log(
@@ -155,6 +273,27 @@ if (json) {
     console.log('\n独立起源待补：');
     for (const entry of independentIsolated) {
       console.log(`  · ${entry.id}  ${entry.nameZh}`);
+    }
+  }
+
+  if (multiTrackWithoutExplicitEntry.length) {
+    console.log('\n多轨道节点尚未指定首选入口：');
+    for (const entry of multiTrackWithoutExplicitEntry) {
+      console.log(`  · ${entry.id}  ${entry.nameZh} (${entry.tracks} 个站点)`);
+    }
+  }
+
+  if (contextMismatches.length) {
+    console.log('\n节点上下文不一致：');
+    for (const item of contextMismatches) {
+      console.log(`  · ${item.id}  ${item.message}`);
+    }
+  }
+
+  if (fallbackEntries.length) {
+    console.log('\n按数据顺序回退入口：');
+    for (const entry of fallbackEntries) {
+      console.log(`  · ${entry.id}  ${entry.nameZh} → ${entry.entry.lineageId}:${entry.entry.stopId}`);
     }
   }
 
@@ -191,6 +330,11 @@ if (json) {
       console.log(`  · ${item.lineageId}:${item.stopId} (${item.script}, ${item.kind})`);
     }
   }
+}
+
+if (contextMismatches.length) {
+  console.error(`\n✘ ${contextMismatches.length} 处节点上下文与源数据不一致`);
+  process.exit(1);
 }
 
 if (strict && isolated.length) {
