@@ -37,31 +37,27 @@ OUT_ALPHA_VARGA = ROOT / 'src' / 'data' / 'glyphAlphabetsVarga.ts'
 UA = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36')
 
-# 数据里没有写 fontFamily 的书写体系，用这里指定的 Noto 字体取轮廓。
-# 选择原则：Google Fonts 上有这个字族的版本，且字形风格与该体系的代表字体一致
-# （汉字取宋体骨架，假名取日文明朝体，藏文只有 Serif 版本，天城文等取 Noto Sans）。
-FALLBACK_FAMILY = {
-  'greek': 'Noto Sans',
-  'devanagari': 'Noto Sans Devanagari',
-  'bengali': 'Noto Sans Bengali',
-  'gujarati': 'Noto Sans Gujarati',
-  'gurmukhi': 'Noto Sans Gurmukhi',
-  'odia': 'Noto Sans Oriya',
-  'tamil': 'Noto Sans Tamil',
-  'telugu': 'Noto Sans Telugu',
-  'kannada': 'Noto Sans Kannada',
-  'malayalam': 'Noto Sans Malayalam',
-  'sinhala': 'Noto Sans Sinhala',
-  'tibetan': 'Noto Serif Tibetan',
-  'khmer': 'Noto Sans Khmer',
-  'thai': 'Noto Sans Thai',
-  'lao': 'Noto Sans Lao',
-  'burmese': 'Noto Sans Myanmar',
-  'arabic': 'Noto Sans Arabic',
-  'chinese-regular': 'LXGW WenKai TC',
-  'hiragana': 'Noto Serif JP',
-  'katakana': 'Noto Serif JP',
-}
+# 数据里没有写 fontFamily 的书写体系，用哪款字体取轮廓。
+#
+# 这份表就是前端渲染用的那份（src/data/fontFallback.ts），这里现场读出来，
+# 不再各存一份——两边一旦分叉，"矢量形变"和"字体渲染"会画出两种字面。
+# 选择原则：Google Fonts 上确实有这个字族，且字形风格与该体系的代表字体一致
+# （汉字取宋体骨架，假名取日文明朝体，藏文只有 Serif 版本，天城文等取 Sans）。
+def load_fallback_family() -> dict[str, str]:
+    source = (ROOT / 'src' / 'data' / 'fontFallback.ts').read_text(encoding='utf8')
+    body = source[source.index('fontFallback'):]
+    body = body[body.index('{'):body.index('};')]
+    table: dict[str, str] = {}
+    for line in body.splitlines():
+        match = re.match(r"\s*'?([a-z0-9-]+)'?:\s*'([^']+)',", line)
+        if match:
+            table[match.group(1)] = match.group(2)
+    if not table:
+        raise SystemExit('fontFallback.ts 里读不到兜底字族，检查它的写法是不是变了')
+    return table
+
+
+FALLBACK_FAMILY = load_fallback_family()
 
 
 def fetch(url: str) -> bytes:
