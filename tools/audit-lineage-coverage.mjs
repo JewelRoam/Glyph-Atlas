@@ -15,6 +15,7 @@
  */
 import {
   graphChildrenByScript,
+  graphConnectionBetween,
   graphRelations,
   lineages,
   scriptContextFor,
@@ -27,6 +28,9 @@ import {
   lineageEntryFor,
   stopRefFor,
 } from '../src/data/lineageIndex.ts';
+import { glyphSets } from '../src/data/glyphSets.ts';
+import { glyphSourceFor } from '../src/data/glyphSources.ts';
+import { hasLetterMap, hasRoster, rosterFor } from '../src/data/letterSlots.ts';
 
 const json = process.argv.includes('--json');
 const strict = process.argv.includes('--strict');
@@ -96,25 +100,41 @@ const lineageAudits = lineages.map((lineage) => {
       to: pair
         ? { stopId: pair.to.stop.id, script: pair.to.stop.script }
         : null,
-      status: pair?.status ?? 'unlinked',
+      status: pair?.status ?? 'unrelated',
+      direction: pair?.connection.direction ?? null,
+      path: pair?.connection.path
+        ? pair.connection.path.steps.map(
+            (step) => `${step.relation.parent}>${step.relation.child}`,
+          )
+        : [],
       kind,
       relation: pair?.link
         ? `${pair.link.relation.parent}>${pair.link.relation.child}`
         : null,
     };
   });
-  const linkedAdjacencies = adjacencies.filter((item) => item.status === 'linked');
-  const linkedDescent = linkedAdjacencies.filter((item) => item.kind === 'descent');
-  const linkedOther = linkedAdjacencies.filter((item) => item.kind !== 'descent');
-  const reverseAdjacencies = adjacencies.filter((item) => item.status === 'reverse');
-  const unlinkedAdjacencies = adjacencies.filter((item) => item.status === 'unlinked');
+  const directAdjacencies = adjacencies.filter((item) => item.status === 'direct');
+  const directDescent = directAdjacencies.filter((item) => item.kind === 'descent');
+  const directOther = directAdjacencies.filter((item) => item.kind !== 'descent');
+  const indirectAdjacencies = adjacencies.filter((item) => item.status === 'indirect');
+  const unrelatedAdjacencies = adjacencies.filter((item) => item.status === 'unrelated');
+  const reverseAdjacencies = adjacencies.filter((item) => item.direction === 'reverse');
   const mode = lineage.mode ?? 'chain';
   const chainAdjacenciesWithoutDescent =
     mode === 'chain'
       ? adjacencies.filter(
-          (item) => item.status !== 'linked' || item.kind !== 'descent',
+          (item) => item.status !== 'direct' || item.kind !== 'descent',
         )
       : [];
+  const chainDirectOther = chainAdjacenciesWithoutDescent.filter(
+    (item) => item.status === 'direct',
+  );
+  const chainIndirect = chainAdjacenciesWithoutDescent.filter(
+    (item) => item.status === 'indirect',
+  );
+  const chainUnrelated = chainAdjacenciesWithoutDescent.filter(
+    (item) => item.status === 'unrelated',
+  );
 
   return {
     id: lineage.id,
@@ -122,12 +142,16 @@ const lineageAudits = lineages.map((lineage) => {
     mode,
     stops: refs.length,
     graphLinks: links.length,
-    linkedAdjacencies: linkedAdjacencies.length,
-    linkedDescent: linkedDescent.length,
-    linkedOther: linkedOther.length,
+    directAdjacencies: directAdjacencies.length,
+    directDescent: directDescent.length,
+    directOther: directOther.length,
+    indirectAdjacencies: indirectAdjacencies.length,
+    unrelatedAdjacencies: unrelatedAdjacencies.length,
     reverseAdjacencies: reverseAdjacencies.length,
-    unlinkedAdjacencies: unlinkedAdjacencies.length,
     chainAdjacenciesWithoutDescent,
+    chainDirectOther,
+    chainIndirect,
+    chainUnrelated,
     adjacencies,
     links: links.map((link) => ({
       parent: link.relation.parent,
@@ -147,24 +171,28 @@ const lineageGraphLinkCount = lineageAudits.reduce(
   (total, lineage) => total + lineage.graphLinks,
   0,
 );
-const linkedAdjacencyCount = lineageAudits.reduce(
-  (total, lineage) => total + lineage.linkedAdjacencies,
+const directAdjacencyCount = lineageAudits.reduce(
+  (total, lineage) => total + lineage.directAdjacencies,
   0,
 );
-const linkedDescentAdjacencyCount = lineageAudits.reduce(
-  (total, lineage) => total + lineage.linkedDescent,
+const directDescentAdjacencyCount = lineageAudits.reduce(
+  (total, lineage) => total + lineage.directDescent,
   0,
 );
-const linkedOtherAdjacencyCount = lineageAudits.reduce(
-  (total, lineage) => total + lineage.linkedOther,
+const directOtherAdjacencyCount = lineageAudits.reduce(
+  (total, lineage) => total + lineage.directOther,
+  0,
+);
+const indirectAdjacencyCount = lineageAudits.reduce(
+  (total, lineage) => total + lineage.indirectAdjacencies,
+  0,
+);
+const unrelatedAdjacencyCount = lineageAudits.reduce(
+  (total, lineage) => total + lineage.unrelatedAdjacencies,
   0,
 );
 const reverseAdjacencyCount = lineageAudits.reduce(
   (total, lineage) => total + lineage.reverseAdjacencies,
-  0,
-);
-const unlinkedAdjacencyCount = lineageAudits.reduce(
-  (total, lineage) => total + lineage.unlinkedAdjacencies,
   0,
 );
 const chainTracksWithoutDescent = lineageAudits.filter(
@@ -436,7 +464,153 @@ for (const system of systems) {
     }
     seenLineages.add(alternative.lineage.id);
   }
+
+  const expectedTrackKeys = expectedEntry.tracks.map((track) => track.key);
+  const trackKeys = context.lineage.tracks.map((track) => track.entry.key);
+  if (!sameIds(trackKeys, expectedTrackKeys)) {
+    mismatch(system.id, 'lineage.tracks 与去重后的轨道入口不一致');
+  }
+  const seenTrackLineages = new Set();
+  for (const track of context.lineage.tracks) {
+    if (track.entry.stop.script !== system.id) {
+      mismatch(system.id, `lineage.tracks 含其他体系的站点 ${track.entry.key}`);
+    }
+    if (seenTrackLineages.has(track.entry.lineage.id)) {
+      mismatch(system.id, `lineage.tracks 重复轨道 ${track.entry.lineage.id}`);
+    }
+    seenTrackLineages.add(track.entry.lineage.id);
+
+    const expectedTrackNeighbors = adjacentStops(track.entry);
+    if (track.previous?.key !== expectedTrackNeighbors.previous?.key) {
+      mismatch(system.id, `${track.entry.lineage.id} 轨道 previous 不一致`);
+    }
+    if (track.next?.key !== expectedTrackNeighbors.next?.key) {
+      mismatch(system.id, `${track.entry.lineage.id} 轨道 next 不一致`);
+    }
+
+    const expectedTrackLinks = graphLinksForLineage(track.entry.lineage);
+    const actualTrackLinkKeys = track.graphLinks.map(
+      (link) => `${link.relation.parent}>${link.relation.child}`,
+    );
+    if (
+      !sameIds(
+        actualTrackLinkKeys,
+        expectedTrackLinks.map((link) => `${link.relation.parent}>${link.relation.child}`),
+      )
+    ) {
+      mismatch(system.id, `${track.entry.lineage.id} 轨道 graphLinks 不一致`);
+    }
+
+    const expectedTrackAdjacency = adjacentGraphLinks(track.entry);
+    for (const side of ['previous', 'next']) {
+      const actual = track.adjacency[side];
+      const expected = expectedTrackAdjacency[side];
+      if (actual?.status !== expected?.status) {
+        mismatch(system.id, `${track.entry.lineage.id} 轨道 adjacency.${side} 状态不一致`);
+      }
+      if (actual?.from.key !== expected?.from.key || actual?.to.key !== expected?.to.key) {
+        mismatch(system.id, `${track.entry.lineage.id} 轨道 adjacency.${side} 站点对不一致`);
+      }
+      const path = actual?.connection.path;
+      if (path) {
+        if (path.from.id !== actual.connection.path?.from.id) {
+          mismatch(system.id, `${track.entry.lineage.id} 轨道 adjacency.${side} 路径起点缺失`);
+        }
+        const brokenStep = path.steps.findIndex(
+          (step, index) =>
+            step.relation.parent !== step.from.id ||
+            step.relation.child !== step.to.id ||
+            (index > 0 && path.steps[index - 1]?.to.id !== step.from.id),
+        );
+        if (brokenStep !== -1) {
+          mismatch(system.id, `${track.entry.lineage.id} 轨道 adjacency.${side} 路径第 ${brokenStep + 1} 步断裂`);
+        }
+      }
+    }
+  }
+
+  const expectedMaterials = {
+    source: glyphSourceFor(system),
+    glyphSet: glyphSets[system.id],
+    hasRoster: hasRoster(system.id),
+    hasManualMap: hasLetterMap(system.id),
+  };
+  if (context.materials.source.kind !== expectedMaterials.source.kind) {
+    mismatch(system.id, 'materials.source 与字形来源解析不一致');
+  }
+  if (context.materials.glyphSet !== expectedMaterials.glyphSet) {
+    mismatch(system.id, 'materials.glyphSet 与样本集不一致');
+  }
+  if (Boolean(context.materials.letterSlots) !== expectedMaterials.hasRoster) {
+    mismatch(system.id, 'materials.letterSlots 与字母表索引不一致');
+  }
+  if (
+    context.materials.letterSlots &&
+    Object.keys(context.materials.letterSlots.roster).length !==
+      Object.keys(rosterFor(system.id)).length
+  ) {
+    mismatch(system.id, 'materials.letterSlots.roster 与字母表索引不一致');
+  }
+  if (
+    context.materials.letterSlots &&
+    context.materials.letterSlots.hasManualMap !== expectedMaterials.hasManualMap
+  ) {
+    mismatch(system.id, 'materials.letterSlots.hasManualMap 与手工槽位表不一致');
+  }
 }
+
+// 关键缺口的历史判断已经核过：三条隔着未入轨节点，一条是姐妹支。
+// 这里把结论固定成回归检查，防止以后为了“审计全绿”误补直系边。
+const expectedGraphConnections = [
+  {
+    from: 'greek',
+    to: 'etruscan',
+    status: 'indirect',
+    steps: ['greek>old-italic', 'old-italic>etruscan'],
+  },
+  {
+    from: 'greek',
+    to: 'latin',
+    status: 'indirect',
+    steps: ['greek>old-italic', 'old-italic>etruscan', 'etruscan>latin'],
+  },
+  {
+    from: 'linear-b',
+    to: 'cypriot',
+    status: 'none',
+    steps: [],
+  },
+  {
+    from: 'aramaic',
+    to: 'inscriptional-pahlavi',
+    status: 'indirect',
+    steps: ['aramaic>pahlavi', 'pahlavi>inscriptional-pahlavi'],
+  },
+];
+const graphConnectionChecks = expectedGraphConnections.map((expected) => {
+  const actual = graphConnectionBetween(expected.from, expected.to);
+  const steps = actual.path?.steps.map(
+    (step) => `${step.relation.parent}>${step.relation.child}`,
+  ) ?? [];
+  const matches =
+    actual.status === expected.status &&
+    steps.length === expected.steps.length &&
+    steps.every((step, index) => step === expected.steps[index]);
+  if (!matches) {
+    contextMismatches.push({
+      id: `${expected.from}>${expected.to}`,
+      message:
+        `关键图连接应为 ${expected.status} ` +
+        `[${expected.steps.join(' → ')}]，实际为 ${actual.status} [${steps.join(' → ')}]`,
+    });
+  }
+  return {
+    ...expected,
+    actualStatus: actual.status,
+    actualSteps: steps,
+    matches,
+  };
+});
 
 const tracksWithoutSourceRefs = lineages.filter((lineage) => !lineage.sourceRefs?.length);
 const incompleteStops = stopRefs.filter(
@@ -475,13 +649,26 @@ const result = {
     stopsWithoutSource: incompleteStops.length,
     stopsWithoutAssetMetadata: undocumentedAssets.length,
     lineageGraphLinks: lineageGraphLinkCount,
-    lineageLinkedAdjacencies: linkedAdjacencyCount,
-    lineageLinkedDescentAdjacencies: linkedDescentAdjacencyCount,
-    lineageLinkedOtherAdjacencies: linkedOtherAdjacencyCount,
+    lineageDirectAdjacencies: directAdjacencyCount,
+    lineageDirectDescentAdjacencies: directDescentAdjacencyCount,
+    lineageDirectOtherAdjacencies: directOtherAdjacencyCount,
+    lineageIndirectAdjacencies: indirectAdjacencyCount,
+    lineageUnrelatedAdjacencies: unrelatedAdjacencyCount,
     lineageReverseAdjacencies: reverseAdjacencyCount,
-    lineageUnlinkedAdjacencies: unlinkedAdjacencyCount,
     chainTracksWithoutDescent: chainTracksWithoutDescent.length,
     chainAdjacenciesWithoutDescent,
+    chainDirectOtherAdjacencies: chainTracksWithoutDescent.reduce(
+      (total, lineage) => total + lineage.chainDirectOther.length,
+      0,
+    ),
+    chainIndirectAdjacencies: chainTracksWithoutDescent.reduce(
+      (total, lineage) => total + lineage.chainIndirect.length,
+      0,
+    ),
+    chainUnrelatedAdjacencies: chainTracksWithoutDescent.reduce(
+      (total, lineage) => total + lineage.chainUnrelated.length,
+      0,
+    ),
   },
   independentIsolated: independentIsolated.map((entry) => ({
     id: entry.id,
@@ -506,6 +693,17 @@ const result = {
     entry: entry.entry,
   })),
   contextMismatches,
+  graphConnectionChecks,
+  indirectAdjacencies: lineageAudits
+    .flatMap((lineage) =>
+      lineage.adjacencies
+        .filter((item) => item.status === 'indirect')
+        .map((item) => ({
+          lineageId: lineage.id,
+          nameZh: lineage.nameZh,
+          ...item,
+        })),
+    ),
   chainTracksWithoutDescent: chainTracksWithoutDescent.map((lineage) => ({
     id: lineage.id,
     nameZh: lineage.nameZh,
@@ -587,8 +785,10 @@ if (json) {
     `  站点 ${stopRefs.length} · 缺来源 ${incompleteStops.length} · 缺素材登记 ${undocumentedAssets.length}`,
   );
   console.log(
-    `  轨道—图边 ${lineageGraphLinkCount} · 相邻直系 ${linkedDescentAdjacencyCount} · ` +
-      `相邻其他关系 ${linkedOtherAdjacencyCount} · 反向 ${reverseAdjacencyCount} · 无直接边 ${unlinkedAdjacencyCount}`,
+    `  轨道—图边 ${lineageGraphLinkCount} · 直接 ${directAdjacencyCount} ` +
+      `(直系 ${directDescentAdjacencyCount} / 其他 ${directOtherAdjacencyCount}) · ` +
+      `间接路径 ${indirectAdjacencyCount} · 无关 ${unrelatedAdjacencyCount} · ` +
+      `反向 ${reverseAdjacencyCount}`,
   );
   console.log(
     `  轨道 ${lineages.length} · 已有轨道级来源 ${lineages.length - tracksWithoutSourceRefs.length} · ` +
@@ -617,24 +817,42 @@ if (json) {
   }
 
   if (chainTracksWithoutDescent.length) {
-    console.log('\nchain 轨道中相邻站缺少直系边（审计项，不阻断构建）：');
+    console.log('\nchain 轨道中相邻站不是直接直系边（审计项，不阻断构建）：');
     for (const lineage of chainTracksWithoutDescent) {
       for (const item of lineage.chainAdjacenciesWithoutDescent) {
+        const label =
+          item.status === 'direct'
+            ? `直接${item.kind ? ` ${item.kind}` : ''}`
+            : item.status === 'indirect'
+              ? '间接路径'
+              : '无有向路径';
         console.log(
           `  · ${lineage.id}: ${item.from.script}:${item.from.stopId} → ` +
-            `${item.to?.script}:${item.to?.stopId} (${item.status}${item.kind ? `, ${item.kind}` : ''})`,
+            `${item.to?.script}:${item.to?.stopId} (${label}` +
+            `${item.direction ? `, ${item.direction}` : ''}` +
+            `${item.path?.length > 1 ? `, 经 ${item.path.join(' → ')}` : ''})`,
         );
       }
+    }
+  }
+
+  if (result.indirectAdjacencies.length) {
+    console.log('\n轨道相邻站的间接图路径：');
+    for (const item of result.indirectAdjacencies) {
+      console.log(
+        `  · ${item.lineageId}: ${item.from.script}:${item.from.stopId} → ` +
+          `${item.to.script}:${item.to.stopId} (${item.path.join(' → ')})`,
+      );
     }
   }
 
   if (reverseAdjacencyCount) {
     console.log('\n轨道顺序与图边方向相反：');
     for (const lineage of lineageAudits.filter((item) => item.reverseAdjacencies)) {
-      for (const item of lineage.adjacencies.filter((entry) => entry.status === 'reverse')) {
+      for (const item of lineage.adjacencies.filter((entry) => entry.direction === 'reverse')) {
         console.log(
           `  · ${lineage.id}: ${item.from.script}:${item.from.stopId} → ` +
-            `${item.to?.script}:${item.to?.stopId} (${item.relation})`,
+            `${item.to?.script}:${item.to?.stopId} (${item.relation ?? '间接路径'})`,
         );
       }
     }

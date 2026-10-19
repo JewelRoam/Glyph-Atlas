@@ -117,9 +117,11 @@ Glyph-Atlas/
     ├── data/                   ── 数据层（纯 TypeScript，无运行时依赖）
     │   ├── types.ts            类型定义：WritingSystem / GlyphStop / Lineage
     │   ├── writingSystems.ts   书写体系主数据
+    │   ├── graphRelations.ts   有语义的体系级图边（直系 / 借用 / 影响 / 模型）
+    │   ├── graphIndex.ts       图关系查询：确定性最短有向路径与连接判定
     │   ├── lineages.ts         血统轨道（字形演变路径）
     │   ├── lineageIndex.ts     站点稳定键与「书写体系 ↔ 轨道」反向索引
-    │   ├── scriptContext.ts    节点上下文：图上的亲缘 + 可选的默认血统入口
+    │   ├── scriptContext.ts    节点上下文：图关系 + 素材 + 全部轨道上下文
     │   ├── glyphPaths.ts       轨道站点的 100×100 矢量轮廓（生成物）
     │   └── index.ts            派生集合：graphSystems / independentSystems …
     ├── lib/                    ── 逻辑层
@@ -366,7 +368,7 @@ stopRefFromParams(lineage, stop) // 从 URL 参数恢复站点，无效参数返
 neighboringStopRefs(scriptId)  // 默认入口的前后邻站
 lineageStatusFor(system)       // neighbors | standalone | isolated
 
-scriptContextFor(scriptId)     // 直接关系 + 全部祖先/后代 + 多路径 + 默认血统入口
+scriptContextFor(scriptId)     // 图关系 + 素材 + 全部轨道的入口、前后站与连接路径
 ancestorsFor(scriptId)         // 全部祖先节点
 descendantsFor(scriptId)       // 全部后代节点
 graphChildrenByScript          // scriptId → 图上的直接子节点
@@ -384,28 +386,53 @@ graphChildrenByScript          // scriptId → 图上的直接子节点
     ancestors, descendants,      // 全部祖先 / 后代（去重）
     ancestryPaths, descendantPaths, // 保留分支的完整路径
   },
+  materials: {                  // 节点详情与字母场共用的素材关联
+    source,                     // font | image | none，及授权与出处
+    glyphSet,                   // Unicode 推导或手工整理的代表字形集
+    letterSlots: {              // 没有可铺字表时整段省略
+      hasManualMap,             // 是否有手工核过的跨体系同源槽位
+      roster,                   // 槽位 → 该体系中的字符
+    },
+  },
   lineage: {                    // 没有任何已核实轨道时整段省略
-    entry,                      // 默认轨道站点，可直接定位 MICRO
-    previous, next,             // 默认入口在轨道上的前后站
-    alternatives,               // 该体系出现的其他轨道入口
-    graphLinks,                 // 默认轨道里落在站点对上的体系级图边
-    adjacency,                  // 入口前后邻接对的 linked / reverse / unlinked 状态
-  }
+    entry, previous, next,      // 默认轨道入口及前后站
+    graphLinks, adjacency,      // 默认轨道的站点级图边与邻接语义
+    alternatives,               // 其他轨道入口，供切换器使用
+    tracks: [{                  // 每条轨道各有一份完整上下文
+      entry, previous, next,
+      graphLinks, adjacency,
+    }],
+  },
 }
 ```
 
 `graph` 和 `lineage` 刻意分成两层：前者回答“这套文字从哪些书写体系而来、又
 影响了谁”，后者回答“这个字位在这条已核实的字形链上如何变化”。两层不能互相
 冒充，节点详情可以在同一份对象里分别展示，而不必再造第二套模型。`alternatives`
-已经按轨道去重，只保留每条轨道的默认站点；同一轨道上的其他书体阶段仍可通过
-`stopsByScript` 取得。
+按轨道去重，只保留每条轨道的入口；`tracks` 则为每条轨道保留自己的前后邻站、
+图边和邻接路径，未来切换轨道时不必再去别处拼索引。
 
-`graphLinksForLineage(lineage)` 把体系级边落到该轨道中距离最近的一对站点上，
-`adjacentGraphLinks(stopRef)` 再把每个相邻站对标成 `linked`、`reverse` 或
-`unlinked`。这里没有第三张关系表：边仍只来自 `graphRelations`，轨道只提供
-具体书体阶段的端点。`linked` 不等于一定是直系，必须同时读 `relation.kind`；
-`unlinked` 也不是数据错误，`cognate` 与 `pair` 轨道的叙事顺序本来就可能不沿
-图边前进。
+`materials` 只关联现有素材层，不复制字形表：字体 / 图版仍由 `glyphSources.ts`
+解析，代表字形仍由 `glyphSets.ts` 维护，字母槽位仍由 `letterSlots.ts` 生成。
+站点自己的 `path`、`image`、`char`、`sourceRef` 与 `asset` 继续随
+`LineageStopRef.stop` 保存。因此，MACRO 节点详情和 MICRO 字母场可以消费同一
+份上下文，而不需要维护两套字形索引。
+
+`graphLinksForLineage(lineage)` 把体系级边落到该轨道中距离最近的一对站点上；
+`adjacentGraphLinks(stopRef)` 再把每个相邻站对标成三种连接状态：
+
+| 状态 | 含义 | 界面应如何理解 |
+| --- | --- | --- |
+| `direct` | 两站之间有直接图边 | 可读 `relation.kind` 区分直系、借用、影响或模型 |
+| `indirect` | 中间隔着未入轨节点，但存在有向路径 | 保留 `connection.path.steps`，不要画成一步直达 |
+| `unrelated` | 两个方向都没有有向路径 | 只是叙事并列或姐妹支，不补假边 |
+
+`connection.direction` 是路径相对于“从前一站到后一站”的方向：`forward` 表示
+沿图边前进，`reverse` 表示需要反向阅读。`indirect` 的 `connection.path` 保留
+完整站点与每一步 `relation`，未来可以从节点详情继续前后行走；`unrelated`
+不是数据错误，`cognate` 与 `pair` 轨道的叙事顺序本来就可能不沿图边前进。
+这里没有第三张关系表：所有连接仍只来自 `graphRelations`，轨道只提供具体书体
+阶段的端点。
 
 入口优先读 `WritingSystem.lineageEntry`。当前 96 个已经进入轨道的节点全部明确
 指定了首选站点，不再依赖 `lineages` 数组顺序；回退逻辑只作为以后新增数据时的
@@ -417,8 +444,8 @@ URL 参数只用稳定的 `script`、`lineage`、`stop` id；后续若需要播�
 
 等样本覆盖足够后，MACRO 节点详情可以直接消费这份上下文：用
 `lineage.entry` 进入对应的 MICRO 街景，用 `previous` / `next` 继续前后行走，
-用 `alternatives` 切换其他轨道；没有 `lineage` 的节点则只展示体系级资料。
-这样合流不需要迁移素材，也不需要给字形再编一套 id。
+用 `tracks` 切换其他轨道；没有 `lineage` 的节点则只展示体系级资料与
+`materials`。这样合流不需要迁移素材，也不需要给字形再编一套 id。
 
 ### 覆盖审计
 
@@ -437,9 +464,12 @@ npm run audit:coverage:json  # 交给脚本或 CI 的 JSON
 独立起源中 3 个已有入口。27 个多轨道节点与其余 69 个单轨道节点均已明确首选
 入口，已入轨但依赖回退的节点为 0。体系级 `sourceRefs` 目前覆盖 13/194 个节点；38 条轨道
 都至少登记了一组参考链接，139 个站点均已有来源（站点专属或继承轨道）和素材
-登记。轨道与图边计算出 83 条站点级关联，其中 43 个相邻站对是直系、11 个是
-借用 / 影响 / 模型、0 个方向相反、47 个没有直接图边；另有 9 个 `chain` 相邻
-站对已列入待核实队列，不会被自动当成直系。图谱有 155 条边：直系 110、借用 15、影响 22、造字模型 8。44 个无父系
+登记。轨道与图边计算出 83 条站点级关联：54 个相邻站对是直接连接（43 个直系、
+11 个借用 / 影响 / 模型），3 个是隔着未入轨节点的间接路径，44 个没有有向路径，
+0 个方向相反。另有 9 个 `chain` 相邻站对不是直接直系边，已按“直接其他关系 /
+间接路径 / 无有向路径”分列；其中 6 个是合法的借用、影响或模型关系，2 个有完整
+间接路径，1 个（线形文字 B → 塞浦路斯音节文字）是姐妹支，不会为了审计全绿
+硬补直系边。图谱有 155 条边：直系 110、借用 15、影响 22、造字模型 8。44 个无父系
 节点中，12 个是独立起源根，32 个是现代创制根，覆盖审计分开计数，不能把“图根”
 直接当成“独立发明”。无轨道不等于漏数据，尤其对未破译或独立起源体系，必须先有
 可靠证据才补链。覆盖率达标后可用 `npm run audit:coverage -- --strict` 把它升级为
@@ -1263,6 +1293,14 @@ npm run build && ls dist/
   边类型统计、图根分类与路径一致性检查，README 同步记录数据契约。同时修正古波斯、
   乌加里特、契丹小字与奥塞治文的父系语义，新增利比亚—柏柏尔字母节点，使提非纳文
   不再直接挂在腓尼基文下。本轮仍不改界面。
+
+- **2026-10-19 · 节点轨道上下文与间接谱系路径**：新增 `graphIndex.ts`，以
+  `graphRelations` 为唯一来源提供确定性最短路径查询，把轨道邻接从
+  `linked / reverse / unlinked` 细化为 `direct / indirect / unrelated`。
+  `scriptContextFor()` 现在为每个节点返回全部轨道的完整上下文（入口、前后站、
+  图边与邻接路径），并关联字体 / 图版来源、代表字形集与字母槽位；素材仍由原
+  模块维护，不做复制。覆盖审计新增关键路径回归检查，当前 3 条间接路径保留完整
+  边序列，`linear-b → cypriot` 明确为无有向路径的姐妹支。本轮仍不改界面。
 
 - **2026-10-19 · 早期谱系校正与轨道图边关联**：逐条校正苏美尔—埃兰、埃及—麦罗埃、
   原始西奈—腓尼基、阿拉米—叙利亚 / 帕尔米拉—摩尼、伊特鲁里亚—拉丁等早期谱系，

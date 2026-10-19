@@ -1,6 +1,12 @@
 import type { GraphRelation, WritingSystem } from './types';
+import type { GlyphSet } from './glyphSets';
+import type { GlyphSource } from './glyphSources';
 import { writingSystems } from './writingSystems';
 import { graphRelations } from './graphRelations';
+import { glyphSets } from './glyphSets';
+import { glyphSourceFor } from './glyphSources';
+import { hasLetterMap, hasRoster, rosterFor } from './letterSlots';
+import type { GraphStep } from './graphIndex';
 import {
   adjacentGraphLinks,
   adjacentStops,
@@ -21,12 +27,6 @@ import {
  * 两层关系不能互相冒充：graph 表示书写体系之间的传承或影响，
  * lineage 表示某个同源字位在具体字形层面的前后关系。
  */
-export interface GraphStep {
-  relation: GraphRelation;
-  from: WritingSystem;
-  to: WritingSystem;
-}
-
 /** 从某个根节点到当前节点的一条完整祖先路径（按时间顺序）。 */
 export interface AncestryPath {
   nodes: readonly WritingSystem[];
@@ -58,23 +58,57 @@ export interface ScriptGraphContext {
   childRelations: readonly GraphRelation[];
 }
 
-export interface ScriptLineageContext {
-  /** 默认入口站点，可直接交给 MICRO 恢复当前上下文 */
+/**
+ * 某一条轨道在该体系入口处的完整上下文。
+ *
+ * 不只是“其他轨道还能点哪里”：每条轨道都带自己的前后邻站、站点级图边和
+ * 邻接路径。未来切换轨道时不需要再用别处的索引拼一次。
+ */
+export interface ScriptLineageTrackContext {
+  /** 该体系在这条轨道里的入口站点 */
   entry: LineageStopRef;
-  /** 默认入口所在轨道的前后站 */
+  /** 这条轨道上的前后站 */
   previous?: LineageStopRef;
   next?: LineageStopRef;
+  /** 这条轨道里所有能落到体系级图边的站点对 */
+  graphLinks: readonly LineageGraphLink[];
+  /** 入口前后两侧的直接 / 间接 / 无关状态 */
+  adjacency: LineageGraphAdjacency;
+}
+
+export interface ScriptLineageContext extends ScriptLineageTrackContext {
   /** 该体系出现的其他轨道入口；保留下来供未来的轨道切换器使用 */
   alternatives: readonly LineageStopRef[];
-  /** 默认轨道里所有能落到体系级图边的站点对；由 graphRelations 计算 */
-  graphLinks?: readonly LineageGraphLink[];
-  /** 默认入口前后两侧的图边状态；与轨道邻站分开表达 */
-  adjacency?: LineageGraphAdjacency;
+  /** 默认轨道在前，其余轨道各有一份完整上下文；同一轨道只出现一次 */
+  tracks: readonly ScriptLineageTrackContext[];
+}
+
+/**
+ * 节点详情与字母场共用的素材读模型。
+ *
+ * 字体 / 图版来源、代表字形集和字母槽位仍分别由原模块维护；这里只做只读
+ * 关联，不复制数据。未来 MACRO 节点详情和 MICRO 字母场从同一个上下文取素材，
+ * 站点自己的 path / image / char / sourceRef / asset 则继续随 LineageStopRef 保存。
+ */
+export interface ScriptMaterialContext {
+  /** 字体、逐字图片或整幅图版；没有可靠来源时 kind 为 none */
+  source: GlyphSource;
+  /** Unicode 推导或手工整理的代表字形集 */
+  glyphSet?: GlyphSet;
+  /** 可铺开的完整字母表；语素文字和没有可靠字库的体系可能没有 */
+  letterSlots?: {
+    /** 是否有手工核过的跨体系同源槽位 */
+    hasManualMap: boolean;
+    /** 槽位 → 该体系中的字符 */
+    roster: Readonly<Record<string, string>>;
+  };
 }
 
 export interface ScriptContext {
   system: WritingSystem;
   graph: ScriptGraphContext;
+  /** 字体、字形清单与字母槽位的统一入口 */
+  materials: ScriptMaterialContext;
   /** 没有任何已核实轨道的体系没有这一段，不伪造链条 */
   lineage?: ScriptLineageContext;
 }
@@ -149,20 +183,43 @@ export function scriptContextFor(scriptId: string): ScriptContext | undefined {
     childRelations,
   };
 
-  const lineageEntry = lineageEntryFor(scriptId);
-  if (!lineageEntry?.track) return { system, graph };
+  const glyphSet = glyphSets[system.id];
+  const materials: ScriptMaterialContext = {
+    source: glyphSourceFor(system),
+    glyphSet,
+  };
+  if (hasRoster(system.id)) {
+    materials.letterSlots = {
+      hasManualMap: hasLetterMap(system.id),
+      roster: rosterFor(system.id),
+    };
+  }
 
-  const { previous, next } = adjacentStops(lineageEntry.track);
+  const lineageEntry = lineageEntryFor(scriptId);
+  if (!lineageEntry?.track) return { system, graph, materials };
+
+  const trackContext = (track: LineageStopRef): ScriptLineageTrackContext => {
+    const { previous, next } = adjacentStops(track);
+    return {
+      entry: track,
+      previous,
+      next,
+      graphLinks: graphLinksForLineage(track.lineage),
+      adjacency: adjacentGraphLinks(track),
+    };
+  };
+  const tracks = lineageEntry.tracks.map(trackContext);
+  const defaultTrack = tracks[0];
+  if (!defaultTrack) return { system, graph, materials };
+
   return {
     system,
     graph,
+    materials,
     lineage: {
-      entry: lineageEntry.track,
-      previous,
-      next,
+      ...defaultTrack,
       alternatives: lineageEntry.tracks.slice(1),
-      graphLinks: graphLinksForLineage(lineageEntry.track.lineage),
-      adjacency: adjacentGraphLinks(lineageEntry.track),
+      tracks,
     },
   };
 }

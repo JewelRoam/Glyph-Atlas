@@ -5,6 +5,14 @@ import { graphRelations } from './graphRelations';
 export * from './types';
 export { writingSystems, scriptById } from './writingSystems';
 export { graphRelations } from './graphRelations';
+export { graphConnectionBetween, graphPathBetween } from './graphIndex';
+export type {
+  GraphConnection,
+  GraphConnectionStatus,
+  GraphPath,
+  GraphPathDirection,
+  GraphStep,
+} from './graphIndex';
 export { lineages } from './lineages';
 export {
   adjacentGraphLinks,
@@ -42,10 +50,11 @@ export {
 export type {
   AncestryPath,
   DescendantPath,
-  GraphStep,
   ScriptContext,
   ScriptGraphContext,
   ScriptLineageContext,
+  ScriptLineageTrackContext,
+  ScriptMaterialContext,
 } from './scriptContext';
 
 /**

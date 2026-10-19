@@ -1,6 +1,7 @@
 import { lineages } from './lineages';
 import { scriptById } from './writingSystems';
 import { graphRelations } from './graphRelations';
+import { graphConnectionBetween, type GraphConnection } from './graphIndex';
 import type { GlyphStop, GraphRelation, Lineage, WritingSystem } from './types';
 
 /**
@@ -65,8 +66,14 @@ export const allStopRefs: readonly LineageStopRef[] = [...stopRefs.values()];
 /** 体系级图谱边在一条字形轨道里的方向。 */
 export type LineageGraphDirection = 'forward' | 'reverse';
 
-/** 相邻两个轨道站点之间的图边状态。 */
-export type LineageAdjacencyStatus = 'linked' | 'reverse' | 'unlinked';
+/**
+ * 相邻两个轨道站点之间的图连接状态。
+ *
+ * direct 表示两站之间有直接边；indirect 表示中间隔着未入轨节点，但图里
+ * 仍有严格沿边方向的路径；unrelated 表示两个方向都没有有向路径。轨道顺序
+ * 本身只是叙事顺序，不能替代图边。
+ */
+export type LineageAdjacencyStatus = 'direct' | 'indirect' | 'unrelated';
 
 /**
  * 一条落在具体轨道站点上的体系级图边。
@@ -89,6 +96,9 @@ export interface LineageAdjacentGraphLink {
   from: LineageStopRef;
   to: LineageStopRef;
   status: LineageAdjacencyStatus;
+  /** 直接边或间接路径；unrelated 时没有。路径方向相对于 from → to。 */
+  connection: GraphConnection;
+  /** 只有当这条直接边也落在当前轨道里时才有 */
   link?: LineageGraphLink;
 }
 
@@ -169,11 +179,12 @@ export function graphLinksForLineage(lineage: Lineage): readonly LineageGraphLin
 }
 
 /**
- * 取一个站点前后两个邻接对的图边状态。
+ * 取一个站点前后两个邻接对的图连接状态。
  *
- * linked 表示前一站是图边父系、后一站是子系；reverse 表示图边方向与轨道
- * 顺序相反；unlinked 表示这条轨道相邻，但 graphRelations 里没有直接边。
- * cognate / pair 轨道没有图边是合法状态，调用方必须结合 lineage.mode 解读。
+ * 直接边会给出它在轨道里的具体端点；间接路径保留中间节点和每一步的
+ * relation，供未来节点详情继续向前后行走。没有有向路径才是 unrelated。
+ * cognate / pair 轨道出现 unrelated 是合法状态，调用方仍应结合
+ * lineage.mode 解读。
  */
 export function adjacentGraphLinks(ref: LineageStopRef): LineageGraphAdjacency {
   const links = graphLinksForLineage(ref.lineage);
@@ -192,10 +203,18 @@ export function adjacentGraphLinks(ref: LineageStopRef): LineageGraphAdjacency {
           (link) => link.parentIndex === to.index && link.childIndex === from.index,
         );
     const link = forward ?? reverse;
+    const connection = graphConnectionBetween(from.stop.script, to.stop.script);
+    const status: LineageAdjacencyStatus =
+      connection.status === 'direct'
+        ? 'direct'
+        : connection.status === 'indirect'
+          ? 'indirect'
+          : 'unrelated';
     return {
       from,
       to,
-      status: forward ? 'linked' : reverse ? 'reverse' : 'unlinked',
+      status,
+      connection,
       link,
     };
   };
