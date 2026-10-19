@@ -319,6 +319,24 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'greek-gothic',
+    nameZh: '希腊 Α → 哥特 \u{10330}',
+    nameEn: 'Greek \u{0391} \u2192 Gothic \u{10330}',
+    mode: 'chain',
+    source: 'Wikipedia《Gothic alphabet》：多数字母与希腊字母一一对应（形、音、数值相同）；乌尔菲拉 4 世纪创制',
+    description:
+      '哥特字母是现存最早为日耳曼语定制的字母表：四世纪时，卡帕多西亚希腊裔主教乌尔菲拉' +
+      '为把圣经译成哥特语而造了它，27 个字母排下来，顺序、音值与数字用法都对着希腊字母走。' +
+      '大多数哥特字母因此与希腊字母一一对应——alpha 对 a、beta 对 b、gamma 对 g。' +
+      '争议在少数几个字：r、s、f 更像拉丁字母，q、h、o 的来路各家说法不一，' +
+      '卢恩字母到底有没有参与，学界至今没有定论。这条轨道走的是对应关系最没有疑问的第一对。',
+    stops: [
+      { script: 'greek', char: '\u{0391}', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'gothic', char: '\u{10330}', label: '哥特 a', phonetic: 'a' },
+    ],
+  },
+
+  {
     id: 'northern-runes',
     nameZh: '古意大利字母 → 卢恩字母',
     nameEn: 'Old Italic → Runic',
@@ -429,6 +447,23 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'brahmi-sinhala',
+    nameZh: '婆罗米文 \u2192 僧伽罗文',
+    nameEn: 'Brahmi \u2192 Sinhala',
+    mode: 'chain',
+    source: 'Wikipedia《Sinhala script》：僧伽罗文是古印度婆罗米文的后裔，中世纪又与南印度格兰塔文合流',
+    description:
+      '僧伽罗语是印欧语，却写在印度系字母上——这层关系是公元前三世纪随佛教一起上岛的：' +
+      '阿努拉德普勒的陶片与石刻上，婆罗米文被借来记僧伽罗语，此后一千多年里没有断过。' +
+      '岛上写字的笔一路圆转下去，到中世纪又受南印度格兰塔文影响，把婆罗米那种方硬的骨架' +
+      '改成了一圈圈贴近棕榈叶纹理的弧线。字母表里 ka 的位置从头到尾没动，笔画却已经换了一副样子。',
+    stops: [
+      { script: 'brahmi', char: '\u{11013}', label: '婆罗米 ka', phonetic: 'ka' },
+      { script: 'sinhala', char: '\u{0D9A}', label: '僧伽罗 ka', phonetic: 'ka' },
+    ],
+  },
+
+  {
     id: 'sharada-branch',
     nameZh: '夏拉达文 a → 塔克里与兰达诸文',
     nameEn: 'Sharada a → Takri and Landa a',
@@ -498,6 +533,26 @@ export const lineages: Lineage[] = [
       { script: 'khmer', char: 'ក', label: '高棉文 ka', phonetic: 'ka' },
       { script: 'java', char: 'ꦏ', label: '爪哇文 ka', phonetic: 'ka' },
       { script: 'balinese', char: 'ᬓ', label: '巴厘文 ka', phonetic: 'ka' },
+    ],
+  },
+
+  {
+    id: 'grantha-malayalam',
+    nameZh: '帕拉瓦文 \u2192 格兰塔文 \u2192 马拉雅拉姆文',
+    nameEn: 'Pallava \u2192 Grantha \u2192 Malayalam',
+    mode: 'chain',
+    source: 'Wikipedia《Grantha script》：格兰塔出自帕拉瓦文，「现代马拉雅拉姆文是格兰塔文的直系后裔」',
+    description:
+      '喀拉拉这一支是南印度字母最清楚的一段传承：帕拉瓦文先分出一支格兰塔文，' +
+      '专用来写梵语；八九世纪，东海岸的格兰塔字母被带到马拉巴尔海岸，' +
+      '在长期与东海岸往来不便的处境里独自长开，成了当地人说的「雅利安字」（Arya-eḻuttu）。' +
+      '它原本只为写梵语，缺马拉雅拉姆语要用的 ḷa、ḻa、ṟa，这几个字从本地的瓦特卢图文补进来；' +
+      '十九世纪中叶，传教士格温特又补上长短 e、o 的分别，才是今天这副样子。' +
+      '字母表上 ka 到 nga 一排排对得严丝合缝，正是这段关系的底气。',
+    stops: [
+      { script: 'pallava', image: 'glyphs/pallava/aksharamala.png', label: '帕拉瓦字母表（南印度，7 世纪）' },
+      { script: 'grantha', char: '\u{11315}', label: '格兰塔 ka', phonetic: 'ka' },
+      { script: 'malayalam', char: '\u{0D15}', label: '马拉雅拉姆 ka', phonetic: 'ka' },
     ],
   },
 
