@@ -177,9 +177,9 @@ parthian	ok	Noto Sans Inscriptional Parthian
 elymaic	ok	Noto Sans Elymaic	
 chorasmian	ok	Noto Sans Chorasmian	
 old-uyghur	ok	Noto Serif Old Uyghur	
-mongolian	ok	Noto Sans Mongolian	蒙古、托忒、满文同在蒙古区块，共用 Noto Sans Mongolian
-todo-bichig	ok	Noto Sans Mongolian	托忒字母在蒙古区块 U+1843 起，Noto Sans Mongolian 覆盖
-manchu	ok	Noto Sans Mongolian	满文字母在蒙古区块 U+1820 起，与蒙古文共用字族
+mongolian	ok	Noto Sans Mongolian	蒙古、托忒、满文共用蒙古区块基础字母 U+1820–1842 的码位，另收 ALI GALI 与 CHA WITH TWO DOTS；同一款字族出字
+todo-bichig	ok	Noto Sans Mongolian	托忒专用字母按 Unicode 名 MONGOLIAN LETTER TODO* 从 U+1843 起单独取，与蒙古文不再整块共用；字面由同一款字族画出
+manchu	ok	Noto Sans Mongolian	满文专用字母按 Unicode 名 MONGOLIAN LETTER MANCHU* 单独取，与蒙古文不再整块共用；字面由同一款字族画出
 old-turkic	ok	Noto Sans Old Turkic	
 old-hungarian	ok	Noto Sans Old Hungarian	
 linear-a	ok	Noto Sans Linear A	

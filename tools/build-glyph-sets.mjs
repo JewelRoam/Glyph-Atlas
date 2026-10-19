@@ -118,6 +118,28 @@ const BLOCK_OVERRIDE = {
   'ipa': 'IPA Extensions',
 };
 
+/**
+ * 同一区块里并排着好几套文字的：按码位名把这一家自己的字母挑出来。
+ *
+ * 蒙古区块 U+1800–U+18AF 就是这种情形：1820–1842 是几家共用的基础字母，
+ * 1843–185C 是托忒字母，185D–1872 是锡伯字母，1873–1877 是满文字母，
+ * 1878 是布里亚特字母，1880 起是梵藏转写用的阿礼嘎礼字母（其中也各有
+ * 托忒、满文专用的几个）。三家都用 Noto Sans Mongolian，照整块取字母会
+ * 把蒙古、托忒、满文画成三张一模一样的字表，所以按名字分红。
+ *
+ * 共用的基础字母三家都列：托忒与满文本来就沿用这批码位，只是字形不同，
+ * 而字体层面的差异（locl）目前没有开源字库支持，字表照实列出码位。
+ */
+const BASE_MONGOLIAN = (cp) => cp >= 0x1820 && cp <= 0x1842;
+
+const NAME_FILTER = {
+  mongolian: (cp, name) =>
+    BASE_MONGOLIAN(cp) ||
+    /^MONGOLIAN LETTER (CHA WITH TWO DOTS|ALI GALI)/.test(name),
+  'todo-bichig': (cp, name) => BASE_MONGOLIAN(cp) || /^MONGOLIAN LETTER TODO/.test(name),
+  manchu: (cp, name) => BASE_MONGOLIAN(cp) || /^MONGOLIAN LETTER MANCHU/.test(name),
+};
+
 /** 多鉴本共用的区块：只保留该书写体系本体的鉴本 */
 const SCRIPT_OVERRIDE = {
   greek: 'Greek', // Greek and Coptic 区块里混着 14 个科普特字母
@@ -319,6 +341,13 @@ function lettersInRange(letterRanges, lo, hi, limit = 20000) {
   return out;
 }
 
+/** 样本集的补充说明，跟着字表一起显示在详情面板里 */
+const NOTES = {
+  mongolian: '蒙古区块里几家共用基础字母，这里列蒙古文自己的字母与本块阿礼嘎礼字母；托忒、满文另有各自的字母，见那两家。',
+  'todo-bichig': '托忒文沿用蒙古文的基础字母码位，另加托忒专有字母；目前没有开源字库区分托忒字形，字面由 Noto Sans Mongolian 画出。',
+  manchu: '满文沿用蒙古文的基础字母码位，另加满文专有字母；目前没有开源字库区分满文字形，字面由 Noto Sans Mongolian 画出。',
+};
+
 const systems = loadSystems();
 const { ranges: letterRanges, nameOf } = await loadUnicodeData();
 const blocks = JSON.parse(read('tools/unicode-block-ranges.json')).blocks;
@@ -363,6 +392,10 @@ for (const s of systems) {
         const scriptOf = loadScripts();
         all = all.filter((c) => scriptOf(c.codePointAt(0)) === script);
       }
+      const nameFilter = NAME_FILTER[s.id];
+      if (nameFilter) {
+        all = all.filter((c) => nameFilter(c.codePointAt(0), nameOf(c.codePointAt(0)) ?? ''));
+      }
       const extra = SCRIPT_EXTRA[s.id];
       if (extra) {
         const seen = new Set(all);
@@ -379,6 +412,7 @@ for (const s of systems) {
       total = all.length;
       chars = all.slice(0, cap);
       if (chars.length < all.length) note = `Unicode 共收录 ${all.length} 个字符，这里截取前 ${chars.length} 个。`;
+      if (NOTES[s.id]) note = note ? `${NOTES[s.id]} ${note}` : NOTES[s.id];
       nonLetters = classifyNonLetters(chars, nameOf, blockOf);
     }
   }

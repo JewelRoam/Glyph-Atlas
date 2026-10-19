@@ -1,4 +1,6 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
+import type { GlyphPlate } from '../data/glyphPlates';
 import type { WritingSystem } from '../data/types';
 import { glyphSets } from '../data/glyphSets';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
@@ -36,6 +38,18 @@ function searchLinks(system: WritingSystem, family?: string) {
  */
 export function GlyphBoard({ system }: { system: WritingSystem }) {
   const [expanded, setExpanded] = useState(false);
+  /** 放大的图版：整幅字表的图往往又长又密，缩在侧栏里读不出笔形 */
+  const [zoom, setZoom] = useState<GlyphPlate | null>(null);
+
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setZoom(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [zoom]);
+
   const source = glyphSourceFor(system);
   const family = source.kind === 'font' ? source.family ?? system.fontFamily : undefined;
   const set = glyphSets[system.id];
@@ -91,7 +105,15 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
         <div className="plate-strip">
           {source.plates.map((plate) => (
             <figure className="plate" key={plate.src}>
-              <img src={assetUrl(plate.src)} alt={plate.caption} loading="lazy" decoding="async" />
+              <button
+                type="button"
+                className="plate-open"
+                onClick={() => setZoom(plate)}
+                aria-label={`放大图版：${plate.caption}`}
+                title="放大"
+              >
+                <img src={assetUrl(plate.src)} alt={plate.caption} loading="lazy" decoding="async" />
+              </button>
               <figcaption>
                 <span className="plate-caption">{plate.caption}</span>
                 <span className="plate-credit">
@@ -177,6 +199,42 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
       )}
 
       {set?.note && covered.length > 0 && <p className="board-note">{set.note}</p>}
+
+      {zoom
+        ? createPortal(
+            <div
+              className="plate-viewer"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${zoom.caption}（放大）`}
+              onClick={() => setZoom(null)}
+            >
+              <figure className="plate-viewer-card" onClick={(e) => e.stopPropagation()}>
+                <img src={assetUrl(zoom.src)} alt={zoom.caption} decoding="async" />
+                <figcaption>
+                  <span className="plate-caption">{zoom.caption}</span>
+                  <span className="plate-credit">
+                    {zoom.credit} · {zoom.license}
+                  </span>
+                  {zoom.home ? (
+                    <a href={zoom.home} target="_blank" rel="noreferrer">
+                      图版出处 ↗
+                    </a>
+                  ) : null}
+                </figcaption>
+              </figure>
+              <button
+                type="button"
+                className="plate-viewer-close"
+                onClick={() => setZoom(null)}
+                aria-label="关闭放大的图版"
+              >
+                ✕
+              </button>
+            </div>,
+            document.body,
+          )
+        : null}
 
       <div className={`board-font ${fontUsable || source.kind === 'image' ? '' : 'missing'}`}>
         {source.kind === 'none' ? (

@@ -476,13 +476,97 @@ main {
   border: 1px solid var(--line);
   background: var(--bg-2);
 }
-.plate img {
+/* 整幅图版一律可以点开看原尺寸：帕拉瓦、印度河这类图又长又密，
+   缩在侧栏里读不出笔形 */
+.plate-open {
   display: block;
   width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.plate img {
+  display: block;
+  width: auto;
+  max-width: 100%;
   max-height: 340px;
+  margin: 0 auto;
   object-fit: contain;
   background: color-mix(in srgb, var(--paper) 94%, transparent);
   mix-blend-mode: multiply;
+}
+.plate-open:focus-visible {
+  outline: 2px solid var(--cinnabar);
+  outline-offset: -2px;
+}
+
+/* 放大的图版：压在整页之上，点背景或按 Esc 关掉 */
+.plate-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: rgba(12, 10, 9, 0.9);
+  overflow: auto;
+  cursor: zoom-out;
+  animation: viewer-in 0.18s ease;
+}
+@keyframes viewer-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.plate-viewer-card {
+  margin: auto;
+  max-width: min(1180px, 94vw);
+  border: 1px solid var(--line-mid);
+  background: var(--paper);
+  cursor: default;
+}
+.plate-viewer-card img {
+  display: block;
+  width: auto;
+  max-width: min(1180px, 94vw);
+  max-height: 80vh;
+  margin: 0 auto;
+  object-fit: contain;
+  background: var(--paper);
+}
+.plate-viewer-card figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  align-items: baseline;
+  padding: 10px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--bg-1);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-dim);
+}
+.plate-viewer-close {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line-mid);
+  border-radius: 3px;
+  background: var(--bg-1);
+  color: var(--ink-strong);
+  font-size: 14px;
+  cursor: pointer;
+}
+.plate-viewer-close:hover {
+  border-color: var(--cinnabar);
+  color: var(--cinnabar);
 }
 .plate figcaption {
   display: flex;
