@@ -2,8 +2,12 @@ import type { GraphRelation, WritingSystem } from './types';
 import { writingSystems } from './writingSystems';
 import { graphRelations } from './graphRelations';
 import {
+  adjacentGraphLinks,
   adjacentStops,
+  graphLinksForLineage,
   lineageEntryFor,
+  type LineageGraphAdjacency,
+  type LineageGraphLink,
   type LineageStopRef,
 } from './lineageIndex';
 
@@ -62,6 +66,10 @@ export interface ScriptLineageContext {
   next?: LineageStopRef;
   /** 该体系出现的其他轨道入口；保留下来供未来的轨道切换器使用 */
   alternatives: readonly LineageStopRef[];
+  /** 默认轨道里所有能落到体系级图边的站点对；由 graphRelations 计算 */
+  graphLinks?: readonly LineageGraphLink[];
+  /** 默认入口前后两侧的图边状态；与轨道邻站分开表达 */
+  adjacency?: LineageGraphAdjacency;
 }
 
 export interface ScriptContext {
@@ -153,6 +161,8 @@ export function scriptContextFor(scriptId: string): ScriptContext | undefined {
       previous,
       next,
       alternatives: lineageEntry.tracks.slice(1),
+      graphLinks: graphLinksForLineage(lineageEntry.track.lineage),
+      adjacency: adjacentGraphLinks(lineageEntry.track),
     },
   };
 }

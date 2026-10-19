@@ -7,8 +7,10 @@ export { writingSystems, scriptById } from './writingSystems';
 export { graphRelations } from './graphRelations';
 export { lineages } from './lineages';
 export {
+  adjacentGraphLinks,
   adjacentStops,
   allStopRefs,
+  graphLinksForLineage,
   lineageById,
   lineageEntryFor,
   lineageHref,
@@ -21,7 +23,16 @@ export {
   stopRefFromParams,
   stopsByScript,
 } from './lineageIndex';
-export type { LineageEntry, LineageStopRef, ScriptLineageStatus } from './lineageIndex';
+export type {
+  LineageAdjacentGraphLink,
+  LineageAdjacencyStatus,
+  LineageEntry,
+  LineageGraphAdjacency,
+  LineageGraphDirection,
+  LineageGraphLink,
+  LineageStopRef,
+  ScriptLineageStatus,
+} from './lineageIndex';
 export {
   ancestorsFor,
   descendantsFor,

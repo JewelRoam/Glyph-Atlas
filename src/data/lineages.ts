@@ -20,10 +20,10 @@ import type { Lineage } from './types';
 export const lineages: Lineage[] = [
   {
     id: 'italy',
-    nameZh: '希腊 Α → 伊特鲁里亚 → 半岛各家 → 罗马',
-    nameEn: 'Greek Α → Etruscan → Old Italic → Latin',
+    nameZh: '希腊 Α → 伊特鲁里亚 → 拉丁',
+    nameEn: 'Greek Α → Etruscan → Latin',
     mode: 'chain',
-    source: 'Wikipedia《Etruscan alphabet》《Old Italic scripts》：希腊 → 伊特鲁里亚 → 半岛各家 → 拉丁',
+    source: 'Wikipedia《Etruscan alphabet》《Old Italic scripts》：希腊 → 伊特鲁里亚 → 拉丁',
     sourceRefs: [
       'https://en.wikipedia.org/wiki/Etruscan_alphabet',
       'https://en.wikipedia.org/wiki/Old_Italic_scripts',
@@ -31,16 +31,14 @@ export const lineages: Lineage[] = [
     description:
       '那不勒斯湾的优卑亚希腊字母北上，先被伊特鲁里亚人借去：希腊 Γ 在那边读 /k/，' +
       '于是成了拉丁 C；希腊 Χ 与 Ψ 照西方希腊的读法给了伊特鲁里亚的 /ks/ 与 /kʰ/。' +
-      '罗马字母的整套骨架就是从伊特鲁里亚落下来的。半岛上其余各家又都从伊特鲁里亚' +
-      '字母出发，各自添字：伊特鲁里亚与法利希添 EF，翁布里亚添 ERS 与 CHE，' +
-      '奥斯坎添 II 与 UU，南皮切努姆添 ESS，北边的维内蒂与雷蒂亚添 YE 与两个 TSE；' +
-      'Unicode 把这些收成一节"古意大利字母"。伊特鲁里亚没有希腊 Ω 的位置，' +
-      '走到那一站时 omega 会消失。最后一站是罗马从南伊特鲁里亚一支定下来的拉丁' +
-      '字母表——半岛各家添的那些字，它又收了回去。',
+      '罗马字母的整套骨架就是从伊特鲁里亚落下来的。半岛上其余各家也从伊特鲁里亚' +
+      '字母出发，各自添字；Unicode 把这些相关书体收在“古意大利字母”一个区块里。' +
+      '古意大利字母是集合名，不是伊特鲁里亚与拉丁之间的一段单线书体，所以这条轨道' +
+      '只走希腊 → 伊特鲁里亚 → 拉丁的主干。伊特鲁里亚没有希腊 Ω 的位置，' +
+      '走到那一站时 omega 会消失；最后一站是罗马从南伊特鲁里亚一支定下来的拉丁字母表。',
     stops: [
       { id: 'greek', script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
       { id: 'etruscan', script: 'etruscan', char: '𐌀', label: '伊特鲁里亚 a', phonetic: 'a' },
-      { id: 'old-italic', script: 'old-italic', char: '𐌀', label: '古意大利字母 a', phonetic: 'a' },
       { id: 'latin', script: 'latin', char: 'A', label: '拉丁 A', phonetic: 'a' },
     ],
   },
@@ -157,8 +155,8 @@ export const lineages: Lineage[] = [
 
   {
     id: 'samaritan-line',
-    nameZh: '腓尼基 ʾālep → 撒玛利亚 alaf',
-    nameEn: 'Phoenician ʾālep → Samaritan alaf',
+    nameZh: '原始西奈 ʾalp → 古希伯来 → 撒玛利亚 alaf',
+    nameEn: 'Proto-Sinaitic ʾalp → Paleo-Hebrew → Samaritan alaf',
     mode: 'chain',
     source: 'Wikipedia《Samaritan script》《Paleo-Hebrew alphabet》',
     sourceRefs: [
@@ -168,12 +166,23 @@ export const lineages: Lineage[] = [
     description:
       '撒玛利亚人没有跟着改用方形希伯来字母，而是守着古希伯来书体一路写下来，' +
       '成为后来的撒玛利亚字母——《撒玛利亚五经》到今天仍用它抄写。' +
-      '中间那一站是圣殿时期犹太人刻在钱币与印章上的古希伯来字母，' +
-      '它与腓尼基共用 Unicode U+10900 一节，二十二个字母逐一对应；' +
+      '古希伯来字母与腓尼基字母是同一古老字母传统的地区变体，不能画成腓尼基的直接后身；' +
+      '中间还隔着原始迦南阶段，所以这条轨道从原始西奈字母起笔。' +
       '走到撒玛利亚字母，字面才换成圆转的连写体——二十二字位一脉相承，' +
       '元音另外用标号记，不进字母表。',
     stops: [
-      { id: 'phoenician', script: 'phoenician', char: '𐤀', label: '腓尼基 ʾālep', phonetic: 'ʔ' },
+      {
+        id: 'proto-sinaitic',
+        script: 'proto-sinaitic',
+        label: 'ʾalp（牛）',
+        phonetic: 'ʔ',
+        path:
+          'M50 10 C43 10 37 15 33 23 C27 17 18 15 10 20 C6 29 12 38 21 41 ' +
+          'C17 54 20 72 28 84 C34 93 42 96 50 93 C58 96 66 93 72 84 ' +
+          'C80 72 83 54 79 41 C88 38 94 29 90 20 C82 15 73 17 67 23 ' +
+          'C63 15 57 10 50 10 Z',
+        asset: { kind: 'path', credit: 'Glyph Atlas 示意性重绘（非精确摹本）' },
+      },
       { id: 'paleo-hebrew', script: 'paleo-hebrew', char: '𐤀', label: '古希伯来 ʾālep', phonetic: 'ʔ' },
       { id: 'samaritan', script: 'samaritan', char: 'ࠀ', label: '撒玛利亚 alaf', phonetic: 'ʔ' },
     ],
@@ -200,8 +209,8 @@ export const lineages: Lineage[] = [
 
   {
     id: 'aramaic-west',
-    nameZh: '阿拉米 ʾālep → 西支诸字母',
-    nameEn: 'Aramaic ʾālep → western branches',
+    nameZh: '阿拉米 ʾālep → 帕尔米拉诸支',
+    nameEn: 'Aramaic ʾālep → Palmyrene branches',
     mode: 'cognate',
     source: 'Wikipedia《Palmyrene alphabet》《Hatran alphabet》《Syriac alphabet》《Manichaean alphabet》',
     sourceRefs: [
@@ -211,10 +220,11 @@ export const lineages: Lineage[] = [
       'https://en.wikipedia.org/wiki/Manichaean_alphabet',
     ],
     description:
-      '阿拉米字母西传后，帕尔米拉、哈特拉和叙利亚各自发展出地方字母，' +
-      '叙利亚字母又长出了摩尼字母。五站都以 ʾālep 为祖形，却分别收束成不同骨架：' +
-      '帕尔米拉与哈特拉留下石刻的棱角，叙利亚字母生出连写与变体传统，' +
-      '摩尼字母为记录中古伊朗语的辅音，在叙利亚的 22 个字母之外另造了 14 个分音字面。',
+      '阿拉米字母西传后，帕尔米拉与哈特拉各自发展出地方字母。' +
+      '叙利亚字母经帕尔米拉传统发展而来；摩尼字母同样承自帕尔米拉，' +
+      '因而有时被看作叙利亚传统的变体，却不是叙利亚字母的直系后身。' +
+      '五站都以 ʾālep 为祖形，却分别收束成不同骨架：帕尔米拉与哈特拉留下石刻的棱角，' +
+      '叙利亚字母生出连写与变体传统，摩尼字母则为记录中古伊朗语的辅音另造分音字面。',
     stops: [
       { id: 'aramaic', script: 'aramaic', char: '𐡀', label: '阿拉米 ʾālep', phonetic: 'ʔ' },
       { id: 'palmyrene', script: 'palmyrene', char: '𐡠', label: '帕尔米拉 ʾālep', phonetic: 'ʔ' },
@@ -1003,8 +1013,8 @@ export const lineages: Lineage[] = [
 
   {
     id: 'meroitic-line',
-    nameZh: '圣书体 → 麦罗埃文',
-    nameEn: 'Egyptian → Meroitic',
+    nameZh: '圣书体 → 麦罗埃碑铭体',
+    nameEn: 'Egyptian → Meroitic Hieroglyphs',
     mode: 'chain',
     source: 'Unicode 麦罗埃文提案 L2/09-250（N3665）字形对照表：𐦀 ← 𓀀（A1）',
     sourceRefs: [
@@ -1012,8 +1022,8 @@ export const lineages: Lineage[] = [
       'https://en.wikipedia.org/wiki/Meroitic_script',
     ],
     description:
-      '尼罗河上游的库施王国把埃及圣书体的符号借来，简化成一套自己的音节文字：' +
-      '碑铭体刻在神庙与石碑上，草书体写在纸草与陶片上。这条轨道走麦罗埃字母表的第 1 个字母，' +
+      '尼罗河上游的库施王国发展出两种并行的麦罗埃书体：碑铭体刻在神庙与石碑上，' +
+      '草书体写在纸草与陶片上。碑铭体从埃及圣书体的符号发展而来。这条轨道走麦罗埃字母表的第 1 个字母，' +
       'Unicode 的麦罗埃提案把碑铭体 a（𐦀）直接对到圣书体的 A1「人」（𓀀）——' +
       '借的是埃及的符号，读的却是麦罗埃语的 /a/。' +
       '麦罗埃文是撒哈拉以南非洲最早的本地书写体系之一，至今没有完全读通，' +
@@ -1021,6 +1031,36 @@ export const lineages: Lineage[] = [
     stops: [
       { id: 'egyptian', script: 'egyptian', char: '𓀀', label: '圣书体「人」（A1）', phonetic: 'a' },
       { id: 'meroitic', script: 'meroitic', char: '𐦀', label: '麦罗埃碑铭体', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'meroitic-cursive-line',
+    nameZh: '世俗体 → 麦罗埃草书体',
+    nameEn: 'Demotic Egyptian → Meroitic Cursive',
+    mode: 'chain',
+    source: 'Wikipedia《Meroitic script》：Meroitic Cursive derived from Demotic Egyptian',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Meroitic_script',
+      'https://en.wikipedia.org/wiki/Demotic_(Egyptian)',
+    ],
+    description:
+      '麦罗埃草书体不是碑铭体的草写化，而是与碑铭体并行的另一支：它从世俗体埃及文发展而来，' +
+      '也是现存麦罗埃铭文中最常见的书体。这条轨道把世俗体纸草与麦罗埃草书的第一个音节放在一起，' +
+      '展示两条埃及书写传统在库施王国的分流，而不是把两种麦罗埃书体硬接成前后身。',
+    stops: [
+      {
+        id: 'demotic',
+        script: 'demotic',
+        image: 'glyphs/demotic/turin-payment-contracts.jpg',
+        label: '世俗体（都灵纸草）',
+        asset: {
+          kind: 'image',
+          credit: 'Museo Egizio, Torino',
+          license: 'CC0 1.0',
+          home: 'https://commons.wikimedia.org/wiki/File:Demotic_papyrus_containing_two_payment_contracts_-_Museo_Egizio_Turin_S_6074_p01.jpg',
+        },
+      },
       { id: 'meroitic-cursive', script: 'meroitic-cursive', char: '𐦠', label: '麦罗埃草书体', phonetic: 'a' },
     ],
   },

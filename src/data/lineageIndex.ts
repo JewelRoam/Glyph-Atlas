@@ -1,6 +1,7 @@
 import { lineages } from './lineages';
 import { scriptById } from './writingSystems';
-import type { GlyphStop, Lineage, WritingSystem } from './types';
+import { graphRelations } from './graphRelations';
+import type { GlyphStop, GraphRelation, Lineage, WritingSystem } from './types';
 
 /**
  * 轨道站点的稳定键。
@@ -59,6 +60,151 @@ export const stopsByScript: ReadonlyMap<string, readonly LineageStopRef[]> = sto
 
 /** 全部站点，按轨道与站内顺序排列。 */
 export const allStopRefs: readonly LineageStopRef[] = [...stopRefs.values()];
+
+
+/** 体系级图谱边在一条字形轨道里的方向。 */
+export type LineageGraphDirection = 'forward' | 'reverse';
+
+/** 相邻两个轨道站点之间的图边状态。 */
+export type LineageAdjacencyStatus = 'linked' | 'reverse' | 'unlinked';
+
+/**
+ * 一条落在具体轨道站点上的体系级图边。
+ *
+ * 关系本身仍由 graphRelations 定义；这里只补上它在轨道里的端点位置，
+ * 不复制关系语义，也不把 cognate / pair 的叙事顺序误当成直系血缘。
+ */
+export interface LineageGraphLink {
+  relation: GraphRelation;
+  parentStop: LineageStopRef;
+  childStop: LineageStopRef;
+  parentIndex: number;
+  childIndex: number;
+  /** forward：父系站在前、子系站在后；reverse：轨道顺序与图边方向相反 */
+  direction: LineageGraphDirection;
+}
+
+/** 一个轨道邻接对及其图边状态。 */
+export interface LineageAdjacentGraphLink {
+  from: LineageStopRef;
+  to: LineageStopRef;
+  status: LineageAdjacencyStatus;
+  link?: LineageGraphLink;
+}
+
+/** 某站点前后两侧的图边邻接状态。 */
+export interface LineageGraphAdjacency {
+  previous?: LineageAdjacentGraphLink;
+  next?: LineageAdjacentGraphLink;
+}
+
+const lineageGraphLinksCache = new Map<string, readonly LineageGraphLink[]>();
+
+function closestGraphLink(
+  parentStops: readonly LineageStopRef[],
+  childStops: readonly LineageStopRef[],
+): { parentStop: LineageStopRef; childStop: LineageStopRef } | undefined {
+  let best:
+    | { parentStop: LineageStopRef; childStop: LineageStopRef }
+    | undefined;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  for (const parentStop of parentStops) {
+    for (const childStop of childStops) {
+      const distance = Math.abs(parentStop.index - childStop.index);
+      if (
+        distance < bestDistance ||
+        (distance === bestDistance &&
+          parentStop.index < (best?.parentStop.index ?? Number.POSITIVE_INFINITY))
+      ) {
+        best = { parentStop, childStop };
+        bestDistance = distance;
+      }
+    }
+  }
+
+  return best;
+}
+
+/**
+ * 取一条轨道上所有能落到站点对的体系级图边。
+ *
+ * 同一书写体系可能在轨道里出现多次。此时体系级边只绑定距离最近的一对
+ * 端点，避免把一条“父系 → 子系”关系重复铺到该体系的所有书体阶段。
+ * 图边本身仍来自 graphRelations；这里没有另一套关系表。
+ */
+export function graphLinksForLineage(lineage: Lineage): readonly LineageGraphLink[] {
+  const cached = lineageGraphLinksCache.get(lineage.id);
+  if (cached) return cached;
+
+  const refsByScript = new Map<string, LineageStopRef[]>();
+  for (const stop of lineage.stops) {
+    const ref = stopRefFor(lineage.id, stop);
+    if (!ref) continue;
+    const refs = refsByScript.get(stop.script) ?? [];
+    refs.push(ref);
+    refsByScript.set(stop.script, refs);
+  }
+
+  const links: LineageGraphLink[] = [];
+  for (const relation of graphRelations) {
+    const parentStops = refsByScript.get(relation.parent);
+    const childStops = refsByScript.get(relation.child);
+    if (!parentStops?.length || !childStops?.length) continue;
+    const pair = closestGraphLink(parentStops, childStops);
+    if (!pair) continue;
+    links.push({
+      relation,
+      parentStop: pair.parentStop,
+      childStop: pair.childStop,
+      parentIndex: pair.parentStop.index,
+      childIndex: pair.childStop.index,
+      direction:
+        pair.parentStop.index < pair.childStop.index ? 'forward' : 'reverse',
+    });
+  }
+
+  lineageGraphLinksCache.set(lineage.id, links);
+  return links;
+}
+
+/**
+ * 取一个站点前后两个邻接对的图边状态。
+ *
+ * linked 表示前一站是图边父系、后一站是子系；reverse 表示图边方向与轨道
+ * 顺序相反；unlinked 表示这条轨道相邻，但 graphRelations 里没有直接边。
+ * cognate / pair 轨道没有图边是合法状态，调用方必须结合 lineage.mode 解读。
+ */
+export function adjacentGraphLinks(ref: LineageStopRef): LineageGraphAdjacency {
+  const links = graphLinksForLineage(ref.lineage);
+  const { previous, next } = adjacentStops(ref);
+
+  const describe = (
+    from: LineageStopRef,
+    to: LineageStopRef,
+  ): LineageAdjacentGraphLink => {
+    const forward = links.find(
+      (link) => link.parentIndex === from.index && link.childIndex === to.index,
+    );
+    const reverse = forward
+      ? undefined
+      : links.find(
+          (link) => link.parentIndex === to.index && link.childIndex === from.index,
+        );
+    const link = forward ?? reverse;
+    return {
+      from,
+      to,
+      status: forward ? 'linked' : reverse ? 'reverse' : 'unlinked',
+      link,
+    };
+  };
+
+  return {
+    previous: previous ? describe(previous, ref) : undefined,
+    next: next ? describe(ref, next) : undefined,
+  };
+}
 
 /** 按 `${lineageId}:${stopId}` 取站点。 */
 export function stopRefByKey(key: string): LineageStopRef | undefined {

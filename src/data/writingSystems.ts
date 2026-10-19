@@ -194,12 +194,13 @@ const writingSystemData: WritingSystem[] = [
   },
   {
     id: 'meroitic-cursive', nameZh: '麦罗埃草书体', nameEn: 'Meroitic Cursive',
-    lineageEntry: { lineageId: 'meroitic-line', stopId: 'meroitic-cursive' },
-    origin: 'derived', parents: ['meroitic'], dateFrom: -300, dateTo: 400,
+    lineageEntry: { lineageId: 'meroitic-cursive-line', stopId: 'meroitic-cursive' },
+    origin: 'derived', parents: ['demotic'], dateFrom: -300, dateTo: 400,
     family: 'africa', region: '努比亚', countries: ['苏丹'],
     type: 'abugida', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Meroitic Cursive U+109A0', sample: '𐦠', fontFamily: 'Noto Sans Meroitic',
-    note: '麦罗埃文的日常手写体，与碑铭体并行使用，是库施王国的通用字体。',
+    note: '从世俗体埃及文发展而来，与麦罗埃碑铭体并行使用，是库施王国最常见的书体；' +
+      '它不是碑铭体的草写体。',
   },
 
   // ─────────────────────────────────────────────
@@ -230,8 +231,8 @@ const writingSystemData: WritingSystem[] = [
     family: 'levant', region: '黎凡特', countries: ['以色列'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
     unicodeBlock: 'Phoenician U+10900', sample: '𐤀', fontFamily: 'Noto Sans Phoenician',
-    note: '与腓尼基字母共用 Unicode 的 U+10900 一节，22 个字母逐一同形；'
-      + '撒玛利亚字母与它一脉相承，方形希伯来字母则另走阿拉米一支。',
+    note: '与腓尼基字母同属古老的西北闪米特字母传统，两者是地区变体；' +
+      '撒玛利亚字母与它一脉相承，方形希伯来字母则另走阿拉米一支。',
   },
   {
     id: 'samaritan', nameZh: '撒玛利亚字母', nameEn: 'Samaritan',
@@ -442,7 +443,9 @@ const writingSystemData: WritingSystem[] = [
     type: 'alphabet', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Old Italic U+10300', sample: '𐌀',
     fontFamily: 'Noto Sans Old Italic',
-    lineageEntry: { lineageId: 'italy', stopId: 'old-italic' },
+    note: 'Unicode 把伊特鲁里亚、法利希、奥斯坎、翁布里亚等半岛书体收在同一区块；' +
+      '它是集合名，不是伊特鲁里亚到拉丁之间的单一历史阶段。',
+    lineageEntry: { lineageId: 'northern-runes', stopId: 'old-italic' },
   },
   {
     id: 'etruscan', nameZh: '伊特鲁里亚字母', nameEn: 'Etruscan',
@@ -455,11 +458,11 @@ const writingSystemData: WritingSystem[] = [
   },
   {
     id: 'latin', nameZh: '拉丁字母', nameEn: 'Latin',
-    origin: 'derived', parents: ['old-italic'], dateFrom: -700, dateTo: null,
+    origin: 'derived', parents: ['etruscan'], dateFrom: -700, dateTo: null,
     family: 'greek', region: '意大利半岛', countries: ['意大利', '美国', '英国', '法国', '德国', '西班牙', '巴西', '尼日利亚', '菲律宾'],
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'Basic Latin U+0041', sample: 'A', fontFamily: 'Noto Sans',
-    note: '当今使用最广的字母系统，覆盖几乎所有大洲。',
+    note: '当今使用最广的字母系统；其字母骨架直接承自伊特鲁里亚字母。',
     lineageEntry: { lineageId: 'aleph', stopId: 'latin' },
   },
   {
@@ -1415,7 +1418,7 @@ const writingSystemData: WritingSystem[] = [
   {
     id: 'manichaean', nameZh: '摩尼字母', nameEn: 'Manichaean',
     lineageEntry: { lineageId: 'aramaic-west', stopId: 'manichaean' },
-    origin: 'derived', parents: ['syriac'], dateFrom: 300, dateTo: 1000,
+    origin: 'derived', parents: ['palmyrene'], dateFrom: 300, dateTo: 1000,
     family: 'centralasia', region: '中亚', countries: ['伊朗', '中国'],
     type: 'abjad', status: 'extinct', direction: 'rtl',
     unicodeBlock: 'Manichaean U+10AC0', sample: '𐫀',
