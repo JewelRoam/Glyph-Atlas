@@ -121,7 +121,7 @@ Glyph-Atlas/
     │   ├── graphIndex.ts       图关系查询：确定性最短有向路径与连接判定
     │   ├── lineages.ts         血统轨道（字形演变路径）
     │   ├── lineageIndex.ts     站点稳定键与「书写体系 ↔ 轨道」反向索引
-    │   ├── scriptContext.ts    节点上下文：图关系 + 素材 + 全部轨道上下文
+    │   ├── scriptContext.ts    节点门户：素材 + 轨道 + 图关系与图邻居入口
     │   ├── glyphPaths.ts       轨道站点的 100×100 矢量轮廓（生成物）
     │   └── index.ts            派生集合：graphSystems / independentSystems …
     ├── lib/                    ── 逻辑层
@@ -368,7 +368,8 @@ stopRefFromParams(lineage, stop) // 从 URL 参数恢复站点，无效参数返
 neighboringStopRefs(scriptId)  // 默认入口的前后邻站
 lineageStatusFor(system)       // neighbors | standalone | isolated
 
-scriptContextFor(scriptId)     // 图关系 + 素材 + 全部轨道的入口、前后站与连接路径
+scriptPortalFor(scriptId)      // 单节点轻量门户：默认链接 + 素材 + 全部轨道
+scriptContextFor(scriptId)     // 节点门户 + 图关系与图邻居门户
 ancestorsFor(scriptId)         // 全部祖先节点
 descendantsFor(scriptId)       // 全部后代节点
 graphChildrenByScript          // scriptId → 图上的直接子节点
@@ -379,10 +380,12 @@ graphChildrenByScript          // scriptId → 图上的直接子节点
 ```ts
 {
   system,                       // 当前书写体系
+  href,                         // 默认详情 / MICRO 入口的稳定链接
   graph: {                      // 体系级血统，不含字形轨道
-    parents, children,           // 直接前后关系
+    parents, children,           // 直接前后关系（兼容字段）
     parentRelations,             // 每条直接父系边的 kind / evidence
     childRelations,              // 每条直接子系边的 kind / evidence
+    parentNeighbors, childNeighbors, // 每条边 + 另一端的完整节点门户
     ancestors, descendants,      // 全部祖先 / 后代（去重）
     ancestryPaths, descendantPaths, // 保留分支的完整路径
   },
@@ -395,22 +398,34 @@ graphChildrenByScript          // scriptId → 图上的直接子节点
     },
   },
   lineage: {                    // 没有任何已核实轨道时整段省略
-    entry, previous, next,      // 默认轨道入口及前后站
+    entry, href, previous, next, // 默认轨道入口、链接及前后站
     graphLinks, adjacency,      // 默认轨道的站点级图边与邻接语义
     alternatives,               // 其他轨道入口，供切换器使用
     tracks: [{                  // 每条轨道各有一份完整上下文
-      entry, previous, next,
+      entry, href, previous, next,
       graphLinks, adjacency,
     }],
   },
 }
 ```
 
+`scriptPortalFor()` 是其中不展开图邻居的轻量版本；`parentNeighbors` 与
+`childNeighbors` 复用它，所以一份节点上下文不会递归复制整张图。每个邻居条目
+包含原始 `relation`、`direction`（`parent` / `child`）以及另一端的
+`system / href / materials / lineage`。未来 MACRO 详情要在血缘总览里打开任一
+父系或子系时，不需要再查 `lineageEntryFor()` 或另拼素材；沿邻居继续走时再取
+该邻居自己的 `scriptContextFor()` 即可。
+
 `graph` 和 `lineage` 刻意分成两层：前者回答“这套文字从哪些书写体系而来、又
 影响了谁”，后者回答“这个字位在这条已核实的字形链上如何变化”。两层不能互相
 冒充，节点详情可以在同一份对象里分别展示，而不必再造第二套模型。`alternatives`
 按轨道去重，只保留每条轨道的入口；`tracks` 则为每条轨道保留自己的前后邻站、
 图边和邻接路径，未来切换轨道时不必再去别处拼索引。
+
+`href` 与每条轨道的 `href` 都由 `lineageHref()` 生成，固定使用稳定的
+`script / lineage / stop` id；即使以后调整页面入口，也不必改变节点或素材的
+标识。没有轨道的节点仍会得到一个只带 `script` 的详情链接，不会被误当成
+“可前后行走”。
 
 `materials` 只关联现有素材层，不复制字形表：字体 / 图版仍由 `glyphSources.ts`
 解析，代表字形仍由 `glyphSets.ts` 维护，字母槽位仍由 `letterSlots.ts` 生成。
@@ -443,9 +458,11 @@ URL 参数只用稳定的 `script`、`lineage`、`stop` id；后续若需要播�
 再加 `t`，不会改动已有站点键。
 
 等样本覆盖足够后，MACRO 节点详情可以直接消费这份上下文：用
-`lineage.entry` 进入对应的 MICRO 街景，用 `previous` / `next` 继续前后行走，
-用 `tracks` 切换其他轨道；没有 `lineage` 的节点则只展示体系级资料与
-`materials`。这样合流不需要迁移素材，也不需要给字形再编一套 id。
+`lineage.entry` / `lineage.href` 进入对应的 MICRO 街景，用 `previous` / `next`
+继续前后行走，用 `tracks` 切换其他轨道；没有 `lineage` 的节点则只展示体系级
+资料与 `materials`。图中的父系和子系也已经各自带着同一套门户，因此可以从血缘
+总览直接跳到任一邻居的前后演变，再继续沿邻居节点行走。这样合流不需要迁移素材，
+也不需要给字形再编一套 id。
 
 ### 覆盖审计
 
@@ -458,13 +475,16 @@ npm run audit:coverage:json  # 交给脚本或 CI 的 JSON
 体系打开、哪些站点或轨道缺来源、哪些素材缺登记。报告还区分首选入口是
 `explicit`（数据里明确指定）还是 `fallback`（按轨道数据顺序回退），并检查
 `scriptContextFor()` 返回的直接关系、边语义、全部祖先 / 后代、路径结构与邻站
-是否与源数据一致。
+是否与源数据一致，以及每条图边的两端是否都能解析到统一的节点门户。
 
 当前 194 个图谱节点中，96 个已有可前后行走的入口，98 个尚无轨道入口；12 个
 独立起源中 3 个已有入口。27 个多轨道节点与其余 69 个单轨道节点均已明确首选
 入口，已入轨但依赖回退的节点为 0。体系级 `sourceRefs` 目前覆盖 13/194 个节点；38 条轨道
 都至少登记了一组参考链接，139 个站点均已有来源（站点专属或继承轨道）和素材
-登记。轨道与图边计算出 83 条站点级关联：54 个相邻站对是直接连接（43 个直系、
+登记。155 条图边展开成 310 个邻居门户，全部能解析到另一端节点；其中 230 个
+可直接进入 MICRO 轨道，80 个仍缺轨道，59 个不同节点构成下一步补链队列；308 个
+邻居已有字体、图版或代表字形，缺素材的只有利比亚—柏柏尔文字与提非纳文这一对。
+轨道与图边计算出 83 条站点级关联：54 个相邻站对是直接连接（43 个直系、
 11 个借用 / 影响 / 模型），3 个是隔着未入轨节点的间接路径，44 个没有有向路径，
 0 个方向相反。另有 9 个 `chain` 相邻站对不是直接直系边，已按“直接其他关系 /
 间接路径 / 无有向路径”分列；其中 6 个是合法的借用、影响或模型关系，2 个有完整
@@ -1293,6 +1313,14 @@ npm run build && ls dist/
   边类型统计、图根分类与路径一致性检查，README 同步记录数据契约。同时修正古波斯、
   乌加里特、契丹小字与奥塞治文的父系语义，新增利比亚—柏柏尔字母节点，使提非纳文
   不再直接挂在腓尼基文下。本轮仍不改界面。
+
+- **2026-10-19 · 图邻居节点门户**：新增 `scriptPortalFor()`，把单个节点的稳定
+  入口、素材和全部轨道收成不递归的轻量门户；`scriptContextFor()` 的
+  `parentNeighbors` / `childNeighbors` 现在为每条直接图边带上另一端的完整门户。
+  轨道上下文补 `href`，图邻居与轨道入口统一由 `lineageHref()` 生成。覆盖审计
+  新增 310 个邻居门户的一致性检查与缺口统计：230 个可进 MICRO、80 个待补轨道，
+  308 个已有素材；`npm run audit:coverage:json` 可直接导出下一步补链队列。本轮
+  仍不改页面入口。
 
 - **2026-10-19 · 节点轨道上下文与间接谱系路径**：新增 `graphIndex.ts`，以
   `graphRelations` 为唯一来源提供确定性最短路径查询，把轨道邻接从

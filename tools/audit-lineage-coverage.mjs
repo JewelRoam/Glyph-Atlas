@@ -19,6 +19,7 @@ import {
   graphRelations,
   lineages,
   scriptContextFor,
+  scriptPortalFor,
   writingSystems,
 } from '../src/data/index.ts';
 import {
@@ -26,6 +27,7 @@ import {
   adjacentStops,
   graphLinksForLineage,
   lineageEntryFor,
+  lineageHref,
   stopRefFor,
 } from '../src/data/lineageIndex.ts';
 import { glyphSets } from '../src/data/glyphSets.ts';
@@ -233,6 +235,7 @@ const inventedRoots = systemsWithoutParents.filter((system) => system.origin ===
 // 节点上下文是未来 MACRO 详情与 MICRO 合流时共用的读模型。这里把它与
 // writingSystems.parents、轨道反向索引逐项对照，防止两套查询在界面合流后分叉。
 const contextMismatches = [];
+const graphNeighborCoverage = [];
 const sameIds = (left, right) =>
   left.length === right.length && left.every((id, index) => id === right[index]);
 const mismatch = (id, message) => contextMismatches.push({ id, message });
@@ -282,6 +285,102 @@ for (const system of systems) {
     )
   ) {
     mismatch(system.id, '上下文 childRelations 与边表不一致');
+  }
+
+  // 图邻居门户必须与边表同序，并且每个门户都指向另一端节点的统一入口。
+  // 这里只核对轻量门户，不递归展开邻居的 graph，避免审计自身形成无限递归。
+  const expectedNeighborGroups = [
+    {
+      label: 'parentNeighbors',
+      direction: 'parent',
+      relations: expectedParentRelations,
+      expectedId: (relation) => relation.parent,
+      actual: context.graph.parentNeighbors,
+    },
+    {
+      label: 'childNeighbors',
+      direction: 'child',
+      relations: expectedChildRelations,
+      expectedId: (relation) => relation.child,
+      actual: context.graph.childNeighbors,
+    },
+  ];
+  for (const group of expectedNeighborGroups) {
+    if (
+      !sameIds(
+        group.actual.map((neighbor) => `${neighbor.relation.parent}>${neighbor.relation.child}`),
+        group.relations.map((relation) => `${relation.parent}>${relation.child}`),
+      )
+    ) {
+      mismatch(system.id, `${group.label} 与边表不一致`);
+    }
+
+    for (const [index, neighbor] of group.actual.entries()) {
+      const expectedRelation = group.relations[index];
+      const expectedId = expectedRelation ? group.expectedId(expectedRelation) : undefined;
+      if (!expectedId) continue;
+      if (neighbor.direction !== group.direction) {
+        mismatch(system.id, `${group.label}[${index}] 方向应为 ${group.direction}`);
+      }
+      if (neighbor.node.system.id !== expectedId) {
+        mismatch(
+          system.id,
+          `${group.label}[${index}] 门户应指向 ${expectedId}，实际为 ${neighbor.node.system.id}`,
+        );
+        continue;
+      }
+
+      const expectedPortal = scriptPortalFor(expectedId);
+      if (!expectedPortal) {
+        mismatch(system.id, `${group.label}[${index}] 无法解析 ${expectedId} 的节点门户`);
+        continue;
+      }
+      if (neighbor.node.href !== expectedPortal.href) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 链接与统一入口不一致`);
+      }
+      if (neighbor.node.materials.source.kind !== expectedPortal.materials.source.kind) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 素材来源不一致`);
+      }
+      if (neighbor.node.materials.glyphSet !== expectedPortal.materials.glyphSet) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 代表字形集不一致`);
+      }
+      if (
+        Boolean(neighbor.node.materials.letterSlots) !==
+        Boolean(expectedPortal.materials.letterSlots)
+      ) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 字母槽位缺失`);
+      } else if (
+        neighbor.node.materials.letterSlots &&
+        expectedPortal.materials.letterSlots &&
+        (neighbor.node.materials.letterSlots.hasManualMap !==
+          expectedPortal.materials.letterSlots.hasManualMap ||
+          Object.keys(neighbor.node.materials.letterSlots.roster).length !==
+            Object.keys(expectedPortal.materials.letterSlots.roster).length)
+      ) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 字母槽位不一致`);
+      }
+      if (neighbor.node.lineage?.entry.key !== expectedPortal.lineage?.entry.key) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 轨道入口不一致`);
+      }
+      if (
+        neighbor.node.lineage?.tracks.length !== expectedPortal.lineage?.tracks.length
+      ) {
+        mismatch(system.id, `${group.label}[${index}] 的 ${expectedId} 轨道上下文不完整`);
+      }
+
+      graphNeighborCoverage.push({
+        from: system.id,
+        to: expectedId,
+        relation: `${neighbor.relation.parent}>${neighbor.relation.child}`,
+        direction: neighbor.direction,
+        kind: neighbor.relation.kind,
+        evidence: neighbor.relation.evidence,
+        hasLineage: Boolean(neighbor.node.lineage),
+        hasMaterials:
+          neighbor.node.materials.source.kind !== 'none' ||
+          Boolean(neighbor.node.materials.glyphSet),
+      });
+    }
   }
 
   const expectedAncestors = new Set();
@@ -386,6 +485,10 @@ for (const system of systems) {
     }
   }
 
+  if (context.href !== lineageHref(system.id)) {
+    mismatch(system.id, '节点门户 href 与默认轨道入口不一致');
+  }
+
   const expectedEntry = lineageEntryFor(system.id);
   if (!expectedEntry?.track) {
     if (context.lineage) mismatch(system.id, '没有轨道却返回了 lineage 上下文');
@@ -480,6 +583,9 @@ for (const system of systems) {
     }
     seenTrackLineages.add(track.entry.lineage.id);
 
+    if (track.href !== lineageHref(system.id, track.entry)) {
+      mismatch(system.id, `${track.entry.lineage.id} 轨道入口链接不一致`);
+    }
     const expectedTrackNeighbors = adjacentStops(track.entry);
     if (track.previous?.key !== expectedTrackNeighbors.previous?.key) {
       mismatch(system.id, `${track.entry.lineage.id} 轨道 previous 不一致`);
@@ -612,6 +718,17 @@ const graphConnectionChecks = expectedGraphConnections.map((expected) => {
   };
 });
 
+const graphNeighborPortals = graphNeighborCoverage.length;
+const graphNeighborPortalsWithLineage = graphNeighborCoverage.filter(
+  (neighbor) => neighbor.hasLineage,
+).length;
+const graphNeighborPortalsWithoutLineage = graphNeighborPortals - graphNeighborPortalsWithLineage;
+const graphNeighborPortalsWithMaterials = graphNeighborCoverage.filter(
+  (neighbor) => neighbor.hasMaterials,
+).length;
+const graphNeighborPortalsWithoutMaterials =
+  graphNeighborPortals - graphNeighborPortalsWithMaterials;
+
 const tracksWithoutSourceRefs = lineages.filter((lineage) => !lineage.sourceRefs?.length);
 const incompleteStops = stopRefs.filter(
   ({ lineage, stop }) => !stop.sourceRef && !lineage.sourceRefs?.length,
@@ -642,6 +759,11 @@ const result = {
     systemsUsingFallbackEntry: fallbackEntries.length,
     linkedSystemsWithoutExplicitEntry: linkedWithoutExplicitEntry.length,
     contextMismatches: contextMismatches.length,
+    graphNeighborPortals,
+    graphNeighborPortalsWithLineage,
+    graphNeighborPortalsWithoutLineage,
+    graphNeighborPortalsWithMaterials,
+    graphNeighborPortalsWithoutMaterials,
     independentSystems: independent.length,
     independentSystemsWithEntry: independent.length - independentIsolated.length,
     independentSystemsIsolated: independentIsolated.length,
@@ -693,6 +815,23 @@ const result = {
     entry: entry.entry,
   })),
   contextMismatches,
+  graphNeighborCoverage,
+  graphNeighborPortalsWithoutLineage: graphNeighborCoverage
+    .filter((neighbor) => !neighbor.hasLineage)
+    .map((neighbor) => ({
+      from: neighbor.from,
+      to: neighbor.to,
+      relation: neighbor.relation,
+      kind: neighbor.kind,
+    })),
+  graphNeighborPortalsWithoutMaterials: graphNeighborCoverage
+    .filter((neighbor) => !neighbor.hasMaterials)
+    .map((neighbor) => ({
+      from: neighbor.from,
+      to: neighbor.to,
+      relation: neighbor.relation,
+      kind: neighbor.kind,
+    })),
   graphConnectionChecks,
   indirectAdjacencies: lineageAudits
     .flatMap((lineage) =>
@@ -772,6 +911,10 @@ if (json) {
   );
   console.log(
     `  节点上下文一致性 ${contextMismatches.length ? `✘ ${contextMismatches.length} 处不一致` : '✔'}`,
+  );
+  console.log(
+    `  图邻居门户 ${graphNeighborPortals} · 可进 MICRO ${graphNeighborPortalsWithLineage} · ` +
+      `待补轨道 ${graphNeighborPortalsWithoutLineage} · 有素材 ${graphNeighborPortalsWithMaterials}`,
   );
   console.log(
     `  图谱边 ${graphRelations.length} · 直系 ${relationsByKind.descent} · 借用 ${relationsByKind.borrowing} · ` +

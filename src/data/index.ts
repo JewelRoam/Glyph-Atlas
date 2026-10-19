@@ -46,15 +46,18 @@ export {
   descendantsFor,
   graphChildrenByScript,
   scriptContextFor,
+  scriptPortalFor,
 } from './scriptContext';
 export type {
   AncestryPath,
   DescendantPath,
   ScriptContext,
   ScriptGraphContext,
+  ScriptGraphNeighborContext,
   ScriptLineageContext,
   ScriptLineageTrackContext,
   ScriptMaterialContext,
+  ScriptNodePortal,
 } from './scriptContext';
 
 /**

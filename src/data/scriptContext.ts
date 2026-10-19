@@ -12,6 +12,7 @@ import {
   adjacentStops,
   graphLinksForLineage,
   lineageEntryFor,
+  lineageHref,
   type LineageGraphAdjacency,
   type LineageGraphLink,
   type LineageStopRef,
@@ -44,6 +45,10 @@ export interface ScriptGraphContext {
   parents: readonly WritingSystem[];
   /** 直接子系，保持原有字段与顺序 */
   children: readonly WritingSystem[];
+  /** 直接父系节点及其可进入的详情 / MICRO 门户，与 parentRelations 同序 */
+  parentNeighbors: readonly ScriptGraphNeighborContext[];
+  /** 直接子系节点及其可进入的详情 / MICRO 门户，与 childRelations 同序 */
+  childNeighbors: readonly ScriptGraphNeighborContext[];
   /** 所有祖先的去重节点集合（不含当前节点） */
   ancestors: readonly WritingSystem[];
   /** 所有后代的去重节点集合（不含当前节点） */
@@ -67,6 +72,8 @@ export interface ScriptGraphContext {
 export interface ScriptLineageTrackContext {
   /** 该体系在这条轨道里的入口站点 */
   entry: LineageStopRef;
+  /** 直接打开这条轨道入口的稳定查询链接 */
+  href: string;
   /** 这条轨道上的前后站 */
   previous?: LineageStopRef;
   next?: LineageStopRef;
@@ -104,13 +111,34 @@ export interface ScriptMaterialContext {
   };
 }
 
-export interface ScriptContext {
+/**
+ * 单个节点的可进入门户，不含它自己的父系 / 子系。
+ *
+ * 这是节点详情的轻量读模型，也是图邻居上下文里的节点摘要。它不递归携带
+ * 邻接图，避免一份节点上下文无限展开；调用方若从邻居继续走，只需再取该
+ * 邻居自己的 scriptContextFor()。href 始终指向该节点默认详情 / MICRO 入口。
+ */
+export interface ScriptNodePortal {
   system: WritingSystem;
-  graph: ScriptGraphContext;
+  /** 默认入口的稳定查询链接；没有轨道时仍可打开该节点的体系详情 */
+  href: string;
   /** 字体、字形清单与字母槽位的统一入口 */
   materials: ScriptMaterialContext;
   /** 没有任何已核实轨道的体系没有这一段，不伪造链条 */
   lineage?: ScriptLineageContext;
+}
+
+/** 图谱上一条直接关系，以及关系另一端的可进入门户。 */
+export interface ScriptGraphNeighborContext {
+  /** 原始有向边；父系门户方向为 parent，子系门户方向为 child */
+  relation: GraphRelation;
+  direction: 'parent' | 'child';
+  /** 另一端节点的详情 / MICRO 入口和素材上下文 */
+  node: ScriptNodePortal;
+}
+
+export interface ScriptContext extends ScriptNodePortal {
+  graph: ScriptGraphContext;
 }
 
 const systemById = new Map(writingSystems.map((system) => [system.id, system]));
@@ -152,37 +180,7 @@ function stepFor(parentId: string, childId: string): GraphStep | undefined {
 export const graphChildrenByScript: ReadonlyMap<string, readonly WritingSystem[]> =
   childrenByScript;
 
-/**
- * 取一个书写体系的完整上下文。
- *
- * 未知 id 返回 undefined；有节点但没有轨道的体系仍会返回 graph 上下文，
- * lineage 留空。这样详情页可以在同一种数据结构下显示“有前后演变”或
- * “尚无已核实血统轨道”，而不需要两套互相平行的模型。
- */
-export function scriptContextFor(scriptId: string): ScriptContext | undefined {
-  const system = systemById.get(scriptId);
-  if (!system) return undefined;
-
-  const parents = system.parents
-    .map((parentId) => systemById.get(parentId))
-    .filter((parent): parent is WritingSystem => Boolean(parent));
-  const children = childrenByScript.get(scriptId) ?? [];
-  const parentRelations = parentRelationsByScript.get(scriptId) ?? [];
-  const childRelations = childRelationsByScript.get(scriptId) ?? [];
-  const { ancestors, ancestryPaths } = ancestryFor(system.id);
-  const { descendants, descendantPaths } = descendantsForWithPaths(system.id);
-
-  const graph: ScriptGraphContext = {
-    parents,
-    children,
-    ancestors,
-    descendants,
-    ancestryPaths,
-    descendantPaths,
-    parentRelations,
-    childRelations,
-  };
-
+function materialContextFor(system: WritingSystem): ScriptMaterialContext {
   const glyphSet = glyphSets[system.id];
   const materials: ScriptMaterialContext = {
     source: glyphSourceFor(system),
@@ -194,32 +192,97 @@ export function scriptContextFor(scriptId: string): ScriptContext | undefined {
       roster: rosterFor(system.id),
     };
   }
+  return materials;
+}
 
-  const lineageEntry = lineageEntryFor(scriptId);
-  if (!lineageEntry?.track) return { system, graph, materials };
-
-  const trackContext = (track: LineageStopRef): ScriptLineageTrackContext => {
-    const { previous, next } = adjacentStops(track);
-    return {
-      entry: track,
-      previous,
-      next,
-      graphLinks: graphLinksForLineage(track.lineage),
-      adjacency: adjacentGraphLinks(track),
-    };
+function trackContextFor(track: LineageStopRef): ScriptLineageTrackContext {
+  const { previous, next } = adjacentStops(track);
+  return {
+    entry: track,
+    href: lineageHref(track.stop.script, track),
+    previous,
+    next,
+    graphLinks: graphLinksForLineage(track.lineage),
+    adjacency: adjacentGraphLinks(track),
   };
-  const tracks = lineageEntry.tracks.map(trackContext);
+}
+
+function lineageContextFor(scriptId: string): ScriptLineageContext | undefined {
+  const lineageEntry = lineageEntryFor(scriptId);
+  if (!lineageEntry?.track) return undefined;
+
+  const tracks = lineageEntry.tracks.map(trackContextFor);
   const defaultTrack = tracks[0];
-  if (!defaultTrack) return { system, graph, materials };
+  if (!defaultTrack) return undefined;
 
   return {
+    ...defaultTrack,
+    alternatives: lineageEntry.tracks.slice(1),
+    tracks,
+  };
+}
+
+/**
+ * 取一个节点的轻量门户，不展开它的父系 / 子系。
+ *
+ * 图邻居摘要和节点自身详情都走这里，确保“节点入口”只有一种生成方式。
+ * 邻居继续前进时再取它自己的 scriptContextFor()，不会递归复制整张图。
+ */
+export function scriptPortalFor(scriptId: string): ScriptNodePortal | undefined {
+  const system = systemById.get(scriptId);
+  if (!system) return undefined;
+
+  const materials = materialContextFor(system);
+  const lineage = lineageContextFor(system.id);
+  return {
     system,
-    graph,
+    href: lineageHref(system.id),
     materials,
-    lineage: {
-      ...defaultTrack,
-      alternatives: lineageEntry.tracks.slice(1),
-      tracks,
+    lineage,
+  };
+}
+
+/** 取一个书写体系的完整上下文。 */
+export function scriptContextFor(scriptId: string): ScriptContext | undefined {
+  const portal = scriptPortalFor(scriptId);
+  if (!portal) return undefined;
+
+  const { system } = portal;
+  const parents = system.parents
+    .map((parentId) => systemById.get(parentId))
+    .filter((parent): parent is WritingSystem => Boolean(parent));
+  const children = childrenByScript.get(scriptId) ?? [];
+  const parentRelations = parentRelationsByScript.get(scriptId) ?? [];
+  const childRelations = childRelationsByScript.get(scriptId) ?? [];
+  const { ancestors, ancestryPaths } = ancestryFor(system.id);
+  const { descendants, descendantPaths } = descendantsForWithPaths(system.id);
+
+  const parentNeighbors = parentRelations.flatMap((relation) => {
+    const node = scriptPortalFor(relation.parent);
+    return node
+      ? [{ relation, direction: 'parent' as const, node }]
+      : [];
+  });
+  const childNeighbors = childRelations.flatMap((relation) => {
+    const node = scriptPortalFor(relation.child);
+    return node
+      ? [{ relation, direction: 'child' as const, node }]
+      : [];
+  });
+
+  return {
+    ...portal,
+    graph: {
+      parents,
+      children,
+      parentNeighbors,
+      childNeighbors,
+      ancestors,
+      descendants,
+      ancestryPaths,
+      descendantPaths,
+      parentRelations,
+      childRelations,
     },
   };
 }
