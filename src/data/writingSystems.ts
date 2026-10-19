@@ -1,4 +1,5 @@
 import type { WritingSystem } from './types';
+import { graphRelations } from './graphRelations';
 
 /**
  * 世界书写体系数据。
@@ -6,7 +7,7 @@ import type { WritingSystem } from './types';
  * 年代为约数，学界多有分歧；负数表示公元前，null 表示至今仍在使用。
  * 该文件是项目的核心资产，可持续扩充。
  */
-export const writingSystems: WritingSystem[] = [
+const writingSystemData: WritingSystem[] = [
   // ─────────────────────────────────────────────
   // 一、独立起源（独立发明的文字，全人类仅数次）
   // ─────────────────────────────────────────────
@@ -126,7 +127,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'old-persian', nameZh: '古波斯楔形文字', nameEn: 'Old Persian Cuneiform',
-    origin: 'influence', parents: ['sumerian'], dateFrom: -525, dateTo: -330,
+    origin: 'influence', parents: ['akkadian'], dateFrom: -525, dateTo: -330,
     family: 'mesopotamia', region: '伊朗高原', countries: ['伊朗'],
     type: 'syllabary', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Old Persian U+103A0', sample: '𐎠',
@@ -136,7 +137,7 @@ export const writingSystems: WritingSystem[] = [
   {
     id: 'ugaritic', nameZh: '乌加里特字母', nameEn: 'Ugaritic',
     lineageEntry: { lineageId: 'semitic-south', stopId: 'ugaritic' },
-    origin: 'influence', parents: ['sumerian', 'proto-sinaitic'], dateFrom: -1400, dateTo: -1190,
+    origin: 'influence', parents: ['akkadian', 'proto-sinaitic'], dateFrom: -1400, dateTo: -1190,
     family: 'levant', region: '叙利亚海岸', countries: ['叙利亚'],
     type: 'abjad', status: 'extinct', direction: 'ltr',
     unicodeBlock: 'Ugaritic U+10380', sample: '𐎀', fontFamily: 'Noto Sans Ugaritic',
@@ -1287,7 +1288,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'hangul', nameZh: '谚文（韩文）', nameEn: 'Hangul',
-    origin: 'invented', parents: ['chinese-regular'], dateFrom: 1443, dateTo: null,
+    origin: 'invented', parents: [], dateFrom: 1443, dateTo: null,
     family: 'sinic', region: '朝鲜半岛', countries: ['韩国', '朝鲜'],
     type: 'featural', status: 'living', direction: 'ltr',
     unicodeBlock: 'Hangul Syllables U+AC00', sample: '한', fontFamily: 'Noto Serif KR',
@@ -1326,7 +1327,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'khitan-small', nameZh: '契丹小字', nameEn: 'Khitan Small Script',
-    origin: 'influence', parents: ['khitan-large'], dateFrom: 925, dateTo: 1200,
+    origin: 'influence', parents: ['old-uyghur'], dateFrom: 925, dateTo: 1200,
     family: 'sinic', region: '东北亚', countries: ['中国'],
     type: 'logosyllabic', status: 'extinct', direction: 'ttb',
     unicodeBlock: 'Khitan Small Script U+18B00', sample: '𘬀',
@@ -1590,8 +1591,19 @@ export const writingSystems: WritingSystem[] = [
   // 十一、非洲
   // ─────────────────────────────────────────────
   {
+    id: 'libyco-berber', nameZh: '利比亚—柏柏尔字母', nameEn: 'Libyco-Berber',
+    origin: 'influence', parents: ['phoenician'], dateFrom: -600, dateTo: 700,
+    family: 'africa', region: '北非', countries: ['摩洛哥', '阿尔及利亚', '突尼斯', '利比亚', '西班牙（加那利群岛）'],
+    type: 'abjad', status: 'extinct', direction: 'mixed',
+    note: '古代柏柏尔人的辅音字母，提非纳文的直接前身；其起源可能受腓尼基／布匿传统影响，也可能另有本地原型，学界尚无定论。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Libyco-Berber_alphabet',
+      'https://en.wikipedia.org/wiki/Tifinagh',
+    ],
+  },
+  {
     id: 'tifinagh', nameZh: '提非纳文', nameEn: 'Tifinagh',
-    origin: 'derived', parents: ['phoenician'], dateFrom: -300, dateTo: null,
+    origin: 'derived', parents: ['libyco-berber'], dateFrom: -300, dateTo: null,
     family: 'africa', region: '北非', countries: ['摩洛哥', '阿尔及利亚', '马里', '尼日尔'],
     type: 'abjad', status: 'living', direction: 'ltr',
     unicodeBlock: 'Tifinagh U+2D30', sample: 'ⴰ',
@@ -1705,7 +1717,7 @@ export const writingSystems: WritingSystem[] = [
   },
   {
     id: 'osage', nameZh: '奥塞治文', nameEn: 'Osage',
-    origin: 'derived', parents: ['canadian-syllabics'], dateFrom: 2006, dateTo: null,
+    origin: 'derived', parents: ['latin'], dateFrom: 2006, dateTo: null,
     family: 'modern', region: '北美', countries: ['美国'],
     type: 'alphabet', status: 'living', direction: 'ltr',
     unicodeBlock: 'Osage U+104B0', sample: '𐓀', fontFamily: 'Noto Sans Osage',
@@ -1749,7 +1761,17 @@ export const writingSystems: WritingSystem[] = [
   },
 ];
 
+/** 边表是 parents 的唯一来源，避免节点字段与边语义各写一份后悄悄分叉。 */
+export const writingSystems: WritingSystem[] = writingSystemData.map((system) => ({
+  ...system,
+  parents: graphRelations
+    .filter((relation) => relation.child === system.id)
+    .map((relation) => relation.parent),
+}));
+
 /** 便于按 id 查询 */
 export const scriptById: Record<string, WritingSystem> = Object.fromEntries(
   writingSystems.map((s) => [s.id, s]),
 );
+
+export { writingSystemData };

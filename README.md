@@ -7,7 +7,7 @@
 把世界上所有书写体系的演化关系画成一张可以缩放的有向图，
 并让同一个字在数千年里连续变形。
 
-<sub>193 个书写体系（另有奇普） · 12 个独立起源 · 88 个今仍使用 · 37 条血统轨道</sub>
+<sub>194 个书写体系（另有奇普） · 12 个独立起源 · 88 个今仍使用 · 37 条血统轨道</sub>
 
 </div>
 
@@ -78,7 +78,7 @@ npm run shots
 ```bash
 npm run build
 node --import ./tools/register-ts.mjs tools/font-sheet.mjs work/font-sheet
-# → work/font-sheet/tile-01.png …，14 张图看完 194 个体系
+# → work/font-sheet/tile-01.png …，14 张图看完 195 个体系
 ```
 
 看图得出的结论写进 `tools/font-verdicts.tsv`：一行一个体系，记 id、结论
@@ -227,7 +227,7 @@ Glyph-Atlas/
   nameEn: 'Phoenician Alphabet',
   alias: ['腓尼基文'],            // 可选，用于搜索
   origin: 'derived',             // independent | derived | influence | invented
-  parents: ['proto-sinaitic'],   // 父系 id 列表（有向边的来源）
+  parents: ['proto-sinaitic'],   // 只读投影，由 graphRelations 生成
   dateFrom: -1050,               // 负数表示公元前
   dateTo: -200,                  // null 表示至今仍在使用
   family: 'levant',              // 十二个泳道之一
@@ -249,13 +249,60 @@ Glyph-Atlas/
 | --- | --- | --- |
 | `id` | 节点主键 | 全表唯一，改动会打断 `parents` 引用 |
 | `origin` | 起源性质 | 有 `parents` 就不能写 `independent`（校验器会拦） |
-| `parents` | 有向边 | 可以多个：接触、混用、多重影响都允许 |
+| `parents` | 有向边的兼容投影 | 不要手改；边写在 `graphRelations.ts`，可多个 |
 | `dateFrom` / `dateTo` | 时间轴定位与生命线长度 | 约数，学界有分歧时取主流观点 |
 | `family` | 泳道 + 配色 | 必须是 `Family` 联合类型里的值 |
 | `type` | 类型学分类 | `nonscript` 的记录系统不会进入演化图 |
 | `sample` / `fontFamily` | 字形渲染 | 没有 Web 字体时会显示码位名片（见下） |
 | `lineageEntry` | 从节点进入血统视图的首选轨道与站点 | 可省略；省略时取第一条经过该体系的轨道 |
 | `sourceRefs` | 体系级参考链接 | 字体、Unicode 提案、条目等通用出处 |
+
+### GraphRelation —— 一条有语义的图边
+
+节点只能说明“这套文字大致怎么来的”，不能说明每一根连线到底是什么关系。
+例如乌加里特字母同时连着阿卡德楔形传统和原始西奈，但两条边的性质并不相同。
+因此图谱边单独成表：
+
+```ts
+{
+  parent: 'akkadian',
+  child: 'ugaritic',
+  kind: 'model',           // descent | borrowing | influence | model
+  evidence: 'sourced',     // pending：待补逐边证据；sourced：已有 sourceRefs
+  sourceRefs: ['https://en.wikipedia.org/wiki/Ugaritic_alphabet'],
+  note: '借楔形笔形与书写方向；字母原理另受原始西奈传统影响。',
+}
+```
+
+| `kind` | 含义 | 不能误读成 |
+| --- | --- | --- |
+| `descent` | 书体或书写制度连续发展 | 所有相似字形都必然直系 |
+| `borrowing` | 字母、字形或整套制度被采用 | 语言同源 |
+| `influence` | 有可核实的设计或观念联系 | 直接父子关系 |
+| `model` | 参照另一体系创制 | 字形同源 |
+
+`writingSystems.ts` 中的 `parents` 现在由这张边表投影而来，旧布局、详情和查询
+仍可继续工作；校验器会检查两边逐项一致。`evidence: 'pending'` 是明确的待办，
+不是“没有关系”。逐边来源仍在补录，当前 155 条边都已有类型，其中 11 条已有逐边来源，
+其余 144 条仍待补；这部分不能拿 `sourceRefs` 里的字体、Unicode 区块
+或整条轨道的参考链接冒充。
+
+`scriptContextFor()` 在图关系这一层提供两套粒度：
+
+```ts
+graph: {
+  parents, children,             // 直接前后关系
+  parentRelations, childRelations, // 与直接关系同序的边语义
+  ancestors, descendants,        // 去重后的全部祖先 / 后代
+  ancestryPaths,                 // 从各根到当前节点的所有路径
+  descendantPaths,               // 从当前节点到各叶节点的所有路径
+}
+```
+
+路径里的每一步都携带 `{ relation, from, to }`，所以未来做节点详情时，既可以
+列出“全部祖先”，也可以保留多父系造成的分支，不会把乌加里特、科普特、西里尔
+这类节点硬压成一条单线。祖先和后代只给节点集合；需要讲清“经过哪条边”时读
+路径。读模型只负责图上的体系级血统，不把 MICRO 的字形轨道混进来。
 
 ### Lineage —— 一条可以"往前走"的街
 
@@ -319,7 +366,9 @@ stopRefFromParams(lineage, stop) // 从 URL 参数恢复站点，无效参数返
 neighboringStopRefs(scriptId)  // 默认入口的前后邻站
 lineageStatusFor(system)       // neighbors | standalone | isolated
 
-scriptContextFor(scriptId)     // 一个节点的图关系 + 默认血统上下文
+scriptContextFor(scriptId)     // 直接关系 + 全部祖先/后代 + 多路径 + 默认血统入口
+ancestorsFor(scriptId)         // 全部祖先节点
+descendantsFor(scriptId)       // 全部后代节点
 graphChildrenByScript          // scriptId → 图上的直接子节点
 ```
 
@@ -328,7 +377,13 @@ graphChildrenByScript          // scriptId → 图上的直接子节点
 ```ts
 {
   system,                       // 当前书写体系
-  graph: { parents, children }, // parents 有向图里的直接前后关系
+  graph: {                      // 体系级血统，不含字形轨道
+    parents, children,           // 直接前后关系
+    parentRelations,             // 每条直接父系边的 kind / evidence
+    childRelations,              // 每条直接子系边的 kind / evidence
+    ancestors, descendants,      // 全部祖先 / 后代（去重）
+    ancestryPaths, descendantPaths, // 保留分支的完整路径
+  },
   lineage: {                    // 没有任何已核实轨道时整段省略
     entry,                      // 默认轨道站点，可直接定位 MICRO
     previous, next,             // 默认入口在轨道上的前后站
@@ -366,14 +421,18 @@ npm run audit:coverage:json  # 交给脚本或 CI 的 JSON
 它把“还缺什么”列成补链队列：哪些节点已有可前后行走的入口、哪些只能先以单
 体系打开、哪些站点或轨道缺来源、哪些素材缺登记。报告还区分首选入口是
 `explicit`（数据里明确指定）还是 `fallback`（按轨道数据顺序回退），并检查
-`scriptContextFor()` 返回的 parents / children / 邻站是否与源数据一致。
+`scriptContextFor()` 返回的直接关系、边语义、全部祖先 / 后代、路径结构与邻站
+是否与源数据一致。
 
-当前 193 个图谱节点中，96 个已有可前后行走的入口，97 个尚无轨道入口；12 个
+当前 194 个图谱节点中，96 个已有可前后行走的入口，98 个尚无轨道入口；12 个
 独立起源中 3 个已有入口。26 个多轨道节点与其余 70 个单轨道节点均已明确首选
-入口，已入轨但依赖回退的节点为 0。体系级 `sourceRefs` 目前覆盖 12/193 个节点；37 条轨道
+入口，已入轨但依赖回退的节点为 0。体系级 `sourceRefs` 目前覆盖 13/194 个节点；37 条轨道
 都至少登记了一组参考链接，139 个站点均已有来源（站点专属或继承轨道）和素材
-登记。无轨道不等于漏数据，尤其对未破译或独立起源体系，必须先有可靠证据才补链。
-覆盖率达标后可用 `npm run audit:coverage -- --strict` 把它升级为 CI 门禁。
+登记。图谱有 155 条边：直系 110、借用 15、影响 22、造字模型 8。44 个无父系
+节点中，12 个是独立起源根，32 个是现代创制根，覆盖审计分开计数，不能把“图根”
+直接当成“独立发明”。无轨道不等于漏数据，尤其对未破译或独立起源体系，必须先有
+可靠证据才补链。覆盖率达标后可用 `npm run audit:coverage -- --strict` 把它升级为
+CI 门禁。
 
 ### 字母场 —— 一整套字母表的形变
 
@@ -672,7 +731,7 @@ npm run build && ls dist/
 
 **当前数据**
 
-- 总表共 194 条记录，其中 193 个书写体系进入演化图；
+- 总表共 195 条记录，其中 194 个书写体系进入演化图；
 - 独立起源包含苏美尔、埃及、中国、印度河、中美洲等已知起点，以及起源仍有争议的候选体系；
 - 字母、音节文字与元音附标文字按主要谱系收录，覆盖历史文字、现役文字和未破译文字；
 - 语素文字包含汉字系的甲骨文、金文、篆书、隶书、楷书等阶段，以及假名、女书、契丹文等衍生体系；
@@ -735,7 +794,7 @@ npm run build && ls dist/
 - **2026-10-18 · 伊朗、努比亚与近现代创制文字**：新增碑铭巴列维、诗篇巴列维、
   麦罗埃草书体、杜普洛伊速记、唐萨、纳格蒙达里、苏努瓦尔、鲍钦豪、苗文（柏格理字母）
   与傈僳文（弗雷泽字母）共 10 条记录，并为卡维文补上 Unicode 区块与字体；
-  类型体系新增"速记文字"。当前共 194 条记录，其中 193 个书写体系进入演化图，
+  类型体系新增"速记文字"。当前共 195 条记录，其中 194 个书写体系进入演化图，
   12 个独立起源，88 个今仍使用，7 条血统轨道。
   这一批的字体可用性由 `work/fontqa/audit.py` 逐个核验：请求 Google Fonts 的
   css2 接口取回全部 woff2 子集，再用字体的 cmap 表确认样例码位确实有字形。
@@ -1012,7 +1071,7 @@ npm run build && ls dist/
   就报错，并挂在 `npm run validate` 后面。
 
 - **2026-10-19 · 字体核实台账**：新增 `tools/font-sheet.mjs` 字体审看台与
-  `tools/font-verdicts.tsv` 台账（194 个体系逐行登记），`wrong` 直接让构建失败。
+  `tools/font-verdicts.tsv` 台账（195 个体系逐行登记），`wrong` 直接让构建失败。
   详见上文"字体审看台"。
 
 - **2026-10-19 · 轮廓生成脚本与轮廓包回正**：`tools/build-glyph-paths.py` 里调
@@ -1167,7 +1226,7 @@ npm run build && ls dist/
   来源，`Lineage` 增加轨道级来源。新增 `lineageEntryFor`、`lineageHref`、
   `stopRefFromParams`、`neighboringStopRefs` 与 `lineageStatusFor`，把“节点 →
   轨道站点 → 前后邻站”的契约固定下来，并让校验器检查入口是否指向真实站点。
-  新增 `npm run audit:coverage`，当前 193 个节点中 96 个可进入前后演变，
+  新增 `npm run audit:coverage`，当前 194 个节点中 96 个可进入前后演变，
   其余进入补链或单体系详情队列；本轮仍不改页面入口。
 
 - **2026-10-19 · 轨道来源全覆盖**：37 条血统轨道逐条补上 `sourceRefs`，共登记
@@ -1184,13 +1243,25 @@ npm run build && ls dist/
   12 个体系补上体系级参考，覆盖审计增加入口模式、来源覆盖与上下文一致性检查。
   本轮仍不改界面。
 
+- **2026-10-19 · 图谱边与完整路径读模型**：把 155 条谱系连接从只有 `parents`
+  升级为一等边表 `graphRelations.ts`，逐边区分直系演变、借用、影响与造字模型；
+  `writingSystems.ts` 的 `parents` 改为边表投影，现有布局与查询保持兼容。边同时
+  带有 `pending / sourced` 证据状态，当前 155 条均已分类，其中 11 条已有逐边来源，144 条仍待补。新增
+  全部祖先、全部后代、保留分支的祖先路径与后代路径，每条路径携带边的语义；
+  `scriptContextFor()` 一次返回直接关系、完整血统和默认 MICRO 入口。覆盖审计增加
+  边类型统计、图根分类与路径一致性检查，README 同步记录数据契约。同时修正古波斯、
+  乌加里特、契丹小字与奥塞治文的父系语义，新增利比亚—柏柏尔字母节点，使提非纳文
+  不再直接挂在腓尼基文下。本轮仍不改界面。
+
 ---
 
 ## 贡献
 
 数据和代码都欢迎提交。
 
-- 新增书写体系 → 改 `writingSystems.ts`，跑 `npm run validate`
+- 新增书写体系 → 改 `writingSystems.ts`，同时在 `graphRelations.ts` 写清父系边的
+  `kind` 与证据状态，跑 `npm run validate`
+- 修正谱系关系 → 改 `graphRelations.ts`，附上只证明这条边的来源
 - 新增字形轨道 → 改 `lineages.ts`：`path`、`char` 或 `image` 三选一，并写明 `source`
 - 修正史实 / 年代 → 请附上来源，方便复核
 - 提交前请跑 `npm run check`

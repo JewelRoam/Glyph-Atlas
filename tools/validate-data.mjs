@@ -15,6 +15,7 @@
  *  8. 中国 / 汉字圈的样本、国家的字段不为空
  *  9. 声明了 Unicode 区块的条目，样例码位确实落在该区块内
  * 10. 字形来源覆盖：声明的字族确实收了这些字符，覆盖不到的就该留空
+ * 11. 图谱边有语义、无重复/自环/环，且 parents 与边表完全一致
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -31,11 +32,13 @@ function loadData() {
       .replace(/^export interface[\s\S]*?\n\}\n/gm, '')
       .replace(/export type[\s\S]*?;\n/g, '')
       .replace(/^export const/gm, 'const')
-      .replace(/:\s*(WritingSystem|Lineage|GlyphSet|LetterSlot|MatraSlot)\[\]/g, '')
+      .replace(/^export \{[^}]+\};?$/gm, '')
+      .replace(/:\s*(WritingSystem|GraphRelation|Lineage|GlyphSet|LetterSlot|MatraSlot)\[\]/g, '')
       .replace(/:\s*\{[^}]*\}\[\]/g, '')
       .replace(/:\s*Record<[^=]*?>(?=\s*=)/g, '');
 
   const wsSrc = strip(read('src/data/writingSystems.ts'));
+  const grSrc = strip(read('src/data/graphRelations.ts'));
   const lnSrc = strip(read('src/data/lineages.ts'));
   // glyphSets.ts 末尾还有一个查表函数，这里只要数据本身
   const gsSrc = strip(read('src/data/glyphSets.ts')).replace(/export function[\s\S]*$/, '');
@@ -47,6 +50,7 @@ function loadData() {
   const lsSrc = strip(read('src/data/letterSlots.ts')).replace(/export function[\s\S]*$/, '');
   const ffSrc = strip(read('src/data/fontFallback.ts')).replace(/export function[\s\S]*$/, '');
   const factory = new Function(`
+    ${grSrc}
     ${wsSrc}
     ${lnSrc}
     ${gsSrc}
@@ -55,13 +59,23 @@ function loadData() {
     ${mtSrc}
     ${lsSrc}
     ${ffSrc}
-    return { writingSystems, scriptById, lineages, glyphSets, fontCoverage, letterMaps, SLOTS, fontFallback };
+    return { writingSystemData, writingSystems, scriptById, graphRelations, lineages, glyphSets, fontCoverage, letterMaps, SLOTS, fontFallback };
   `);
   return factory();
 }
 
-const { writingSystems, scriptById, lineages, glyphSets, fontCoverage, letterMaps, SLOTS, fontFallback } =
-  loadData();
+const {
+  writingSystemData,
+  writingSystems,
+  scriptById,
+  graphRelations,
+  lineages,
+  glyphSets,
+  fontCoverage,
+  letterMaps,
+  SLOTS,
+  fontFallback,
+} = loadData();
 
 /** 码位是否落在某个字族的覆盖区间里（区间是扁平的 [起, 止, …]） */
 function familyCovers(family, char) {
@@ -94,6 +108,79 @@ for (const s of writingSystems) {
   seen.add(s.id);
 }
 
+// ── 图谱边 ────────────────────────────────────────────────────
+// 边是一等数据；WritingSystem.parents 只是它的投影。这里同时检查两边是否
+// 完全一致，避免未来某个界面读到一套关系、审计读到另一套关系。
+const RELATION_KINDS = new Set(['descent', 'borrowing', 'influence', 'model']);
+const relationKeys = new Set();
+const outgoing = new Map();
+const incoming = new Map();
+for (const relation of graphRelations) {
+  const key = `${relation.parent}>${relation.child}`;
+  if (relationKeys.has(key)) err(`[relations] 重复的边: ${key}`);
+  relationKeys.add(key);
+  if (relation.parent === relation.child) err(`[relations] 自环: ${key}`);
+  if (!scriptById[relation.parent]) err(`[relations] ${key} 的父系不存在`);
+  if (!scriptById[relation.child]) err(`[relations] ${key} 的子系不存在`);
+  if (!RELATION_KINDS.has(relation.kind))
+    err(`[relations] ${key} 的 kind「${relation.kind}」无效`);
+  if (!['pending', 'sourced'].includes(relation.evidence))
+    err(`[relations] ${key} 的 evidence「${relation.evidence}」无效`);
+  if (relation.evidence === 'sourced' && !relation.sourceRefs?.length)
+    err(`[relations] ${key} 标为 sourced，却没有 sourceRefs`);
+  if (relation.evidence === 'sourced') {
+    const substantive = (relation.sourceRefs ?? []).some(
+      (ref) => !/(fonts\.google\.com|unicode\.org\/charts|unicode\.org\/versions)/.test(ref),
+    );
+    if (!substantive)
+      err(`[relations] ${key} 的 sourced 证据不能只来自字体页或 Unicode 码表`);
+  }
+  if (relation.evidence === 'pending' && relation.sourceRefs?.length)
+    warn(`[relations] ${key} 已有 sourceRefs，可以把 evidence 改为 sourced`);
+  for (const ref of relation.sourceRefs ?? []) {
+    if (!/^https?:\/\//.test(ref))
+      err(`[relations] ${key} 的 sourceRefs 不是 http(s) 链接：${ref}`);
+  }
+  const children = outgoing.get(relation.parent) ?? [];
+  children.push(relation.child);
+  outgoing.set(relation.parent, children);
+  const parents = incoming.get(relation.child) ?? [];
+  parents.push(relation.parent);
+  incoming.set(relation.child, parents);
+}
+
+// 没有边时 parents 的投影结果就是空数组；`fromEdges` 为空时不必再查。
+// 这里只核非空投影，既能抓住“节点字段残留旧父系”，也不会把合法的图根误报。
+for (const system of writingSystemData) {
+  if (!system.parents?.length) continue;
+  const projected = writingSystems.find((candidate) => candidate.id === system.id)?.parents ?? [];
+  const fromEdges = incoming.get(system.id) ?? [];
+  if (
+    projected.length !== fromEdges.length ||
+    projected.some((parentId, index) => parentId !== fromEdges[index])
+  ) {
+    err(`[relations] ${system.id} 的 parents 与边表投影不一致`);
+  }
+}
+
+// 无环：DFS 三色标记，报出真正形成环的节点，而不是只给一句“有环”。
+const color = new Map();
+const cyclePath = [];
+const visit = (id, stack) => {
+  const state = color.get(id);
+  if (state === 1) {
+    const start = stack.indexOf(id);
+    cyclePath.push([...stack.slice(start), id].join(' → '));
+    return;
+  }
+  if (state === 2) return;
+  color.set(id, 1);
+  for (const child of outgoing.get(id) ?? []) visit(child, [...stack, id]);
+  color.set(id, 2);
+};
+for (const system of writingSystemData) visit(system.id, []);
+if (cyclePath.length) err(`[relations] 图谱存在环: ${cyclePath[0]}`);
+
 for (const s of writingSystems) {
   // parents
   for (const p of s.parents ?? []) {
@@ -108,6 +195,11 @@ for (const s of writingSystems) {
     err(`[origin] ${s.id} 声明独立起源，却列有父系: ${s.parents.join(', ')}`);
   if (s.origin === 'derived' && (s.parents ?? []).length === 0)
     err(`[origin] ${s.id} 声明为衍生，却没有父系`);
+  if (s.origin === 'influence' && (s.parents ?? []).length === 0)
+    err(`[origin] ${s.id} 声明为受影响而创制，却没有父系`);
+  if (s.origin === 'invented' && (s.parents ?? []).length === 0) {
+    // 现代创制可以没有来源边；没有父系时它就是图上的新根，不能冒充独立起源。
+  }
   // 年代
   if (s.dateTo !== null && s.dateTo < s.dateFrom)
     err(`[dates] ${s.id} 的终止年代早于起始年代`);
@@ -341,7 +433,9 @@ if (unexpandedLetters.length)
 // 统计信息，顺便作为 README 的数字来源
 const independent = writingSystems.filter((s) => s.origin === 'independent');
 const graph = writingSystems.filter((s) => s.type !== 'nonscript');
-const graphIndependent = graph.filter((s) => s.origin === 'independent');
+const graphIndependent = graph.filter(
+  (s) => s.origin === 'independent' && s.parents.length === 0,
+);
 const living = graph.filter((s) => s.status === 'living' || s.status === 'revived');
 
 if (warnings.length) {
@@ -356,5 +450,6 @@ if (errors.length) {
 console.log(
   `✔ 数据校验通过：${graph.length} 个书写体系进入图谱，` +
     `${graphIndependent.length} 个独立起源（另有 ${independent.length - graphIndependent.length} 条非文字记录），` +
-    `${living.length} 个今仍使用，${lineages.length} 条血统轨道`,
+    `${living.length} 个今仍使用，${lineages.length} 条血统轨道，` +
+    `${graphRelations.length} 条有语义的图谱边`,
 );

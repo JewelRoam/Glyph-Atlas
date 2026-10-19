@@ -15,6 +15,7 @@
  */
 import {
   graphChildrenByScript,
+  graphRelations,
   lineages,
   scriptContextFor,
   writingSystems,
@@ -88,6 +89,17 @@ const multiTrackWithoutExplicitEntry = multiTrack.filter(
 );
 const fallbackEntries = entries.filter((entry) => entry.entryMode === 'fallback');
 const linkedWithoutExplicitEntry = entries.filter((entry) => entry.entryMode === 'fallback');
+const relationsByKind = Object.fromEntries(
+  ['descent', 'borrowing', 'influence', 'model'].map((kind) => [
+    kind,
+    graphRelations.filter((relation) => relation.kind === kind).length,
+  ]),
+);
+const sourcedRelations = graphRelations.filter((relation) => relation.evidence === 'sourced');
+const pendingRelations = graphRelations.filter((relation) => relation.evidence === 'pending');
+const systemsWithoutParents = systems.filter((system) => system.parents.length === 0);
+const independentRoots = systemsWithoutParents.filter((system) => system.origin === 'independent');
+const inventedRoots = systemsWithoutParents.filter((system) => system.origin === 'invented');
 
 // 节点上下文是未来 MACRO 详情与 MICRO 合流时共用的读模型。这里把它与
 // writingSystems.parents、轨道反向索引逐项对照，防止两套查询在界面合流后分叉。
@@ -118,6 +130,131 @@ for (const system of systems) {
   }
   if (!sameIds(mappedChildren, expectedChildren)) {
     mismatch(system.id, 'graphChildrenByScript 与 writingSystems.parents 不一致');
+  }
+
+  const expectedParentRelations = graphRelations.filter(
+    (relation) => relation.child === system.id,
+  );
+  const expectedChildRelations = graphRelations.filter(
+    (relation) => relation.parent === system.id,
+  );
+  if (
+    !sameIds(
+      context.graph.parentRelations.map((relation) => `${relation.parent}>${relation.child}`),
+      expectedParentRelations.map((relation) => `${relation.parent}>${relation.child}`),
+    )
+  ) {
+    mismatch(system.id, '上下文 parentRelations 与边表不一致');
+  }
+  if (
+    !sameIds(
+      context.graph.childRelations.map((relation) => `${relation.parent}>${relation.child}`),
+      expectedChildRelations.map((relation) => `${relation.parent}>${relation.child}`),
+    )
+  ) {
+    mismatch(system.id, '上下文 childRelations 与边表不一致');
+  }
+
+  const expectedAncestors = new Set();
+  const visitAncestors = (id) => {
+    const current = systems.find((candidate) => candidate.id === id);
+    for (const parentId of current?.parents ?? []) {
+      if (expectedAncestors.has(parentId)) continue;
+      expectedAncestors.add(parentId);
+      visitAncestors(parentId);
+    }
+  };
+  visitAncestors(system.id);
+  if (
+    !sameIds(
+      [...context.graph.ancestors.map((node) => node.id)].sort(),
+      [...expectedAncestors].sort(),
+    )
+  ) {
+    mismatch(system.id, '上下文 ancestors 与完整祖先遍历不一致');
+  }
+
+  const expectedDescendants = new Set();
+  const visitDescendants = (id) => {
+    for (const candidate of systems) {
+      if (!candidate.parents.includes(id) || expectedDescendants.has(candidate.id)) continue;
+      expectedDescendants.add(candidate.id);
+      visitDescendants(candidate.id);
+    }
+  };
+  visitDescendants(system.id);
+  if (
+    !sameIds(
+      [...context.graph.descendants.map((node) => node.id)].sort(),
+      [...expectedDescendants].sort(),
+    )
+  ) {
+    mismatch(system.id, '上下文 descendants 与完整后代遍历不一致');
+  }
+
+  const pathIsChronological = (nodes) =>
+    nodes.every(
+      (node, index) => index === 0 || node.dateFrom >= nodes[index - 1].dateFrom,
+    );
+
+  for (const path of context.graph.ancestryPaths) {
+    if (path.nodes.at(-1)?.id !== system.id) {
+      mismatch(system.id, 'ancestryPaths 有一条路径未终止于当前节点');
+      break;
+    }
+    if (path.nodes.length - 1 !== path.steps.length) {
+      mismatch(system.id, 'ancestryPaths 的节点数与边数不一致');
+      break;
+    }
+    if (path.nodes[0] && systems.find((candidate) => candidate.id === path.nodes[0].id)?.parents.length) {
+      mismatch(system.id, 'ancestryPaths 有一条未从图根开始');
+      break;
+    }
+    if (!pathIsChronological(path.nodes)) {
+      mismatch(system.id, 'ancestryPaths 有一条节点年代倒退');
+      break;
+    }
+    const brokenStep = path.steps.findIndex(
+      (step, index) =>
+        step.from.id !== path.nodes[index]?.id ||
+        step.to.id !== path.nodes[index + 1]?.id ||
+        step.relation.parent !== step.from.id ||
+        step.relation.child !== step.to.id,
+    );
+    if (brokenStep !== -1) {
+      mismatch(system.id, `ancestryPaths 第 ${brokenStep + 1} 步与节点序列不一致`);
+      break;
+    }
+  }
+  for (const path of context.graph.descendantPaths) {
+    if (path.nodes[0]?.id !== system.id) {
+      mismatch(system.id, 'descendantPaths 有一条路径未从当前节点开始');
+      break;
+    }
+    if (path.nodes.length - 1 !== path.steps.length) {
+      mismatch(system.id, 'descendantPaths 的节点数与边数不一致');
+      break;
+    }
+    const lastId = path.nodes.at(-1)?.id;
+    if (lastId && systems.some((candidate) => candidate.parents.includes(lastId))) {
+      mismatch(system.id, 'descendantPaths 有一条未到叶节点');
+      break;
+    }
+    if (!pathIsChronological(path.nodes)) {
+      mismatch(system.id, 'descendantPaths 有一条节点年代倒退');
+      break;
+    }
+    const brokenStep = path.steps.findIndex(
+      (step, index) =>
+        step.from.id !== path.nodes[index]?.id ||
+        step.to.id !== path.nodes[index + 1]?.id ||
+        step.relation.parent !== step.from.id ||
+        step.relation.child !== step.to.id,
+    );
+    if (brokenStep !== -1) {
+      mismatch(system.id, `descendantPaths 第 ${brokenStep + 1} 步与节点序列不一致`);
+      break;
+    }
   }
 
   const expectedEntry = lineageEntryFor(system.id);
@@ -173,6 +310,13 @@ const undocumentedAssets = stopRefs.filter(
 const result = {
   summary: {
     graphSystems: entries.length,
+    graphRelations: graphRelations.length,
+    graphRelationsByKind: relationsByKind,
+    graphRelationsSourced: sourcedRelations.length,
+    graphRelationsPendingEvidence: pendingRelations.length,
+    graphRoots: systemsWithoutParents.length,
+    independentGraphRoots: independentRoots.length,
+    inventedGraphRoots: inventedRoots.length,
     lineageTracks: lineages.length,
     lineageStops: stopRefs.length,
     systemsWithEntry: linked.length,
@@ -215,6 +359,11 @@ const result = {
     entry: entry.entry,
   })),
   contextMismatches,
+  relationsPendingEvidence: pendingRelations.map((relation) => ({
+    parent: relation.parent,
+    child: relation.child,
+    kind: relation.kind,
+  })),
   isolated: isolated.map((entry) => ({
     id: entry.id,
     nameZh: entry.nameZh,
@@ -265,6 +414,14 @@ if (json) {
   );
   console.log(
     `  节点上下文一致性 ${contextMismatches.length ? `✘ ${contextMismatches.length} 处不一致` : '✔'}`,
+  );
+  console.log(
+    `  图谱边 ${graphRelations.length} · 直系 ${relationsByKind.descent} · 借用 ${relationsByKind.borrowing} · ` +
+      `影响 ${relationsByKind.influence} · 模型 ${relationsByKind.model} · 已有逐边来源 ${sourcedRelations.length}`,
+  );
+  console.log(
+    `  图根 ${systemsWithoutParents.length} · 独立起源根 ${independentRoots.length} · ` +
+      `现代创制根 ${inventedRoots.length}（后两类不能混算）`,
   );
   console.log(
     `  站点 ${stopRefs.length} · 缺来源 ${incompleteStops.length} · 缺素材登记 ${undocumentedAssets.length}`,

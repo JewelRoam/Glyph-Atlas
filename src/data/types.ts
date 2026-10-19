@@ -30,6 +30,36 @@ export type Origin =
   | 'influence'    // 受其他文字影响而创制
   | 'invented'     // 现代人为创制
 
+/**
+ * 一条图谱边凭什么成立。
+ *
+ * 不能从子节点的 origin 反推：同一个子节点可能既有一条直系来源，又受到
+ * 另一套文字的字母形式或造字制度影响。
+ */
+export type GraphRelationKind =
+  | 'descent'    // 直系演变：前一体系的书体或制度连续发展成后一体系
+  | 'borrowing'  // 借用：字母、字形或整套书写制度被另一传统采用
+  | 'influence'  // 影响：可核实的设计或观念联系，但不声称直系血缘
+  | 'model';     // 造字模型：参照另一体系创制，字形本身不一定同源
+
+/** 一条有向的书写体系关系。 */
+export interface GraphRelation {
+  /** 父系书写体系 id */
+  parent: string;
+  /** 子系书写体系 id */
+  child: string;
+  kind: GraphRelationKind;
+  /**
+   * pending：关系分类已登记，逐边证据仍待补；
+   * sourced：已有至少一条针对这条关系的来源。
+   */
+  evidence: 'pending' | 'sourced';
+  /** 只证明这条边、而不是整套文字或字形清单的参考链接 */
+  sourceRefs?: string[];
+  /** 对关系性质或学界分歧的短注 */
+  note?: string;
+}
+
 /** 使用状态 */
 export type Status =
   | 'living'       // 仍作为日常文字使用
@@ -64,7 +94,10 @@ export interface WritingSystem {
   /** 别名（中文） */
   alias?: string[];
   origin: Origin;
-  /** 父系书写体系 id 列表（用于绘制有向图的边） */
+  /**
+   * 父系书写体系 id 列表，由 graphRelations 投影而来，供现有布局与查询兼容。
+   * 新数据应写 graphRelations；不要在这里另加一条没有边语义的父系。
+   */
   parents: string[];
   /** 起始年代，负数表示公元前 */
   dateFrom: number;
