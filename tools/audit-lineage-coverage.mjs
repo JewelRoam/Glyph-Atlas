@@ -7,11 +7,11 @@
  *   npm run audit:coverage -- --json
  *   npm run audit:coverage -- --strict
  *
- * 这个脚本不是构建门禁。它把“从 MACRO 任意节点进入前后演变”还缺什么
+ * 这个脚本不是构建门禁。它把“从演化全图任意节点进入前后演变”还缺什么
  * 列成可执行队列：哪些书写体系已有可前后行走的轨道，哪些只能以单体系
  * 打开，哪些站点还缺出处或素材登记。
  *
- * --strict 会把覆盖率不足当成失败，供未来覆盖率达标后的 CI 使用。
+ * --strict 会把覆盖率不足当成失败，供覆盖率达标后的 CI 使用。
  */
 import {
   graphChildrenByScript,
@@ -243,7 +243,7 @@ const systemsWithoutParents = systems.filter((system) => system.parents.length =
 const independentRoots = systemsWithoutParents.filter((system) => system.origin === 'independent');
 const inventedRoots = systemsWithoutParents.filter((system) => system.origin === 'invented');
 
-// 节点上下文是未来 MACRO 详情与 MICRO 合流时共用的读模型。这里把它与
+// 节点上下文是演化全图与体系焦点共用的读模型。这里把它与
 // writingSystems.parents、轨道反向索引逐项对照，防止两套查询在界面合流后分叉。
 const contextMismatches = [];
 const graphNeighborCoverage = [];
@@ -972,7 +972,7 @@ if (json) {
       `detail ${routeModeCounts.detail} · 素材就绪 ${systemsWithMaterials.length}/${entries.length}`,
   );
   console.log(
-    `  图邻居门户 ${graphNeighborPortals} · 可进 MICRO ${graphNeighborPortalsWithLineage} · ` +
+    `  图邻居门户 ${graphNeighborPortals} · 可进字形街景 ${graphNeighborPortalsWithLineage} · ` +
       `待补轨道 ${graphNeighborPortalsWithoutLineage} · 有素材 ${graphNeighborPortalsWithMaterials}/` +
       `${graphNeighborPortals}`,
   );

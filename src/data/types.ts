@@ -5,7 +5,7 @@
  *  1. writingSystem（书写体系）= 图中的一个节点。可以是字母表、辅音音素文字、
  *     元音附标文字、音节文字、语素文字、特征文字，或尚未破译的文字。
  *  2. lineage（血统轨道）= 一条穿越多个书写体系的"同源字位"路径，
- *     用于微观维度的"街景"演进与字形形变动画。
+ *     用于字形街景的演进与字形形变动画。
  *  3. glyph（字形）= 轨道上的一个站点，既能用字体渲染，也能用矢量路径渲染。
  */
 
@@ -72,7 +72,7 @@ export type Status =
 /** 书写方向 */
 export type Direction = 'ltr' | 'rtl' | 'ttb' | 'boustrophedon' | 'mixed';
 
-/** 谱系分区（用于宏观图的泳道与配色） */
+/** 谱系分区（用于演化全图的泳道与配色） */
 export type Family =
   | 'mesopotamia'   // 美索不达米亚
   | 'egypt'         // 埃及
@@ -150,7 +150,7 @@ export interface GlyphStop {
   /**
    * 轨道内的稳定站点 id。
    *
-   * 这是站点在轨道内的持久标识，供详情页、反向索引与未来图谱节点跳转使用。
+   * 这是站点在轨道内的持久标识，供体系焦点、反向索引与图谱节点跳转使用。
    * 一旦发布就不要改名；同一轨道出现同一书写体系时更必须各自独立。
    */
   id: string;
@@ -196,7 +196,7 @@ export interface Lineage {
   mode?: LineageMode;
   /**
    * 史实依据：这条轨道凭什么成立——条目正文、Unicode 提案或字形对照表。
-   * MICRO 会把它印在说明下面一行。写不出出处的链条不该上线，
+   * 体系焦点会把它印在说明下面一行。写不出出处的链条不该上线，
    * tools/validate-data.mjs 把空 source 当错误。
    */
   source: string;

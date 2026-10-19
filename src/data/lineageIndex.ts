@@ -7,7 +7,7 @@ import type { GlyphStop, GraphRelation, Lineage, WritingSystem } from './types';
 /**
  * 轨道站点的稳定键。
  *
- * 未来 MACRO 的任意书写体系节点要能直接进入它所在的轨道，并继续前后行走，
+ * 从演化全图的任意书写体系节点直接进入它所在的轨道，并继续前后行走，
  * 因而不能只拿 writingSystem.id 定位：同一体系可以在不同轨道里出现，
  * 同一条轨道也可能因年代或书体不同而出现多次。每个站点都有必填且稳定的
  * id，校验器会拒绝缺失、重复或格式不合法的站点键。
@@ -182,7 +182,7 @@ export function graphLinksForLineage(lineage: Lineage): readonly LineageGraphLin
  * 取一个站点前后两个邻接对的图连接状态。
  *
  * 直接边会给出它在轨道里的具体端点；间接路径保留中间节点和每一步的
- * relation，供未来节点详情继续向前后行走。没有有向路径才是 unrelated。
+ * relation，供体系焦点继续向前后行走。没有有向路径才是 unrelated。
  * cognate / pair 轨道出现 unrelated 是合法状态，调用方仍应结合
  * lineage.mode 解读。
  */

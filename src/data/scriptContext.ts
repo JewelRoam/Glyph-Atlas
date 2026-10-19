@@ -21,7 +21,7 @@ import {
 /**
  * 一个书写体系在“图谱 + 血统”两层里的完整上下文。
  *
- * 未来 MACRO 节点详情与 MICRO 合流时，界面只需要拿这一份对象：
+ * 演化全图与体系焦点共用这一份只读上下文：
  *  - graph：节点在有向图中的直接关系、完整祖先/后代，以及保留分支的多条路径；
  *  - lineage：默认字形轨道、轨道上的前后站，以及该体系出现的其他轨道。
  *
@@ -45,9 +45,9 @@ export interface ScriptGraphContext {
   parents: readonly WritingSystem[];
   /** 直接子系，保持原有字段与顺序 */
   children: readonly WritingSystem[];
-  /** 直接父系节点及其可进入的详情 / MICRO 门户，与 parentRelations 同序 */
+  /** 直接父系节点及其可进入的体系焦点门户，与 parentRelations 同序 */
   parentNeighbors: readonly ScriptGraphNeighborContext[];
-  /** 直接子系节点及其可进入的详情 / MICRO 门户，与 childRelations 同序 */
+  /** 直接子系节点及其可进入的体系焦点门户，与 childRelations 同序 */
   childNeighbors: readonly ScriptGraphNeighborContext[];
   /** 所有祖先的去重节点集合（不含当前节点） */
   ancestors: readonly WritingSystem[];
@@ -67,7 +67,7 @@ export interface ScriptGraphContext {
  * 某一条轨道在该体系入口处的完整上下文。
  *
  * 不只是“其他轨道还能点哪里”：每条轨道都带自己的前后邻站、站点级图边和
- * 邻接路径。未来切换轨道时不需要再用别处的索引拼一次。
+ * 邻接路径。切换轨道时不需要再用别处的索引拼一次。
  */
 export interface ScriptLineageTrackContext {
   /** 该体系在这条轨道里的入口站点 */
@@ -84,7 +84,7 @@ export interface ScriptLineageTrackContext {
 }
 
 export interface ScriptLineageContext extends ScriptLineageTrackContext {
-  /** 该体系出现的其他轨道入口；保留下来供未来的轨道切换器使用 */
+  /** 该体系出现的其他轨道入口；保留给轨道切换器使用 */
   alternatives: readonly LineageStopRef[];
   /** 默认轨道在前，其余轨道各有一份完整上下文；同一轨道只出现一次 */
   tracks: readonly ScriptLineageTrackContext[];
@@ -94,7 +94,7 @@ export interface ScriptLineageContext extends ScriptLineageTrackContext {
  * 节点详情与字母场共用的素材读模型。
  *
  * 字体 / 图版来源、代表字形集和字母槽位仍分别由原模块维护；这里只做只读
- * 关联，不复制数据。未来 MACRO 节点详情和 MICRO 字母场从同一个上下文取素材，
+ * 关联，不复制数据。体系焦点与字母场从同一个上下文取素材，
  * 站点自己的 path / image / char / sourceRef / asset 则继续随 LineageStopRef 保存。
  */
 export interface ScriptMaterialContext {
@@ -116,9 +116,9 @@ export interface ScriptMaterialContext {
 /**
  * 节点进入演化视图时的首选路线。
  *
- * `lineage`：已有可核实的字形轨道，默认进入 MICRO；即使当前是单站轨道，
+ * `lineage`：已有可核实的字形轨道，默认进入字形街景；即使当前是单站轨道，
  *   也保留轨道上下文，不能退化成图关系。
- * `graph`：还没有已核实的字形轨道，但体系级有父系或子系，可先从 MACRO
+ * `graph`：还没有已核实的字形轨道，但体系级有父系或子系，可先从演化全图
  *   图邻居前后浏览。
  * `detail`：没有轨道也没有图邻居，只能打开单体系详情；不伪造链条。
  */
@@ -138,13 +138,13 @@ export interface ScriptNodeRoute {
  *
  * 这是节点详情的轻量读模型，也是图邻居上下文里的节点摘要。它不递归携带
  * 邻接图，避免一份节点上下文无限展开；调用方若从邻居继续走，只需再取该
- * 邻居自己的 scriptContextFor()。href 始终指向该节点默认详情 / MICRO 入口。
+ * 邻居自己的 scriptContextFor()。href 始终指向该节点默认体系焦点入口。
  */
 export interface ScriptNodePortal {
   system: WritingSystem;
   /** 默认入口的稳定查询链接；没有轨道时仍可打开该节点的体系详情 */
   href: string;
-  /** 详情与 MICRO 合流后共用的首选路线 */
+  /** 体系焦点采用的首选路线 */
   route: ScriptNodeRoute;
   /** 字体、字形清单与字母槽位的统一入口 */
   materials: ScriptMaterialContext;
@@ -157,7 +157,7 @@ export interface ScriptGraphNeighborContext {
   /** 原始有向边；父系门户方向为 parent，子系门户方向为 child */
   relation: GraphRelation;
   direction: 'parent' | 'child';
-  /** 另一端节点的详情 / MICRO 入口和素材上下文 */
+  /** 另一端节点的体系焦点入口和素材上下文 */
   node: ScriptNodePortal;
 }
 

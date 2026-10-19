@@ -110,7 +110,7 @@ for (const s of writingSystems) {
 
 // ── 图谱边 ────────────────────────────────────────────────────
 // 边是一等数据；WritingSystem.parents 只是它的投影。这里同时检查两边是否
-// 完全一致，避免未来某个界面读到一套关系、审计读到另一套关系。
+// 完全一致，避免不同界面读到一套关系、审计读到另一套关系。
 const RELATION_KINDS = new Set(['descent', 'borrowing', 'influence', 'model']);
 const relationKeys = new Set();
 const outgoing = new Map();
@@ -357,7 +357,7 @@ if (uncoveredSets.length)
   warn(`[coverage] ${uncoveredSets.length} 个体系有字形未被字库收录（页面留空）：${uncoveredSets.slice(0, 8).join('，')}${uncoveredSets.length > 8 ? ' …' : ''}`);
 
 // ── 11. 字母槽位表 ────────────────────────────────────────────
-// MICRO 的字母场按"同源槽位"把两套字母表对上号（见 src/data/letterSlots.ts）。
+// 字形街景的字母场按"同源槽位"把两套字母表对上号（见 src/data/letterSlots.ts）。
 // 槽位错一个字，页面就会把两个不相干的字母画成一条演化链，所以这里逐条核对：
 // 槽位有没有定义、字符是不是单字符、字库里有没有这个字形。
 const slotIds = new Set(SLOTS.map((x) => x.id));

@@ -1,17 +1,16 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import type { GlyphPlate } from '../data/glyphPlates';
 import type { WritingSystem } from '../data/types';
 import { glyphSets } from '../data/glyphSets';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { nonLetterKind } from '../data/letterSlots';
+import { familyFor } from '../data/fontFallback';
 import { coverageOf, hasCoverage } from '../lib/coverage';
 import { assetUrl } from '../lib/assets';
 import { FontGlyph, ImageGlyph } from './Glyph';
 
-/** 折叠状态下先铺这么多，够看出这款文字的骨架 */
-const PREVIEW = 48;
-/** 语素文字的字符本来就不该铺满一屏，给一个更小的上限 */
+/** 语素文字取代表字，不追求把一个包含数万字的字库铺满页面。 */
 const LOGOGRAPHIC_PREVIEW = 28;
 
 function searchLinks(system: WritingSystem, family?: string) {
@@ -25,61 +24,71 @@ function searchLinks(system: WritingSystem, family?: string) {
 }
 
 /**
- * 字形样本板。
+ * 字形图版。
  *
- * 详情面板里只有一枚放大的示例字时，读不出这套文字长什么样；这里铺一张字表：
- * 字母表把 Unicode 收录的字母全铺出来（可展开），语素文字只给少量代表字。
- *
- * 每一格都必须有据可查：
- *  · 字体来源 —— 覆盖表说"字库里没有"就留空，绝不回退到系统字体；
- *  · 图片来源 —— 只有登记过授权与出处的图片才画，其余留空。
- * 甲骨文、小篆被画成宋体、楷体，隶书被画成黑体，都是"悄悄回退"造成的，
- * 所以这里宁可空着。
+ * 字母表、音节文字与元音附标文字默认铺开全部可靠字形；语素文字只取代表字。
+ * 每一格必须有据可查：字体覆盖表说没有就留空，图片只画登记过授权与出处的素材，
+ * 不以系统字体或现代书体冒充历史字形。
  */
 export function GlyphBoard({ system }: { system: WritingSystem }) {
-  const [expanded, setExpanded] = useState(false);
-  /** 放大的图版：整幅字表的图往往又长又密，缩在侧栏里读不出笔形 */
   const [zoom, setZoom] = useState<GlyphPlate | null>(null);
 
   useEffect(() => {
     if (!zoom) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setZoom(null);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setZoom(null);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [zoom]);
 
   const source = glyphSourceFor(system);
-  const family = source.kind === 'font' ? source.family ?? system.fontFamily : undefined;
+  const family = source.kind === 'font' ? source.family ?? familyFor(system.id) : undefined;
   const set = glyphSets[system.id];
   const raw = set?.chars.length ? set.chars : system.sample ? [system.sample] : [];
-  // 符号（OM、表词符号）与记号（叠字、长音、标调）不是字母，不摆进字表；
-  // 词尾形这类异体是同一个字母的另一种写法，留在字表里当字形样本
-  const full = raw.filter((c) => {
-    const kind = nonLetterKind(system.id, c);
+  const full = raw.filter((char) => {
+    const kind = nonLetterKind(system.id, char);
     return kind !== 'symbol' && kind !== 'mark';
   });
 
-  // 覆盖表说"有"的才算数；font 来源之外（图片 / 留空）一格都不摆
-  const covered = source.kind === 'font' ? full.filter((c) => coverageOf(family, c) !== 'no') : [];
-  const missing = full.length - covered.length;
-  const fontUsable = source.kind === 'font' && (!family || hasCoverage(family) || covered.length > 0);
+  const covered = useMemo(
+    () =>
+      source.kind === 'font'
+        ? full.filter((char) => coverageOf(family, char) !== 'no')
+        : [],
+    [family, full, source.kind],
+  );
+  const plates = useMemo(
+    () => full.filter((char) => imageFor(source, char)),
+    [full, source],
+  );
+  const imageOnlyChars = useMemo(() => {
+    if (source.kind !== 'font') return [];
+    const represented = new Set([...covered, ...plates]);
+    return Object.keys(source.images ?? {}).filter((key) => !represented.has(key));
+  }, [covered, plates, source]);
 
-  // 图片字形：只有 images 里登记过的字才画
-  const plates = full.filter((c) => imageFor(source, c));
   const previewLimit =
-    system.type === 'logographic' || system.type === 'logosyllabic' ? LOGOGRAPHIC_PREVIEW : PREVIEW;
-  const shown = expanded ? covered : covered.slice(0, previewLimit);
-  const shownPlates = expanded ? plates : plates.slice(0, previewLimit);
+    system.type === 'logographic' || system.type === 'logosyllabic'
+      ? LOGOGRAPHIC_PREVIEW
+      : Number.POSITIVE_INFINITY;
+  const shown = covered.slice(0, previewLimit);
+  const shownPlates = plates.slice(0, previewLimit);
+  const shownImageOnly = imageOnlyChars.slice(0, previewLimit);
+
+  const missing = full.length - covered.length;
+  const fontUsable =
+    source.kind === 'font' && (!family || hasCoverage(family) || covered.length > 0);
   const { named, web } = searchLinks(system, family);
 
-  const isSyllabic =
-    system.type === 'logographic' || system.type === 'logosyllabic' || system.type === 'undeciphered';
-  const cell = isSyllabic ? 42 : 36;
-  const size = isSyllabic ? 28 : 24;
-
+  const compact =
+    system.type === 'logographic' ||
+    system.type === 'logosyllabic' ||
+    system.type === 'undeciphered';
+  const cell = compact ? 44 : 40;
+  const glyphSize = compact ? 28 : 26;
   const plateOnly = Boolean(source.plates?.length) && !plates.length;
+
   const countText = plateOnly
     ? `${source.plates!.length} 幅图版`
     : source.kind === 'image'
@@ -96,10 +105,13 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
 
   return (
     <section className="detail-board">
-      <div className="board-head">
-        <h3>{source.kind === 'image' ? '字形图版' : '字形样本'}</h3>
+      <header className="board-head">
+        <div>
+          <span>字形图版</span>
+          <h2>字形样本</h2>
+        </div>
         <span className="board-count">{countText}</span>
-      </div>
+      </header>
 
       {source.plates && source.plates.length > 0 && (
         <div className="plate-strip">
@@ -134,50 +146,46 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
         <p className="board-note">{source.note}</p>
       ) : null}
 
-      {source.kind === 'image' && plates.length > 0 && (
-        <>
-          <div className="glyph-grid" style={{ '--cell': `${cell}px` } as CSSProperties}>
-            {shownPlates.map((c, i) => (
-              <span className="glyph-cell" key={`${c}-${i}`} title={c}>
-                <ImageGlyph
-                  src={imageFor(source, c)!}
-                  label={c}
-                  size={cell - 4}
-                  credit={source.credit}
-                />
-              </span>
-            ))}
-          </div>
-          {plates.length > previewLimit && !expanded && (
-            <button className="board-more" onClick={() => setExpanded(true)}>
-              展开全部 {plates.length} 个
-            </button>
-          )}
-        </>
+      {source.kind === 'image' && shownPlates.length > 0 && (
+        <div className="glyph-grid" style={{ '--cell': `${cell}px` } as CSSProperties}>
+          {shownPlates.map((char, index) => (
+            <span className="glyph-cell" key={`${char}-${index}`} title={char}>
+              <ImageGlyph
+                src={imageFor(source, char)!}
+                label={char}
+                size={cell - 4}
+                credit={source.credit}
+              />
+            </span>
+          ))}
+        </div>
       )}
 
-      {source.kind === 'font' && covered.length > 0 && (
-        <>
-          <div className="glyph-grid" style={{ '--cell': `${cell}px` } as CSSProperties}>
-            {shown.map((c, i) => {
-              const plate = imageFor(source, c);
-              return (
-                <span className="glyph-cell" key={`${c}-${i}`} title={c}>
-                  {plate ? (
-                    <ImageGlyph src={plate} label={c} size={cell - 4} credit={source.credit} />
-                  ) : (
-                    <FontGlyph char={c} fontFamily={family} size={size} />
-                  )}
-                </span>
-              );
-            })}
-          </div>
-          {covered.length > previewLimit && !expanded && (
-            <button className="board-more" onClick={() => setExpanded(true)}>
-              展开全部 {covered.length} 个
-            </button>
-          )}
-        </>
+      {source.kind === 'font' && (shown.length > 0 || shownImageOnly.length > 0) && (
+        <div className="glyph-grid" style={{ '--cell': `${cell}px` } as CSSProperties}>
+          {shown.map((char, index) => {
+            const plate = imageFor(source, char);
+            return (
+              <span className="glyph-cell" key={`${char}-${index}`} title={char}>
+                {plate ? (
+                  <ImageGlyph src={plate} label={char} size={cell - 4} credit={source.credit} />
+                ) : (
+                  <FontGlyph char={char} fontFamily={family} size={glyphSize} />
+                )}
+              </span>
+            );
+          })}
+          {shownImageOnly.map((key) => (
+            <span className="glyph-cell" key={key} title={key}>
+              <ImageGlyph
+                src={source.images![key]}
+                label={key}
+                size={cell - 4}
+                credit={source.credit}
+              />
+            </span>
+          ))}
+        </div>
       )}
 
       {source.kind === 'image' && !plates.length && !source.plates?.length && (
@@ -192,7 +200,7 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
         </div>
       )}
 
-      {source.kind === 'font' && !covered.length && (
+      {source.kind === 'font' && !covered.length && !shownImageOnly.length && (
         <div className="board-empty">
           <p>{set?.note ?? '这款字库里没有可用的字形，字形位留空。'}</p>
         </div>
@@ -209,7 +217,7 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
               aria-label={`${zoom.caption}（放大）`}
               onClick={() => setZoom(null)}
             >
-              <figure className="plate-viewer-card" onClick={(e) => e.stopPropagation()}>
+              <figure className="plate-viewer-card" onClick={(event) => event.stopPropagation()}>
                 <img src={assetUrl(zoom.src)} alt={zoom.caption} decoding="async" />
                 <figcaption>
                   <span className="plate-caption">{zoom.caption}</span>
@@ -236,7 +244,7 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
           )
         : null}
 
-      <div className={`board-font ${fontUsable || source.kind === 'image' ? '' : 'missing'}`}>
+      <footer className={`board-font ${fontUsable || source.kind === 'image' ? '' : 'missing'}`}>
         {source.kind === 'none' ? (
           <span>暂无可靠字形来源，不以现代字体顶替</span>
         ) : source.kind === 'image' ? (
@@ -271,7 +279,7 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
             </a>
           </>
         )}
-      </div>
+      </footer>
     </section>
   );
 }

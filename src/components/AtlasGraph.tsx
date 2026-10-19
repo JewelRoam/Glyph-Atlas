@@ -4,12 +4,11 @@ import { graphSystems as writingSystems } from '../data';
 import type { WritingSystem } from '../data/types';
 import { computeLayout, FAMILY_ORDER, relatives } from '../lib/layout';
 import { FAMILY_COLOR, FAMILY_LABEL, formatYearShort } from '../lib/time';
-import { loadFont } from '../lib/fonts';
 import { measureText } from '../lib/measure';
 import { buildTimeScale } from '../lib/timescale';
 
 /**
- * 宏观维度：全站书写体系的有向演化图。
+ * 全球演化全图：全部书写体系的有向演化关系。
  *
  * 图分两层：
  *  · 坐标系层（会缩放平移）：泳道底色、年代竖线、演化边、节点与生命线；
@@ -88,20 +87,36 @@ const STATUS_RANK: Record<string, number> = {
   undeciphered: 4,
 };
 
-interface Props {
-  selected: string | null;
-  onSelect: (id: string | null) => void;
+export interface AtlasViewport {
+  x: number;
+  y: number;
+  k: number;
 }
 
-export function AtlasGraph({ selected, onSelect }: Props) {
+interface Props {
+  /** 从字形街景返回时恢复的视图；首次进入传 null。 */
+  initialView?: AtlasViewport | null;
+  onViewChange: (view: AtlasViewport) => void;
+  onOpenScript: (scriptId: string) => void;
+}
+
+export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
-  const [size, setSize] = useState({ w: 1200, h: 720 });
+  const initialViewRef = useRef(initialView);
+  const positionedRef = useRef(false);
+  const onViewChangeRef = useRef(onViewChange);
+  const [size, setSize] = useState({ w: 0, h: 0 });
   const [view, setView] = useState({ x: 0, y: 0, k: NOMINAL_K });
+  const viewRef = useRef(view);
   const [showLabels, setShowLabels] = useState(true);
   const [hovered, setHovered] = useState<string | null>(null);
+
+  useEffect(() => {
+    onViewChangeRef.current = onViewChange;
+  }, [onViewChange]);
 
   /** 画布可用宽度（扣掉左侧泳道名留白） */
   const plotW = Math.max(160, size.w - GUTTER);
@@ -130,11 +145,6 @@ export function AtlasGraph({ selected, onSelect }: Props) {
   }, [labelWidth, axisWidth]);
 
   const xScale = layout.axis.x;
-
-  // 预加载所有出现在图上的字体
-  useEffect(() => {
-    writingSystems.forEach((s) => loadFont(s.fontFamily));
-  }, []);
 
   // 容器尺寸
   useEffect(() => {
@@ -186,11 +196,18 @@ export function AtlasGraph({ selected, onSelect }: Props) {
       .on('zoom', (event) => {
         const { x, y, k } = event.transform;
         g.attr('transform', event.transform.toString());
-        setView((prev) =>
-          Math.abs(prev.k - k) < 0.004 && Math.abs(prev.x - x) < 0.6 && Math.abs(prev.y - y) < 0.6
-            ? prev
-            : { x, y, k },
-        );
+        const next = { x, y, k };
+        const previous = viewRef.current;
+        if (
+          Math.abs(previous.k - k) < 0.004 &&
+          Math.abs(previous.x - x) < 0.6 &&
+          Math.abs(previous.y - y) < 0.6
+        ) {
+          return;
+        }
+        viewRef.current = next;
+        setView(next);
+        onViewChangeRef.current(next);
       });
     zoomRef.current = zoom;
     svg.call(zoom);
@@ -199,11 +216,17 @@ export function AtlasGraph({ selected, onSelect }: Props) {
     };
   }, []);
 
-  // 尺寸或布局变化时重新适配总览
+  // 首次有真实画布尺寸后定位：返回全图时恢复离开前的视图，首次进入则居中适配。
+  // 之后窗口尺寸变化不再把用户已经选好的视域拽回总览。
   useEffect(() => {
-    if (!svgRef.current || !zoomRef.current) return;
-    d3.select(svgRef.current).call(zoomRef.current.transform, overview(fitK));
-  }, [fitK, overview]);
+    if (!svgRef.current || !zoomRef.current || !size.w || !size.h || positionedRef.current) return;
+    const saved = initialViewRef.current;
+    const target = saved
+      ? d3.zoomIdentity.translate(saved.x, saved.y).scale(saved.k)
+      : overview(fitK);
+    d3.select(svgRef.current).call(zoomRef.current.transform, target);
+    positionedRef.current = true;
+  }, [fitK, overview, size.h, size.w]);
 
   // 缩放下限跟着适配比例走，理由见 ZOOM_MIN 的注释
   useEffect(() => {
@@ -221,7 +244,7 @@ export function AtlasGraph({ selected, onSelect }: Props) {
     [fitK, overview],
   );
 
-  const focusId = hovered ?? selected;
+  const focusId = hovered;
   const rel = useMemo(
     () => (focusId ? relatives(focusId, writingSystems) : null),
     [focusId],
@@ -284,16 +307,19 @@ export function AtlasGraph({ selected, onSelect }: Props) {
     if (!showLabels || view.k > 1.6) return { hidden, flipped };
     const ordered = [...layout.nodes].sort(
       (a, b) =>
+        Number(b.sys.origin === 'independent') - Number(a.sys.origin === 'independent') ||
         (STATUS_RANK[a.sys.status] ?? 5) - (STATUS_RANK[b.sys.status] ?? 5) ||
         a.y - b.y ||
         a.x - b.x,
     );
+    // 手机总览空间有限，只保留独立起源与高优先级节点；放大后完整标注仍会回来。
+    const labelBudget = size.w < 620 ? 26 : ordered.length;
     /** 与已占位矩形是否相撞（留 LABEL_GAP 呼吸） */
     const free = (r: { x0: number; x1: number; y0: number; y1: number }) =>
       !placed.some(
         (o) => r.x0 < o.x1 + LABEL_GAP && r.x1 + LABEL_GAP > o.x0 && r.y0 < o.y1 && r.y1 > o.y0,
       );
-    for (const n of ordered) {
+    for (const n of ordered.slice(0, labelBudget)) {
       const w = measureText(n.sys.nameZh, NODE_LABEL_PX);
       const dotX = view.x + n.x * view.k;
       const baseline = view.y + n.y * view.k + LABEL_DY;
@@ -309,8 +335,9 @@ export function AtlasGraph({ selected, onSelect }: Props) {
         hidden.add(n.sys.id);
       }
     }
+    for (const n of ordered.slice(labelBudget)) hidden.add(n.sys.id);
     return { hidden, flipped };
-  }, [showLabels, layout, view]);
+  }, [showLabels, layout, size.w, view]);
 
   return (
     <div className="atlas" ref={wrapRef} style={{ '--u': u } as CSSProperties}>
@@ -400,18 +427,26 @@ export function AtlasGraph({ selected, onSelect }: Props) {
                 {layout.nodes.map((n) => {
                   const color = FAMILY_COLOR[n.sys.family];
                   const dim = isDimmed(n.sys.id);
-                  const isSel = n.sys.id === selected;
                   const folded = labelPlan.hidden.has(n.sys.id);
                   const flipped = labelPlan.flipped.has(n.sys.id);
-                  const showLabel = showLabels && (!folded || n.sys.id === hovered || isSel);
+                  const showLabel = showLabels && (!folded || n.sys.id === hovered);
                   return (
                     <g
                       key={n.sys.id}
-                      className={`node ${dim ? 'dim' : ''} ${isSel ? 'selected' : ''}`}
+                      className={`node ${dim ? 'dim' : ''}`}
                       transform={`translate(${n.x},${n.y})`}
                       onMouseEnter={() => setHovered(n.sys.id)}
                       onMouseLeave={() => setHovered(null)}
-                      onClick={() => onSelect(isSel ? null : n.sys.id)}
+                      onClick={() => onOpenScript(n.sys.id)}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`查看${n.sys.nameZh}的演变`}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          onOpenScript(n.sys.id);
+                        }
+                      }}
                     >
                       {/* 生命线 */}
                       <line
@@ -430,14 +465,6 @@ export function AtlasGraph({ selected, onSelect }: Props) {
                       {/* 放大的透明命中区：小圆点也要好点中 */}
                       <circle r={10 * u} fill="transparent" />
                       <circle r={4.4 * u} fill={color} stroke="#0d1018" strokeWidth={1.4 * u} />
-                      {isSel && (
-                        <circle
-                          r={8 * u}
-                          fill="none"
-                          stroke={color}
-                          strokeWidth={1.5 * u}
-                        />
-                      )}
                       {showLabel && (
                         <text
                           className={`node-label ${folded ? 'was-folded' : ''}`}

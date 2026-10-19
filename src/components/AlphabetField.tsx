@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { letterGlyphKey, rosterFor, sharedSlotsFor, slotLabel } from '../data/letterSlots';
 import { scriptById } from '../data/writingSystems';
 import { familyFor } from '../data/fontFallback';
@@ -15,8 +15,8 @@ import { CrossFade } from './CrossFade';
  * 同一格，所以在两种文字之间推拉时，每个字母都是"原地变形"成它的后代，
  * 而不是两个字随机交叉淡化。
  *
- * 只在一边出现的槽位，就是字母表的增与减：新字母从下方飞入，
- * 被淘汰的字母向上飞出并缩小消失。腓尼基 wāw 分出两支的情形会看到
+ * 只在一边出现的槽位，就是字母表的增与减：新字母沿字带滑入，
+ * 被淘汰的字母向另一侧滑出并缩小消失。腓尼基 wāw 分出两支的情形会看到
  * 同一个祖形在两个格子里同时变形成希腊 Υ 与 Ϝ。
  */
 
@@ -118,7 +118,6 @@ export function AlphabetField({
   );
   const slots = useMemo(() => sharedSlotsFor(a, b, ma, mb), [a, b, ma, mb]);
   const gridRef = useRef<HTMLDivElement | null>(null);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
   const rectsRef = useRef(new Map<string, DOMRect>());
   const paintedRef = useRef(false);
   const slotKey = slots.join('|');
@@ -152,32 +151,13 @@ export function AlphabetField({
   const pathsPending = !paths && (Boolean(alphabetGroup(a)) || Boolean(alphabetGroup(b)));
 
   /**
-   * 字母场最多长多高。
-   *
-   * 几百格的音节文字表（吉兹、加拿大原住民、彝文）全铺开有三四屏高，会把上面的
-   * 舞台挤成一条缝，所以字母场只吃"剩下的高度"：视口减去 MICRO 里它以外的开销
-   * （舞台保底 190px + 展签、控件、时间轴、页头，实测约 675px）。高屏上能多铺几
-   * 行就多铺几行，矮屏上再窄也有 150px 可看，其余交给场内滚动，窗口变了就重算。
-   */
-  const [viewportH, setViewportH] = useState(() =>
-    typeof window === 'undefined' ? 900 : window.innerHeight,
-  );
-  useEffect(() => {
-    const onResize = () => setViewportH(window.innerHeight);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-  const scrollCap = Math.round(Math.min(300, Math.max(150, viewportH - 745)));
-
-  /**
-   * 一段轨道上的格子数会变（走到下一站时这一段的槽位增减），网格就会换行重排。
+   * 一段轨道上的格子数会变（走到下一站时这一段的槽位增减），横向网格随之重排。
    * 直接重排会让整排字母"啪"地跳一下，所以这里按 FLIP 把每个格子从旧位置
-   * 滑到新位置，连带网格高度一起过渡。
+   * 滑到新位置。
    */
   useLayoutEffect(() => {
     const grid = gridRef.current;
-    const scroll = scrollRef.current;
-    if (!grid || !scroll) return;
+    if (!grid) return;
 
     const painted = paintedRef.current;
     const before = rectsRef.current;
@@ -211,11 +191,6 @@ export function AlphabetField({
     rectsRef.current = after;
     paintedRef.current = true;
 
-    const natural = grid.offsetHeight;
-    const capped = Math.min(natural, scrollCap);
-    scroll.style.height = `${capped}px`;
-    scroll.style.overflowY = natural > capped + 1 ? 'auto' : 'hidden';
-
     if (!painted || (!moves.length && !fresh.length)) return;
 
     for (const [el, dx, dy] of moves) {
@@ -237,8 +212,7 @@ export function AlphabetField({
         el.style.opacity = '1';
       }
     });
-    // 视口高度变了会重跑一遍：格子位置没动的话下面会直接返回，只更新外层高度
-  }, [slotKey, scrollCap]);
+  }, [slotKey]);
 
   if (!slots.length) return null;
 
@@ -270,11 +244,7 @@ export function AlphabetField({
   }`;
 
   return (
-    <section
-      className="alpha-field"
-      aria-label={`${nameA}到${nameB}的字母对照`}
-      style={{ '--alpha-cap': `${scrollCap}px` } as CSSProperties}
-    >
+    <section className="alpha-field" aria-label={`${nameA}到${nameB}的字母对照`}>
       <div className="alpha-head">
         <CrossFade
           token={`${heading}|${kept}|${added}|${lost}`}
@@ -292,7 +262,7 @@ export function AlphabetField({
         </CrossFade>
       </div>
 
-      <div className="alpha-scroll" ref={scrollRef}>
+      <div className="alpha-scroll">
         <div className="alpha-grid" ref={gridRef}>
           {slots.map((slot, i) => {
             const ca = ma[slot];
@@ -347,7 +317,7 @@ export function AlphabetField({
                 );
               }
             } else if (cb) {
-              // 新字母：从下方飞入、放大到位
+              // 新字母：沿字带滑入、放大到位
               const p = easeOut(local);
               body = (
                 <LetterGlyph
@@ -359,12 +329,12 @@ export function AlphabetField({
                   pending={pending}
                   opacity={p}
                   style={{
-                    transform: `translateY(${(1 - p) * 22}px) scale(${0.55 + 0.45 * p})`,
+                    transform: `translateX(${(1 - p) * 22}px) scale(${0.55 + 0.45 * p})`,
                   }}
                 />
               );
             } else if (ca) {
-              // 被淘汰的字母：向上飞出
+              // 被淘汰的字母：向字带另一侧滑出
               const q = 1 - easeIn(local);
               body = (
                 <LetterGlyph
@@ -376,7 +346,7 @@ export function AlphabetField({
                   pending={pending}
                   opacity={q}
                   style={{
-                    transform: `translateY(${-(1 - q) * 22}px) scale(${0.55 + 0.45 * q})`,
+                    transform: `translateX(${-(1 - q) * 22}px) scale(${0.55 + 0.45 * q})`,
                   }}
                 />
               );

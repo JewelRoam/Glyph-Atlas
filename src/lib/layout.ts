@@ -1,6 +1,6 @@
 import type { Family, WritingSystem } from '../data/types';
 
-/** 泳道顺序（宏观图上从上到下） */
+/** 泳道顺序（演化全图上从上到下） */
 export const FAMILY_ORDER: Family[] = [
   'mesopotamia',
   'egypt',
@@ -55,7 +55,7 @@ const TAIL = 200;
 export type LabelWidth = (system: WritingSystem) => number;
 
 /**
- * 计算宏观图布局：x 轴为年代，y 轴按谱系分区排成泳道，
+ * 计算演化全图布局：x 轴为年代，y 轴按谱系分区排成泳道，
  * 同一泳道内用贪心算法分行，避免标签重叠。
  */
 export function computeLayout(

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { lineages } from '../data';
+import { stopRefFor, type LineageStopRef } from '../data/lineageIndex';
 import { glyphPaths } from '../data/glyphPaths';
 import { scriptById } from '../data/writingSystems';
 import type { CSSProperties } from 'react';
@@ -10,10 +11,9 @@ import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { assetUrl } from '../lib/assets';
 import { hasRoster } from '../data/letterSlots';
 import { familyFor } from '../data/fontFallback';
-import { preloadAlphabetGroup, preloadAlphabetPaths } from '../lib/alphabetPaths';
+import { preloadAlphabetGroup } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { loadFont } from '../lib/fonts';
-import { LINEAGE_MODE_HINT, LINEAGE_MODE_LABEL, formatSpan } from '../lib/time';
 
 /** 站点轮廓：优先用轨道里的手绘 path，否则查字体生成的轮廓表。 */
 function resolveGlyphPath(stop: GlyphStop): string | null {
@@ -53,90 +53,87 @@ const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 const GLYPH_MAX = 260;
 
 /**
- * 微观维度：沿一条血统轨道"往前走 / 往后走"。
+ * 字形街景：从一个书写体系进入，沿一条已核实的轨道"往前走 / 往后走"。
  *
  * 中心舞台在两个相邻站点之间连续插值：
  *  - 两端都有矢量路径时 → 真·路径形变（点对点弧长插值）
  *  - 否则 → 平滑淡变 + 缩放平移（对任意文字可用）
  * 两侧按距离排布相邻站点，形成"街道"纵深感。
  *
- * 顶部标签切换轨道时两条街交叉淡变；key 让新轨道整条街重新挂载：
- * 位置与播放状态自然归零，不需要在 effect 里手动重置状态。
+ * 换轨时旧街交叉淡出，新街从目标站点进入。轨道选择由左侧轨道栏承担，
+ * 舞台本身只保留横向行走与观看。
  */
-export function WalkView() {
-  const [lineageId, setLineageId] = useState(lineages[0].id);
-  // 换轨道时保留上一条街一小会儿，两条叠着交叉淡变；直接换 key 会让整块
-  // 内容硬切，所以这里自己管一份"正在离开的轨道"。
-  const [leaving, setLeaving] = useState<{ id: string; dir: 1 | -1 } | null>(null);
+interface LineageStageProps {
+  lineage: Lineage;
+  stationId?: string;
+  onStationChange: (track: LineageStopRef) => void;
+}
+
+/**
+ * 一条已核实的字形轨道被铺成一条时间街景。位置与形变都在这里，
+ * 站点变化向上汇报，让右侧档案与地址栏始终指向当前这一站。
+ */
+export function LineageStage({ lineage, stationId, onStationChange }: LineageStageProps) {
+  const currentRef = useRef({ lineage, stationId });
+  const [leaving, setLeaving] = useState<{ lineage: Lineage; stationId?: string } | null>(null);
   const [arriving, setArriving] = useState(false);
   const swapTimer = useRef<number | null>(null);
 
-  const lineage = lineages.find((l) => l.id === lineageId) ?? lineages[0];
-  const leavingLineage = leaving ? lineages.find((l) => l.id === leaving.id) : undefined;
-  const dir = leaving?.dir ?? 1;
-
-  // 进 MICRO 先把闪米特—希腊那条线（core 包）拉起来，别等字母场挂载才请求；
-  // 鼠标移到某条轨道标签上时，再顺手预取那条轨道要用的包（婆罗米系在另一包里）
   useEffect(() => {
-    preloadAlphabetGroup('core');
-  }, []);
+    const previous = currentRef.current;
+    if (previous.lineage.id === lineage.id) {
+      currentRef.current = { lineage, stationId };
+      return;
+    }
+    if (swapTimer.current !== null) window.clearTimeout(swapTimer.current);
+    setLeaving(previous);
+    setArriving(true);
+    currentRef.current = { lineage, stationId };
+    swapTimer.current = window.setTimeout(() => {
+      setLeaving(null);
+      setArriving(false);
+      swapTimer.current = null;
+    }, SWAP_MS);
+  }, [lineage, stationId]);
 
   useEffect(() => () => {
     if (swapTimer.current !== null) window.clearTimeout(swapTimer.current);
   }, []);
 
-  /** 切轨道：旧轨道滑出、新轨道滑入，交错进行 */
-  const selectLineage = useCallback(
-    (nextId: string) => {
-      if (nextId === lineageId) return;
-      const from = lineages.findIndex((l) => l.id === lineageId);
-      const to = lineages.findIndex((l) => l.id === nextId);
-      if (swapTimer.current !== null) window.clearTimeout(swapTimer.current);
-      setLeaving((prev) => ({
-        // 上一次的交叉淡变还没跑完就又点了一下：沿用最初那条正在离开的街，
-        // 免得中间态一闪而过
-        id: prev ? prev.id : lineageId,
-        dir: to >= from ? 1 : -1,
-      }));
-      setArriving(true);
-      setLineageId(nextId);
-      swapTimer.current = window.setTimeout(() => {
-        setLeaving(null);
-        setArriving(false);
-        swapTimer.current = null;
-      }, SWAP_MS);
-    },
-    [lineageId],
-  );
+  // 先把核心路线所需的轮廓包拉起来，换轨时悬停 / 聚焦再预取。
+  useEffect(() => {
+    preloadAlphabetGroup('core');
+  }, []);
+
+  const from = lineages.findIndex((item) => item.id === leaving?.lineage.id);
+  const to = lineages.findIndex((item) => item.id === lineage.id);
+  const dir = from >= 0 && to >= 0 && to < from ? -1 : 1;
 
   return (
-    <div className="walk">
-      <div className="walk-tabs">
-        {lineages.map((l) => (
-          <button
-            key={l.id}
-            className={l.id === lineageId ? 'active' : ''}
-            aria-pressed={l.id === lineageId}
-            onMouseEnter={() => preloadAlphabetPaths(l.stops.map((s) => s.script))}
-            onFocus={() => preloadAlphabetPaths(l.stops.map((s) => s.script))}
-            onClick={() => selectLineage(l.id)}
-          >
-            {l.nameZh}
-          </button>
-        ))}
-      </div>
+    <div className="walk lineage-stage">
       <div
         className="walk-swap"
         data-swapping={arriving ? 'on' : 'off'}
         data-dir={dir === 1 ? 'right' : 'left'}
       >
-        {leavingLineage && (
+        {leaving && (
           <div className="walk-layer walk-layer-leaving" aria-hidden="true">
-            <WalkTrack lineage={leavingLineage} interactive={false} />
+            <WalkTrack
+              key={`${leaving.lineage.id}:${leaving.stationId ?? ''}`}
+              lineage={leaving.lineage}
+              stationId={leaving.stationId}
+              interactive={false}
+              onStationChange={() => undefined}
+            />
           </div>
         )}
         <div className="walk-layer walk-layer-arriving" key={lineage.id}>
-          <WalkTrack lineage={lineage} />
+          <WalkTrack
+            lineage={lineage}
+            stationId={stationId}
+            interactive
+            onStationChange={onStationChange}
+          />
         </div>
       </div>
     </div>
@@ -145,11 +142,21 @@ export function WalkView() {
 
 /** 一条轨道 = 一条街。interactive=false 用于正在淡出的旧街：只保留画面，
  *  不再抢方向键。 */
-function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interactive?: boolean }) {
+function WalkTrack({
+  lineage,
+  stationId,
+  interactive = true,
+  onStationChange,
+}: {
+  lineage: Lineage;
+  stationId?: string;
+  interactive?: boolean;
+  onStationChange: (track: LineageStopRef) => void;
+}) {
   const stops = lineage.stops;
+  const initialIndex = Math.max(0, stops.findIndex((stop) => stop.id === stationId));
 
-  const [p, setP] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [p, setP] = useState(initialIndex);
   const dragRef = useRef<{ x: number; p: number } | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   /** 位置的最新值：动画与手势互相打断时都要读它 */
@@ -157,14 +164,27 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
   const animRef = useRef<number | null>(null);
   /** 正在滑向的那一站：补间途中再点左右，以它为准往前/往后，目标不会来回抖 */
   const targetRef = useRef(p);
+  /** 已经上报过的整数站，避免动画每帧都更新地址与档案 */
+  const reportedStationRef = useRef<number | null>(null);
 
   useEffect(() => {
     pRef.current = p;
   }, [p]);
 
+  useEffect(() => {
+    if (!interactive) return;
+    const index = Math.max(0, Math.min(stops.length - 1, Math.round(p)));
+    if (reportedStationRef.current === index) return;
+    reportedStationRef.current = index;
+    onStationChange(stopRefFor(lineage.id, stops[index])!);
+  }, [interactive, lineage.id, onStationChange, p, stops]);
+
   // 预加载这条轨道上所有站点用到的字体
   useEffect(() => {
-    stops.forEach((s) => loadFont(scriptById[s.script]?.fontFamily));
+    stops.forEach((s) => {
+      const script = scriptById[s.script];
+      loadFont(familyFor(s.script, script?.fontFamily));
+    });
   }, [stops]);
 
   const prepared = useMemo<(PreparedGlyph | null)[]>(
@@ -194,7 +214,7 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
   /**
    * 平滑滑到某一站。
    *
-   * 左右箭头、侧边站点、底部刻度都用它，这样"前进一站"和拖动滚轮是同一套
+   * 左右箭头、侧边站点、底部刻度都用它，这样"前进一站"和横向拖动是同一套
    * 形变过程：中间态一直在算，而不是瞬间跳到下一格。
    */
   const glideTo = useCallback(
@@ -221,6 +241,13 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
     [clamp, stopGlide],
   );
 
+  // 浏览器前进 / 后退或选中另一条轨道时，由外部站点驱动街道滑到对应位置。
+  useEffect(() => {
+    const index = stops.findIndex((stop) => stop.id === stationId);
+    if (index < 0 || Math.abs(pRef.current - index) < 0.01) return;
+    glideTo(index);
+  }, [glideTo, stationId, stops]);
+
   /**
    * 往前走 / 往后走一站。
    *
@@ -234,7 +261,6 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
         dir > 0 ? Math.floor(base + 1e-6) + 1 : Math.ceil(base - 1e-6) - 1,
       );
       if (next === base) return;
-      setPlaying(false);
       glideTo(next);
     },
     [clamp, glideTo],
@@ -248,24 +274,6 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
     },
     [clamp, stopGlide],
   );
-
-  // 播放
-  useEffect(() => {
-    if (!playing) return;
-    let raf = 0;
-    let last = performance.now();
-    const tick = (now: number) => {
-      const dt = (now - last) / 1000;
-      last = now;
-      setP((prev) => {
-        const next = prev + dt * 0.55;
-        return next >= stops.length - 1 ? 0 : next;
-      });
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [playing, stops.length]);
 
   // 键盘左右：同样走补间，走一步就是一整套形变
   useEffect(() => {
@@ -333,8 +341,6 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
       ? interpolatePath(prepared[i0]!, prepared[i1]!, t)
       : null;
 
-  const mode = lineage.mode ?? 'chain';
-
   /**
    * 展签从"这一站"换到"下一站"的进度：0 = 完全是 a，1 = 完全是 b。
    * 两份展签都挂在舞台上，靠这个因子交叉淡变，字名不会在形变半路硬跳。
@@ -391,16 +397,27 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
     };
   }, [a.script, b.script, t, lineage.alphabetField, lineage.alphabetSlotOverrides]);
 
-  const onWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    setPlaying(false);
-    setDirect((v) => v + Math.sign(e.deltaY) * 0.35);
-  };
+  // React 的 wheel 监听是 passive 的，在横向手势里无法阻止浏览器默认行为。
+  // 这里用原生非被动监听：明确的横向手势驱动时间轴，纵向手势仍归还页面。
+  const onWheel = useCallback(
+    (e: WheelEvent) => {
+      if (!interactive || Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      setDirect((v) => v + e.deltaX / 160);
+    },
+    [interactive, setDirect],
+  );
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    stage.addEventListener('wheel', onWheel, { passive: false });
+    return () => stage.removeEventListener('wheel', onWheel);
+  }, [onWheel]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     stopGlide();
     dragRef.current = { x: e.clientX, p: pRef.current };
-    setPlaying(false);
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
@@ -432,21 +449,9 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
 
   return (
     <>
-      <div className="walk-meta">
-        <span className="walk-mode" title={LINEAGE_MODE_HINT[mode]}>
-          {LINEAGE_MODE_LABEL[mode]}
-        </span>
-        <div className="walk-meta-text">
-          <p className="walk-desc">{lineage.description}</p>
-          {/* 这条链凭什么算数：出处放在说明底下，读者能自己回去核对 */}
-          <p className="walk-source">依据 · {lineage.source}</p>
-        </div>
-      </div>
-
       <div
         className="walk-stage"
         ref={stageRef}
-        onWheel={onWheel}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -487,7 +492,6 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
                   opacity,
                 }}
                 onClick={() => {
-                  setPlaying(false);
                   glideTo(idx);
                 }}
               >
@@ -550,16 +554,6 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
         <button onClick={() => stepBy(-1)} aria-label="上一个">
           ←
         </button>
-        <button
-          className={`play ${playing ? 'on' : ''}`}
-          onClick={() => {
-            stopGlide();
-            setPlaying((v) => !v);
-          }}
-          aria-pressed={playing}
-        >
-          {playing ? '暂停' : '播放演进'}
-        </button>
         <button onClick={() => stepBy(1)} aria-label="下一个">
           →
         </button>
@@ -573,7 +567,6 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
           step={0.01}
           value={p}
           onChange={(e) => {
-            setPlaying(false);
             setDirect(Number(e.target.value));
           }}
         />
@@ -584,10 +577,7 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
               className={Math.round(p) === i ? 'active' : ''}
               style={{ left: `${(i / Math.max(1, stops.length - 1)) * 100}%` }}
               title={s.label ?? scriptById[s.script]?.nameZh}
-              onClick={() => {
-                setPlaying(false);
-                glideTo(i);
-              }}
+              onClick={() => glideTo(i)}
             >
               <StopGlyph stop={s} size={34} />
             </button>
@@ -599,10 +589,10 @@ function WalkTrack({ lineage, interactive = true }: { lineage: Lineage; interact
 }
 
 /**
- * 单个站点的展签：站名 + 文字名 + 音值 + 年代 + 今用国家。
+ * 单个站点的展签：站名 + 文字名 + 音值。
  *
  * 拆出来是因为展签要挂两份（这一站、下一站），跟着形变交叉淡变；
- * 站与站之间只是同一套排版换内容。
+ * 站与站之间只是同一套排版换内容。年代与今用国家只在上方体系档案中保留。
  */
 function StopCaption({ stop }: { stop: GlyphStop }) {
   const script = scriptById[stop.script];
@@ -612,9 +602,7 @@ function StopCaption({ stop }: { stop: GlyphStop }) {
       <div className="walk-caption-sub">
         {script?.nameZh}
         {stop.phonetic ? ` · /${stop.phonetic}/` : ''}
-        {script ? ` · ${formatSpan(script.dateFrom, script.dateTo)}` : ''}
       </div>
-      {script && <div className="walk-caption-country">{script.countries.join(' · ')}</div>}
     </>
   );
 }
