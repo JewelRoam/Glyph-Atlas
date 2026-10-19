@@ -489,10 +489,14 @@ main {
 .plate-open {
   display: block;
   width: 100%;
-  padding: 0;
+  /* 一圈纸边：图版是裱在纸上的实物拓片或照片，不是压在夜色里的浮层 */
+  padding: 10px;
   border: 0;
-  background: none;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
   cursor: zoom-in;
+  /* 纸面自成一层：图上的 multiply 只和这层纸相乘，
+     不会跟页面深底叠在一起把整幅图压成黑的 */
+  isolation: isolate;
 }
 .plate img {
   display: block;
@@ -501,7 +505,7 @@ main {
   max-height: 340px;
   margin: 0 auto;
   object-fit: contain;
-  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  background: none;
   mix-blend-mode: multiply;
 }
 .plate-open:focus-visible {

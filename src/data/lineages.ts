@@ -281,21 +281,75 @@ export const lineages: Lineage[] = [
   },
 
   {
-    id: 'greek-diaspora',
-    nameZh: '希腊 Α → 科普特与哥特 a',
-    nameEn: 'Greek Α → Coptic and Gothic a',
-    mode: 'cognate',
-    source: 'Wikipedia《Gothic alphabet》（乌尔菲拉以希腊字母为底）、《Coptic alphabet》',
+    id: 'cyrillic-permic',
+    nameZh: '西里尔 А → 古彼尔姆 𐍐',
+    nameEn: 'Cyrillic А → Old Permic 𐍐',
+    mode: 'chain',
+    source: 'Wikipedia《Old Permic script》：1372 年斯蒂芬为科米语创制，字母取自西里尔与希腊并掺入科米印记符号；字母表据 Lytkin 1952',
     description:
-      '希腊字母往南、往北各留下一支自己的 /a/：' +
-      '尼罗河谷用希腊字母记写埃及语，科普特 alfa Ⲁ 直接沿用了希腊的字面；' +
-      '四世纪的乌尔菲拉为哥特语造字母，aza 𐌰 也是照希腊 alpha 的骨架立的。' +
-      '这一站只收字形上真能对回希腊的两家——亚美尼亚、格鲁吉亚的字母表另有来路，' +
-      '不作为希腊 alpha 的后身列在这里。',
+      '1372 年，俄罗斯传教士彼尔姆的斯蒂芬为科米语造了一套字母，' +
+      '头两枚读 an、bur，整套因此被叫作 Abur。它没有照搬现成字母，' +
+      '而是把西里尔与希腊的笔画拆开重排，再掺进科米人用刀刻的印记符号——' +
+      '记号是刻出来的、不是写出来的，笔画自然跟 А 不像。' +
+      '这套字母用到十七世纪被西里尔取代，此后还被俄国人拿去当密码写俄语。',
+    stops: [
+      { script: 'cyrillic', char: 'А', label: '西里尔 azъ', phonetic: 'a' },
+      { script: 'old-permic', char: '𐍐', label: '古彼尔姆 an', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'greek-coptic',
+    nameZh: '希腊 Α → 科普特 Ⲁ',
+    nameEn: 'Greek Α → Coptic Ⲁ',
+    mode: 'chain',
+    source: 'Wikipedia《Coptic alphabet》：科普特字形以希腊安色尔体为基础，另从世俗体补入六七枚字母',
+    description:
+      '尼罗河谷为了把埃及语写清楚，整套借走了希腊字母：二十四枚希腊字母原样进来，' +
+      '再补上六七枚取自世俗体的旧符号，去记希腊语没有的音。' +
+      '同一个 /a/，科普特的 alfa Ⲁ 与希腊 alpha 几乎不用改形，' +
+      '是希腊字母往南传出去的一支里字面保留得最完整的一个。',
     stops: [
       { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
       { script: 'coptic', char: 'Ⲁ', label: '科普特 alfa', phonetic: 'a' },
-      { script: 'gothic', char: '𐌰', label: '哥特 aza', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'greek-armenian',
+    nameZh: '希腊 Α → 亚美尼亚 Ա',
+    nameEn: 'Greek Α → Armenian Ա',
+    mode: 'chain',
+    source: 'Wikipedia《Armenian alphabet》：多数意见认为亚美尼亚字母以希腊为模型，证据是字母顺序、数字值排法与 Θ/թ、Φ/փ、Β/բ 等形近对',
+    description:
+      '405 年，梅斯罗布·马什托茨为亚美尼亚语造了一套字母，用到今天几乎没有改过。' +
+      '字面是他重画过的，整张表的骨架却照着希腊来：字母顺序按希腊排，' +
+      '前九枚各领 1 到 9、再往下领十位与百位的数字值，也和希腊一一对上。' +
+      '常被举出来的形近例子是三对——希腊 Θ 与亚美尼亚 թ、Φ 与 փ、Β 与 բ；' +
+      '整表头一枚 ayb Ա 与希腊 alpha 同占第一格、同读 /a/，这条线就从它开头。',
+    stops: [
+      { script: 'greek', char: 'Α', label: '希腊 alpha', phonetic: 'a' },
+      { script: 'armenian', char: 'Ա', label: '亚美尼亚 ayb', phonetic: 'a' },
+    ],
+  },
+
+  {
+    id: 'armenian-albanian',
+    nameZh: '亚美尼亚 Ա → 高加索阿尔巴尼亚 𐔰',
+    nameEn: 'Armenian Ա → Caucasian Albanian 𐔰',
+    mode: 'chain',
+    source: 'Wikipedia《Caucasian Albanian script》《Caucasian Albania》：据科里温《马斯托茨传》，字母由梅斯罗布·马什托茨创制；52 枚字母的形式近格鲁吉亚、埃塞俄比亚与亚美尼亚',
+    description:
+      '高加索阿尔巴尼亚文是东高加索的基督教地区为自己语言造的一套字母，' +
+      '记的是今天乌迪人祖先讲的话。据弟子科里温写的《马斯托茨传》，' +
+      '字母是梅斯罗布·马什托茨应一位阿尔巴尼亚长者本雅明之请造的；' +
+      '十五世纪的比较字表抄本里还留着 52 枚。表头几枚的名字与亚美尼亚一路对下来——' +
+      'alt 对 ayb、bet 对 ben、gim 对 gim，头一枚 𐔰 与亚美尼亚的 Ա 一样读 /a/、' +
+      '一样占第一格。字面本身与格鲁吉亚、埃塞俄比亚、亚美尼亚三家都有几分像，' +
+      '来路不止一条，这一站走的是最硬的那条：同一批人、同一个世纪、同一种教会文字传统。',
+    stops: [
+      { script: 'armenian', char: 'Ա', label: '亚美尼亚 ayb', phonetic: 'a' },
+      { script: 'caucasian-albanian', char: '𐔰', label: '高加索阿尔巴尼亚 a', phonetic: 'a' },
     ],
   },
 
