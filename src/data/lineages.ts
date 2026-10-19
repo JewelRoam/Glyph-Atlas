@@ -547,4 +547,26 @@ export const lineages: Lineage[] = [
       { script: 'makasar', char: '𑻠', label: '望加锡文', phonetic: 'ka' },
     ],
   },
+  {
+    id: 'pallava-branch',
+    nameZh: '帕拉瓦 ka → 东南亚诸文 ka',
+    nameEn: 'Pallava ka → Southeast Asian ka',
+    mode: 'cognate',
+    description:
+      '南印度的帕拉瓦文是东南亚多数文字的直系祖先。' +
+      '同一个 ka，占人、孟人、高棉人、爪哇人与巴厘人各写各的骨架：' +
+      '占文与孟文保留南印度式的圆转，高棉文把头部拉出一道竖笔，' +
+      '爪哇与巴厘把笔画收进更密的方形结构里。' +
+      '与帕拉瓦同期、同出南印度的卡丹巴文没有独立字库，' +
+      '前两站放的是有登记的实物图版。',
+    stops: [
+      { script: 'pallava', image: 'glyphs/pallava/aksharamala.png', label: '帕拉瓦字母表（南印度，7 世纪）' },
+      { script: 'kadamba', image: 'glyphs/kadamba/edakkal-kerala.png', label: '卡丹巴文（埃达卡尔铭文，5—6 世纪）' },
+      { script: 'cham', char: 'ꨆ', label: '占文 ka', phonetic: 'ka' },
+      { script: 'mon', char: 'က', label: '孟文 ka', phonetic: 'ka' },
+      { script: 'khmer', char: 'ក', label: '高棉文 ka', phonetic: 'ka' },
+      { script: 'java', char: 'ꦏ', label: '爪哇文 ka', phonetic: 'ka' },
+      { script: 'balinese', char: 'ᬓ', label: '巴厘文 ka', phonetic: 'ka' },
+    ],
+  },
 ]
