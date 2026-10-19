@@ -34,6 +34,15 @@ export const localFonts: LocalFont[] = [
     license: 'SIL OFL 1.1 / OGDL-Taiwan-1.0',
     home: 'https://github.com/frankslin/kaiyuan-small-seal-font',
   },
+  {
+    // Google Fonts 当前子集仍缺 U+11241（Khojki 依附式 r），上游 Noto 字体已收录；
+    // 自托管同名字族，字形来源与 Google Fonts 一致，只补上这一批缺字。
+    family: 'Noto Sans Khojki',
+    files: ['fonts/glyph-atlas-khojki.woff2'],
+    credit: 'Noto Sans Khojki 2.005（Noto Project Authors）Khojki 区段子集',
+    license: 'SIL OFL 1.1',
+    home: 'https://github.com/notofonts/khojki',
+  },
 ];
 
 export function localFont(family?: string): LocalFont | undefined {

@@ -31,7 +31,7 @@ function loadData() {
       .replace(/^export interface[\s\S]*?\n\}\n/gm, '')
       .replace(/export type[\s\S]*?;\n/g, '')
       .replace(/^export const/gm, 'const')
-      .replace(/:\s*(WritingSystem|Lineage|GlyphSet|LetterSlot)\[\]/g, '')
+      .replace(/:\s*(WritingSystem|Lineage|GlyphSet|LetterSlot|MatraSlot)\[\]/g, '')
       .replace(/:\s*\{[^}]*\}\[\]/g, '')
       .replace(/:\s*Record<[^=]*?>(?=\s*=)/g, '');
 
@@ -40,8 +40,10 @@ function loadData() {
   // glyphSets.ts 末尾还有一个查表函数，这里只要数据本身
   const gsSrc = strip(read('src/data/glyphSets.ts')).replace(/export function[\s\S]*$/, '');
   const fcSrc = strip(read('src/data/fontCoverage.ts'));
-  // 元音槽位表要先于 letterSlots 求值：后者用扩展运算符把 SVARA_SLOTS 铺进去
+  // 元音槽位表要先于 letterSlots 求值：后者用扩展运算符把 SVARA_SLOTS、
+  // MATRA_SLOTS 与 MATRA_EXTRA_SLOTS 铺进去。
   const svSrc = strip(read('src/data/svaraSlots.ts')).replace(/export function[\s\S]*$/, '');
+  const mtSrc = strip(read('src/data/matraSlots.ts')).replace(/export function[\s\S]*$/, '');
   const lsSrc = strip(read('src/data/letterSlots.ts')).replace(/export function[\s\S]*$/, '');
   const ffSrc = strip(read('src/data/fontFallback.ts')).replace(/export function[\s\S]*$/, '');
   const factory = new Function(`
@@ -50,6 +52,7 @@ function loadData() {
     ${gsSrc}
     ${fcSrc}
     ${svSrc}
+    ${mtSrc}
     ${lsSrc}
     ${ffSrc}
     return { writingSystems, scriptById, lineages, glyphSets, fontCoverage, letterMaps, SLOTS, fontFallback };
@@ -214,11 +217,12 @@ for (const [scriptId, slots] of Object.entries(letterMaps)) {
   const family = system.fontFamily ?? fontFallback[scriptId];
   if (!family) warn(`[slots] ${scriptId} 有字母槽位表，却没有可用字体`);
   const chars = glyphSets[scriptId]?.chars ?? [];
-  const mappedCount = new Set(Object.values(slots)).size;
   for (const [slot, char] of Object.entries(slots)) {
     if (!slotIds.has(slot)) err(`[slots] ${scriptId} 用了未定义的槽位「${slot}」`);
     if (Array.from(char).length !== 1) err(`[slots] ${scriptId}.${slot} 不是单个字符`);
-    if (chars.length && !chars.includes(char))
+    // 依附式元音（matra-*）是 Mc/Mn 记号，天生不进只收字母类码位的 glyphSets，
+    // 它们的字形由 src/data/matraSlots.ts 单独给出，这里只核字族覆盖。
+    if (chars.length && !slot.startsWith('matra-') && !chars.includes(char))
       warn(`[slots] ${scriptId}.${slot} 的「${char}」不在该体系的字形样本集里`);
     if (family && familyCovers(family, char) === false)
       warn(`[slots] ${scriptId}.${slot} 的「${char}」在字族「${family}」里没有字形`);
@@ -227,6 +231,9 @@ for (const [scriptId, slots] of Object.entries(letterMaps)) {
   const norm = (c) => c.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
   const known = new Set([...Object.values(slots)].map(norm));
   const rest = chars.filter((c) => !known.has(norm(c))).length;
+  // 只把"样本集里认得出来的字母"算作已进手工表：matra / svara 这类
+  // 记号不占样本集的码位，算进去会让分子大过分母。
+  const mappedCount = chars.filter((c) => known.has(norm(c))).length;
   if (!rest) continue;
   for (const c of chars) {
     if (known.has(norm(c))) continue;

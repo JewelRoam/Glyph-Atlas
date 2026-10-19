@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { rosterFor, sharedSlots, slotLabel } from '../data/letterSlots';
+import { letterGlyphKey, rosterFor, sharedSlots, slotLabel } from '../data/letterSlots';
 import { scriptById } from '../data/writingSystems';
 import { familyFor } from '../data/fontFallback';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
@@ -282,8 +282,10 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
             const shift = slots.length > 1 ? (i / (slots.length - 1)) * SPREAD : 0;
             const local = clamp01((t - shift) / (1 - SPREAD));
             const label = slotLabel[slot] ?? ca ?? cb ?? slot;
-            const da = ca ? paths?.[`${a}:${ca}`] : undefined;
-            const db = cb ? paths?.[`${b}:${cb}`] : undefined;
+            const keyA = ca ? letterGlyphKey(a, slot, ca) : null;
+            const keyB = cb ? letterGlyphKey(b, slot, cb) : null;
+            const da = keyA ? paths?.[keyA] : undefined;
+            const db = keyB ? paths?.[keyB] : undefined;
             const plateA = plateFor(a, ca);
             const plateB = plateFor(b, cb);
             // 轮廓还没到位；有图版的字先画图版，其余画骨架
@@ -294,8 +296,8 @@ export function AlphabetField({ a, b, t }: { a: string; b: string; t: number }) 
               const morph =
                 da && db && !plateA && !plateB
                   ? interpolatePath(
-                      preparedPath(`${a}:${ca}`, da),
-                      preparedPath(`${b}:${cb}`, db),
+                      preparedPath(keyA!, da),
+                      preparedPath(keyB!, db),
                       local,
                     )
                   : null;

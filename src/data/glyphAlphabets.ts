@@ -5,7 +5,8 @@
  * 参与对照的字母都需要自己的轮廓。字形取自各书写体系声明的字体
  * （见 src/data/fontFallback.ts），缩放居中到 100x100 坐标盒。
  *
- * 键为 `${scriptId}:${char}`；按组拆包是因为这组字只在这几条轨道上用得到，
+ * 普通槽位的键为 `${scriptId}:${char}`；依附式元音因为轮廓要带基字，
+ * 改为 `${scriptId}#${slot}`。按组拆包是因为这组字只在这几条轨道上用得到，
  * 让 lib/alphabetPaths.ts 按需取。
  *
  * 字形来源（Noto 系列，SIL OFL 1.1）：

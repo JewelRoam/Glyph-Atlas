@@ -14,6 +14,7 @@
 | --- | --- | --- | --- |
 | `glyph-atlas-oracle-bone.woff2` | Oracular 鏡原甲骨文（Peichao Qin） | SIL OFL 1.1 | https://github.com/Ivan666jjj/yigezi |
 | `glyph-atlas-small-seal.woff2` | 開元小篆（frankslin）＋ 全字庫《說文解字》 | SIL OFL 1.1 / OGDL-Taiwan-1.0 | https://github.com/frankslin/kaiyuan-small-seal-font |
+| `glyph-atlas-khojki.woff2` | Noto Sans Khojki 2.005（Noto Project Authors）Khojki 区段子集 | SIL OFL 1.1 | https://github.com/notofonts/khojki |
 
 ### 1.2 Google Fonts
 

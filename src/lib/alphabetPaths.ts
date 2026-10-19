@@ -6,8 +6,9 @@ export type AlphabetPaths = Record<string, string>;
 /**
  * 字母轮廓分两包：
  *  · core  —— 闪米特—希腊—拉丁那条线（ʾālep → Α → A…）；
- *  · varga —— 婆罗米系的元音位与梵语字音表（svara-* 与 varga-* 两套槽位：
- *    婆罗米 𑀅 → 天城 अ、婆罗米 ka → 天城 क → 泰文 ก…）。
+ *  · varga —— 婆罗米系的独立元音、依附式元音与梵语字音表
+ *    （svara-*、matra-* 与 varga-* 三套槽位：婆罗米 𑀅 → 天城 अ、
+ *    婆罗米 ka → 天城 क → 泰文 ก…）。
  *
  * 两套槽位互不相干，一条轨道只用得到其中一包，所以按包拆文件、按需取：
  * 走闪米特轨道的读者不必先下载印度那六百多个轮廓。
@@ -22,7 +23,12 @@ export function alphabetGroup(scriptId: string): AlphabetGroup | null {
   if (group === undefined) {
     const map = letterMaps[scriptId];
     group = map
-      ? Object.keys(map).some((slot) => slot.startsWith('varga-') || slot.startsWith('svara-'))
+      ? Object.keys(map).some(
+          (slot) =>
+            slot.startsWith('varga-') ||
+            slot.startsWith('svara-') ||
+            slot.startsWith('matra-'),
+        )
         ? 'varga'
         : 'core'
       : null;

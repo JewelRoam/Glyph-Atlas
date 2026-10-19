@@ -87,6 +87,7 @@
  */
 
 import { SVARA_SLOTS, svaraMaps } from './svaraSlots.ts';
+import { MATRA_BASE, MATRA_EXTRA_SLOTS, MATRA_SLOTS, matraMaps } from './matraSlots.ts';
 import { glyphSets, type NonLetterKind } from './glyphSets.ts';
 import { scriptById } from './writingSystems.ts';
 import { familyFor } from './fontFallback.ts';
@@ -582,6 +583,14 @@ export const SLOTS: LetterSlot[] = [
   // 这 18 格在各家的字面与取舍见 src/data/svaraSlots.ts——泰米尔文没有
   // 元音 r、藏文只有 ཨ 一个独立元音，走到那些站时空格就是「消失」。
   ...SVARA_SLOTS,
+
+  // ── 婆罗米系依附式元音（matra）─────────────────────────────────────
+  // 元音附标不在字音表的独立元音里，而是挂在辅音上写：का कि की。槽位仍按
+  // 音位对齐，取轮廓时由 matraSlots.ts 把它们挂回各家的 ka，再交给 HarfBuzz
+  // 整形；泰文的前置元音因此会按该文字的真实排法出现在基字前面。
+  ...MATRA_SLOTS,
+  // 高棉、巴厘、泰、藏各家独有的元音符号只在一站出现，走到那一站时飞入。
+  ...MATRA_EXTRA_SLOTS.map(({ id, label }) => ({ id, label })),
 
   // ── 婆罗米系（梵语字音表 varga）─────────────────────────────────────
   // 婆罗米文把梵语的 33 个辅音按发音部位排成五组（五处）：软腭、硬腭、
@@ -3974,8 +3983,19 @@ const coreLetterMaps: Record<string, Record<string, string>> = {
  * 有的格子按字母表的增删处理，飞入或飞出。
  */
 export const letterMaps: Record<string, Record<string, string>> = Object.fromEntries(
-  Object.entries(coreLetterMaps).map(([id, map]) => [id, { ...map, ...(svaraMaps[id] ?? {}) }]),
+  Object.entries(coreLetterMaps).map(([id, map]) => [
+    id,
+    { ...map, ...(svaraMaps[id] ?? {}), ...(matraMaps[id] ?? {}) },
+  ]),
 );
+
+/**
+ * 轮廓查表键。普通槽位按字符取；依附式元音按「文字#槽位」取，因为它的轮廓
+ * 是「基字 + 元音符号」整形后的整段连写，同一个符号在不同文字里不能混用。
+ */
+export function letterGlyphKey(scriptId: string, slot: string, char: string): string {
+  return slot.startsWith('matra-') ? `${scriptId}#${slot}` : `${scriptId}:${char}`;
+}
 
 /** 槽位在字母场格子里的固定次序 */
 const slotIndex = new Map(SLOTS.map((slot, i) => [slot.id, i]));
@@ -4113,6 +4133,10 @@ function autoRoster(
 
   // 手工表里的字面就是这些字母的正式站位；同字母的其它字面（小写、带调）不再单列
   const used = new Set(Object.values(manual ?? {}).map(letterKey));
+  // 元音附标挂在 ka 上取轮廓，但 ka 自己还有正式的 varga 槽位；先登记它，
+  // 免得自动补位把它又铺成一格。
+  const matraBase = MATRA_BASE[scriptId];
+  if (matraBase) used.add(letterKey(matraBase));
   const chars = glyphSets[scriptId]?.chars ?? [];
   const out: Record<string, string> = {};
   let count = 0;

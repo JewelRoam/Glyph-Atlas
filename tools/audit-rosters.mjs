@@ -14,7 +14,7 @@
  * 字族里根本没有这个字形（缺字，提示里说明，页面留空而不拿别的字体顶替）。
  */
 import { writingSystems } from '../src/data/writingSystems.ts';
-import { letterMaps, rosterAudit, rosterFor, hasRoster } from '../src/data/letterSlots.ts';
+import { letterGlyphKey, letterMaps, rosterAudit, rosterFor, hasRoster } from '../src/data/letterSlots.ts';
 import { alphabetPaths } from '../src/data/glyphAlphabets.ts';
 import { alphabetPathsVarga } from '../src/data/glyphAlphabetsVarga.ts';
 
@@ -78,10 +78,16 @@ const outlines = { ...alphabetPaths, ...alphabetPathsVarga };
 const noOutline = [];
 let outlineSlots = 0;
 for (const [script, slots] of Object.entries(letterMaps)) {
-  for (const char of new Set(Object.values(slots))) {
+  const seen = new Set();
+  for (const [slot, char] of Object.entries(slots)) {
+    const key = letterGlyphKey(script, slot, char);
+    if (seen.has(key)) continue;
+    seen.add(key);
     outlineSlots += 1;
-    if (!outlines[`${script}:${char}`] && !OUTLINE_EXEMPT.has(`${script}:${char}`)) {
-      noOutline.push(`${script}:${char} U+${char.codePointAt(0).toString(16).toUpperCase()}`);
+    if (!outlines[key] && !OUTLINE_EXEMPT.has(key)) {
+      noOutline.push(
+        `${script}:${slot} ${char} U+${char.codePointAt(0).toString(16).toUpperCase()}`,
+      );
     }
   }
 }

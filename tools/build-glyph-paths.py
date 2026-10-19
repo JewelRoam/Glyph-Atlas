@@ -13,11 +13,12 @@
 
 依赖（只在需要重新生成轮廓时才安装，不进 package.json）：
   python3 -m venv work/.venv
-  work/.venv/bin/pip install fonttools brotli
+  work/.venv/bin/pip install fonttools brotli uharfbuzz
 
 用法：
   work/.venv/bin/python tools/build-glyph-paths.py
 """
+import io
 import json
 import re
 import subprocess
@@ -25,8 +26,11 @@ import sys
 import urllib.request
 from pathlib import Path
 
+import uharfbuzz as hb
+
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.svgPathPen import SVGPathPen
+from fontTools.pens.transformPen import TransformPen
 from fontTools.ttLib import TTFont
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -160,6 +164,9 @@ def transform(path_data: str, scale: float, cx: float, cy: float) -> str:
 LOCAL_FONTS = {
     'Glyph Atlas Oracle Bone': ROOT / 'public/fonts/glyph-atlas-oracle-bone.woff2',
     'Glyph Atlas Small Seal': ROOT / 'public/fonts/glyph-atlas-small-seal.woff2',
+    # Google Fonts 的 Khojki 子集缺 U+11241，上游 Noto 字体有这个字形；
+    # 用本地同一字族的补字版本，避免元音符号在字母场里变成 .notdef。
+    'Noto Sans Khojki': ROOT / 'public/fonts/glyph-atlas-khojki.woff2',
 }
 
 
@@ -187,6 +194,58 @@ def outline(family: str, char: str) -> str:
     return transform(pen.getCommands(), scale, (x0 + x1) / 2, (y0 + y1) / 2)
 
 
+# HarfBuzz 要把字体解成 TTFace 才能按文字规则整形；同一个子集只解一次。
+_SHAPED_FONT_CACHE: dict[tuple[str, int], tuple[TTFont, bytes]] = {}
+
+
+def shaped_font(family: str, text: str) -> tuple[TTFont, bytes]:
+    key = (family, ord(text[0]))
+    cached = _SHAPED_FONT_CACHE.get(key)
+    if cached is not None:
+        return cached
+    font = open_font(family, ord(text[0]))
+    font.flavor = None
+    buffer = io.BytesIO()
+    font.save(buffer)
+    cached = (font, buffer.getvalue())
+    _SHAPED_FONT_CACHE[key] = cached
+    return cached
+
+
+def shaped_outline(family: str, text: str) -> str:
+    """把基字与元音符号交给 HarfBuzz 整形，再取整段连写的轮廓。
+
+    元音附标不能单独按码位取字形：泰文的前置元音、天城的 i-matra 都要和
+    辅音一起排，离开上下文就只剩一个孤立记号。这里按字体的真实排版规则拿到
+    每个 glyph 的位置，再累加成一条路径。
+    """
+    font, data = shaped_font(family, text)
+    hb_font = hb.Font(hb.Face(data))
+    buffer = hb.Buffer()
+    buffer.add_str(text)
+    buffer.guess_segment_properties()
+    hb.shape(hb_font, buffer)
+
+    order = font.getGlyphOrder()
+    glyphs = font.getGlyphSet()
+    pen, bounds = SVGPathPen(glyphs), BoundsPen(glyphs)
+    x = y = 0
+    for info, pos in zip(buffer.glyph_infos, buffer.glyph_positions):
+        if info.codepoint == 0:
+            raise LookupError(f'{family} 的 {text!r} 整形后出现 .notdef')
+        name = order[info.codepoint]
+        offset = (1, 0, 0, 1, x + pos.x_offset, y + pos.y_offset)
+        glyphs[name].draw(TransformPen(pen, offset))
+        glyphs[name].draw(TransformPen(bounds, offset))
+        x += pos.x_advance
+        y += pos.y_advance
+    if not bounds.bounds:
+        raise LookupError(f'{family} 的 {text!r} 整形后是空轮廓')
+    x0, y0, x1, y1 = bounds.bounds
+    scale = 88.0 / max(x1 - x0, y1 - y0, 1e-6)
+    return transform(pen.getCommands(), scale, (x0 + x1) / 2, (y0 + y1) / 2)
+
+
 def dump(script_name: str) -> list[dict]:
     # 用 tools/register-ts.mjs 这个 loader：新版 Node 的 --experimental-strip-types
     # 不再给缺扩展名的相对导入补 .ts，src/ 里的数据模块会直接解析失败。
@@ -208,9 +267,10 @@ def letter_slots() -> list[dict]:
 def write_alphabets() -> int:
     """字母槽位表里每个字符的轮廓，供 MICRO 字母场做整套字母表的形变。
 
-    分成两包：闪米特—希腊—拉丁那条线（core）与婆罗米系的元音位加梵语字音表
-    （varga，即 svara-* 与 varga-* 两套槽位）。字母场只按当前这一段轨道需要
-    的包去取，走闪米特轨道的读者不必先下载印度那 1000 多个轮廓。
+    分成两包：闪米特—希腊—拉丁那条线（core）与婆罗米系的独立元音、依附式
+    元音与梵语字音表（varga，即 svara-*、matra-* 与 varga-* 三套槽位）。
+    字母场只按当前这一段轨道需要的包去取，走闪米特轨道的读者不必先下载印度
+    那 1000 多个轮廓。
     """
     groups: dict[str, dict[str, str]] = {'core': {}, 'varga': {}}
     sources: dict[str, str] = {}
@@ -221,20 +281,27 @@ def write_alphabets() -> int:
         if not family:
             failures.append(f"{item['script']}/{item['slot']} 没有可用字体")
             continue
-        key = f"{item['script']}:{item['char']}"
-        brahmic = item['slot'].startswith('varga-') or item['slot'].startswith('svara-')
+        key = item.get('key') or f"{item['script']}:{item['char']}"
+        brahmic = (
+            item['slot'].startswith('varga-')
+            or item['slot'].startswith('svara-')
+            or item['slot'].startswith('matra-')
+        )
         group = 'varga' if brahmic else 'core'
         if key in groups[group]:
             continue
         try:
-            groups[group][key] = outline(family, item['char'])
+            if item.get('base'):
+                groups[group][key] = shaped_outline(family, f"{item['base']}{item['char']}")
+            else:
+                groups[group][key] = outline(family, item['char'])
             sources[key] = family
         except Exception as error:  # noqa: BLE001
             failures.append(f"{item['script']} {item['slot']} {item['char']} ({family}): {error}")
 
     for group, path, exported, title in (
         ('core', OUT_ALPHA, 'alphabetPaths', '闪米特—希腊—拉丁一线'),
-        ('varga', OUT_ALPHA_VARGA, 'alphabetPathsVarga', '婆罗米系（独立元音 svara 与梵语字音表 varga）'),
+        ('varga', OUT_ALPHA_VARGA, 'alphabetPathsVarga', '婆罗米系（独立元音 svara、依附式元音 matra 与梵语字音表 varga）'),
     ):
         entries = groups[group]
         lines = [
@@ -245,7 +312,8 @@ def write_alphabets() -> int:
             ' * 参与对照的字母都需要自己的轮廓。字形取自各书写体系声明的字体',
             ' * （见 src/data/fontFallback.ts），缩放居中到 100x100 坐标盒。',
             ' *',
-            ' * 键为 `${scriptId}:${char}`；按组拆包是因为这组字只在这几条轨道上用得到，',
+            ' * 普通槽位的键为 `${scriptId}:${char}`；依附式元音因为轮廓要带基字，',
+            ' * 改为 `${scriptId}#${slot}`。按组拆包是因为这组字只在这几条轨道上用得到，',
             ' * 让 lib/alphabetPaths.ts 按需取。',
             ' *',
             ' * 字形来源（Noto 系列，SIL OFL 1.1）：',
