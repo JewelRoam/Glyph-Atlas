@@ -100,7 +100,7 @@ Glyph-Atlas/
 ├── public/favicon.svg          朱砂印标记
 ├── tools/
 │   ├── validate-data.mjs       数据校验器（构建前置检查）
-│   ├── audit-rosters.mjs       字母表体检：确认每家的字表都整张进字母场
+│   ├── audit-rosters.mjs       字母表体检：字表整张进字母场，且每个槽位都有轮廓
 │   ├── audit-glyph-sources.mjs 字形来源体检：每个字都能落到字体 / 图版 / 轮廓
 │   ├── unicode-block-ranges.json  Unicode 18.0 区块索引（校验名称与码位）
 │   ├── screenshot.mjs          视觉校对：拍下每一屏（Playwright 按需装，不进依赖）
@@ -396,6 +396,13 @@ npm run validate
 缩放、居中、翻转 Y 轴后写入 `src/data/glyphPaths.ts`。轨道渲染时会自动使用
 `${scriptId}:${char}` 对应的轮廓。没有轮廓的字符仍走淡变、缩放与平移的兜底方案。
 
+字母场的同源槽位另有一份整表轮廓（`src/data/glyphAlphabets*.ts`），同一支脚本
+一并生成。手工槽位的字符**必须**有轮廓：少一个，那一格就悄悄退回交叉淡变——
+不报错，只是不再形变，是最难被发现的一种退化。`tools/audit-rosters.mjs` 因此
+把"手工槽位的字符都有轮廓"当硬约束，缺哪个直接列出来（确实没有字形的写进
+`OUTLINE_EXEMPT` 并说明原因）。这条约束是因为真正的退化才补上的：霍杰基文的
+短 i（𑉀）与婆罗米的 𑁵 加进字表后没重跑生成脚本，两份轮廓包一直停在旧版本。
+
 编写时的两个约定：
 
 - **站点要有名字和音值。** `label` 出现在舞台标题上，`phonetic` 让读者知道
@@ -469,6 +476,10 @@ path B ─→ splitSubpaths ─→ 每条子路径沿弧长采样 N+1 个点 ─
 - 渲染点先问来源是哪一类，字体来源必须有字族，图版来源必须有图；
 - `verifyFont()` 用 `document.fonts.load()` 兜底探测，私有区（PUA）直接判无字形；
 - 拿不到字形就渲染一枚**码位名片**（`U+10600 · 字库未收`），而不是豆腐块。
+
+`tools/audit-rosters.mjs` 另守一件事：手工同源槽位的每个字符都要有矢量轮廓。
+槽位加了、轮廓包没重跑，字母场会从那一段起悄悄退回交叉淡变——这条体检就是拿来
+抓这种"不报错、只是不再形变"的退化的。
 
 `tools/audit-glyph-sources.mjs` 把这些规矩钉进 `npm run validate`：逐个体系核对
 来源可定性、图版文件真实存在且登记在册、字母场的每一格与轨道的每一站都能落到
@@ -873,6 +884,22 @@ npm run build && ls dist/
   字母——目前最大一张 520 格。配套加了 `tools/audit-rosters.mjs`：逐个体系核对
   样本集里的字去了哪（进表格 / 与手工表同格 / 非字母记号 / 字库未收），撞上限
   就报错，并挂在 `npm run validate` 后面。
+
+- **2026-10-19 · 字体核实台账**：新增 `tools/font-sheet.mjs` 字体审看台与
+  `tools/font-verdicts.tsv` 台账（194 个体系逐行登记），`wrong` 直接让构建失败。
+  详见上文"字体审看台"。
+
+- **2026-10-19 · 轮廓生成脚本与轮廓包回正**：`tools/build-glyph-paths.py` 里调
+  子脚本用的还是 `node --experimental-strip-types`，新版 Node 不再给缺扩展名的
+  相对导入补 `.ts`，`dump-letter-slots.mjs` 直接解析失败——也就是说轮廓包其实
+  **生成不出来**了，只是没人重跑。改用项目自己的 `tools/register-ts.mjs` loader
+  后重新生成，发现两份字母轮廓包停在旧版本，补上霍杰基文短 i（𑉀）与婆罗米
+  𑁵。同一支脚本重跑，轨道轮廓（76 个）逐字节不变，说明它是稳定的。
+
+- **2026-10-19 · 轮廓覆盖进体检**：`tools/audit-rosters.mjs` 新增一条硬约束——
+  手工同源槽位的每个字符都必须有矢量轮廓，否则字母场会在那一段悄悄退回交叉
+  淡变。当前 75 个手工花名册体系、2968 个槽位字符全部有轮廓；缺的会被点名，
+  并在 `npm run validate` 里让构建失败。
 
 ---
 

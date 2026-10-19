@@ -6,7 +6,7 @@
 归一化到 100x100 的坐标盒，让每一站都能参与真正的矢量形变。
 
 流程：
-  1. node --experimental-strip-types tools/dump-lineage-stops.mjs
+  1. node --import ./tools/register-ts.mjs tools/dump-lineage-stops.mjs
      拿到轨道上所有站点及其字体（需要 Node 22.6+ 的类型剥离）。
   2. 按 codepoint 命中 css2 返回的 unicode-range 子集，只下载那一个 woff2。
   3. fontTools 取轮廓，等比缩放居中到 88x88、Y 轴翻转成 SVG 方向。
@@ -188,8 +188,10 @@ def outline(family: str, char: str) -> str:
 
 
 def dump(script_name: str) -> list[dict]:
+    # 用 tools/register-ts.mjs 这个 loader：新版 Node 的 --experimental-strip-types
+    # 不再给缺扩展名的相对导入补 .ts，src/ 里的数据模块会直接解析失败。
     raw = subprocess.run(
-        ['node', '--experimental-strip-types', f'tools/{script_name}'],
+        ['node', '--import', './tools/register-ts.mjs', f'tools/{script_name}'],
         cwd=ROOT, check=True, capture_output=True, text=True,
     ).stdout
     return json.loads(raw)

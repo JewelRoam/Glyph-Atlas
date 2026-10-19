@@ -1,5 +1,5 @@
 // 把字母槽位表连同字体信息导成 JSON，供 tools/build-glyph-paths.py 取字形轮廓。
-//   node --experimental-strip-types tools/dump-letter-slots.mjs
+//   node --import ./tools/register-ts.mjs tools/dump-letter-slots.mjs
 import { letterMaps } from '../src/data/letterSlots.ts';
 import { writingSystems } from '../src/data/writingSystems.ts';
 import { fontFallback } from '../src/data/fontFallback.ts';

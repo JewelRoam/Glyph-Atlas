@@ -14,7 +14,9 @@
  * 字族里根本没有这个字形（缺字，提示里说明，页面留空而不拿别的字体顶替）。
  */
 import { writingSystems } from '../src/data/writingSystems.ts';
-import { rosterAudit, rosterFor, hasRoster } from '../src/data/letterSlots.ts';
+import { letterMaps, rosterAudit, rosterFor, hasRoster } from '../src/data/letterSlots.ts';
+import { alphabetPaths } from '../src/data/glyphAlphabets.ts';
+import { alphabetPathsVarga } from '../src/data/glyphAlphabetsVarga.ts';
 
 const ALPHABETIC = new Set(['alphabet', 'abjad', 'abugida', 'syllabary', 'featural']);
 
@@ -58,6 +60,44 @@ if (empty.length) {
 if (uncovered.length) {
   console.log(`   · 字族里没有字形、字母场只能留空的：${uncovered.join('，')}`);
 }
+/**
+ * 同源槽位的矢量轮廓。
+ *
+ * 字母场里"原地变形"的部分靠 src/data/glyphAlphabets*.ts 里生成好的轮廓：两张
+ * 表的每个手工槽位字符都得有自己的一条 path（`${scriptId}:${char}`），缺一个，
+ * 那一格就悄悄退回"两张图交叉淡变"——不报错，只是不再形变，正好是最难被发现的
+ * 一种退化。所以这里把"手工槽位的字符必须有轮廓"当作硬约束。
+ *
+ * 同字不同槽（腓尼基的 waw 与 digamma 用同一个码位）按字符去重后只算一个。
+ */
+const OUTLINE_EXEMPT = new Set([
+  // 例：'某体系:某字符' —— 字族里确实没有这个字形、只可能留空的，写在这里并说明原因
+]);
+
+const outlines = { ...alphabetPaths, ...alphabetPathsVarga };
+const noOutline = [];
+let outlineSlots = 0;
+for (const [script, slots] of Object.entries(letterMaps)) {
+  for (const char of new Set(Object.values(slots))) {
+    outlineSlots += 1;
+    if (!outlines[`${script}:${char}`] && !OUTLINE_EXEMPT.has(`${script}:${char}`)) {
+      noOutline.push(`${script}:${char} U+${char.codePointAt(0).toString(16).toUpperCase()}`);
+    }
+  }
+}
+
+console.log(
+  `✔ 字母轮廓覆盖：${Object.keys(letterMaps).length} 个手工花名册体系、` +
+    `${outlineSlots} 个槽位字符，${noOutline.length ? `${noOutline.length} 个缺轮廓` : '全部有矢量轮廓'}`,
+);
+
+if (noOutline.length) {
+  console.error(`\n✖ 字母场会退回交叉淡变：${noOutline.join('，')}`);
+  console.error('  重新生成轮廓：work/.venv/bin/python tools/build-glyph-paths.py；');
+  console.error('  字族里确实没有这个字形的，在 tools/audit-rosters.mjs 的 OUTLINE_EXEMPT 里写明原因。');
+  process.exit(1);
+}
+
 if (truncated.length) {
   console.error(`\n✖ 字母表被截断：${truncated.join('，')}`);
   console.error('  字母场必须铺出整张表。请提高 AUTO_LIMIT，或在 letterSlots.ts 里说明原因。');

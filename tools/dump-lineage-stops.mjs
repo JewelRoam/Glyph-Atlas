@@ -1,7 +1,7 @@
 // 把血统轨道上的站点连同其字体信息导成 JSON，供 tools/build-glyph-paths.py 使用。
 //
-// 直接 import 数据模块，所以用 Node 的类型剥离功能运行：
-//   node --experimental-strip-types tools/dump-lineage-stops.mjs
+// 直接 import 数据模块，所以借 tools/register-ts.mjs 这个 loader 跑：
+//   node --import ./tools/register-ts.mjs tools/dump-lineage-stops.mjs
 import { lineages } from '../src/data/lineages.ts';
 import { writingSystems } from '../src/data/writingSystems.ts';
 import { fontFallback } from '../src/data/fontFallback.ts';
