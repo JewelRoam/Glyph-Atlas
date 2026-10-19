@@ -431,6 +431,10 @@ main {
 .glyph-cell:hover {
   background: rgba(211, 161, 63, 0.08);
 }
+/* 逐字图版本身已有白底；格子也换成纸白，避免图片加载前先露出一块深色。 */
+.glyph-cell:has(.image-glyph) {
+  background: #fff;
+}
 .glyph-cell .glyph-tile {
   border: none;
   background: none;
@@ -483,6 +487,7 @@ main {
   margin: 0;
   border: 1px solid var(--line);
   background: #fff;
+  isolation: isolate;
 }
 /* 整幅图版一律可以点开看原尺寸：帕拉瓦、印度河这类图又长又密，
    缩在侧栏里读不出笔形 */
@@ -491,9 +496,10 @@ main {
   width: 100%;
   /* 一圈白边：图版是裱在纸上的实物拓片或照片，不是压在夜色里的浮层。
      背景必须是不透明纯色，透明底 PNG 和拓片才不会和深色页面叠成一片黑。 */
-  padding: 10px;
+  padding: 12px;
   border: 0;
   background: #fff;
+  isolation: isolate;
   cursor: zoom-in;
 }
 .plate img {
@@ -502,10 +508,15 @@ main {
   max-width: 100%;
   max-height: 340px;
   margin: 0 auto;
-  object-fit: contain;
+  /* 图片自己也留一圈纸白：黑底拓片不再贴着深色面板，透明底 PNG/SVG
+     也有不依赖页面叠色的实体白底。 */
+  padding: 10px;
   background: #fff;
-  /* 不再用 multiply：有的浏览器会把透明底图与隔离层相乘成黑块。
-     白底已经保证拓片和线摹的对比度，直接正常绘制即可。 */
+  box-shadow: 0 0 0 1px rgba(16, 14, 12, 0.14);
+  object-fit: contain;
+  opacity: 1;
+  filter: none;
+  /* 不再用 multiply：有的浏览器会把透明底图与隔离层相乘成黑块。 */
   mix-blend-mode: normal;
 }
 .plate-open:focus-visible {
@@ -540,6 +551,7 @@ main {
   max-width: min(1180px, 94vw);
   border: 1px solid var(--line-mid);
   background: #fff;
+  isolation: isolate;
   cursor: default;
 }
 .plate-viewer-card img {
@@ -548,8 +560,12 @@ main {
   max-width: min(1180px, 94vw);
   max-height: 80vh;
   margin: 0 auto;
-  object-fit: contain;
+  padding: 14px;
   background: #fff;
+  object-fit: contain;
+  opacity: 1;
+  filter: none;
+  mix-blend-mode: normal;
 }
 .plate-viewer-card figcaption {
   display: flex;
@@ -1528,6 +1544,8 @@ main {
   padding: 2px;
   border-radius: 1px;
   background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(16, 14, 12, 0.12);
+  isolation: isolate;
 }
 /* 竖长的碑帖拓本不能撑破方框：按宽高两边同时收，等比装进去。
    之前写死 width/height:100%，竖向拓片会把方框撑高、溢出到展签上。 */
