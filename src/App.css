@@ -955,16 +955,13 @@ main {
   border: 0;
 }
 
-.glyph-field .alpha-head {
-  margin-bottom: 14px;
-}
-
 .glyph-field-source {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 14px;
   align-items: baseline;
-  margin-top: 14px;
+  min-height: 29px;
+  margin-top: 12px;
   padding-top: 10px;
   border-top: 1px dashed var(--line);
   color: var(--ink-faint);
@@ -1146,68 +1143,12 @@ main {
 }
 
 /* ── 字母全表：同源槽位上的整表形变 ── */
-@keyframes alpha-field-in {
-  from { opacity: 0; transform: translateY(7px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .alpha-field {
   flex-shrink: 0;
   margin: 2px 0 10px;
   padding: 10px 0 7px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
-  animation: alpha-field-in 260ms ease both;
-}
-
-.alpha-head {
-  margin-bottom: 7px;
-}
-
-.alpha-head-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.alpha-title {
-  color: var(--ink-dim);
-  font-family: var(--antique);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
-.alpha-title em {
-  margin-left: 10px;
-  color: var(--ink-strong);
-  font-family: var(--display);
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.045em;
-}
-
-.alpha-legend {
-  color: var(--ink-dim);
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-}
-
-.alpha-legend b {
-  margin-left: 7px;
-  font-weight: 700;
-}
-
-.alpha-legend b.in {
-  color: var(--cinnabar);
-}
-
-.alpha-legend b.out {
-  color: var(--line-strong);
 }
 
 .alpha-scroll {
@@ -1277,16 +1218,31 @@ main {
   50% { opacity: 0.9; background-position: 0 0; }
 }
 
-.alpha-note {
+.alpha-status {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  height: 21px;
   margin: 7px 0 0;
+  color: var(--ink-faint);
+  font-family: var(--antique);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  line-height: 21px;
+  white-space: nowrap;
 }
 
-.alpha-note-line {
-  display: block;
+.alpha-status b {
+  font-weight: 700;
+}
+
+.alpha-status .in {
+  color: var(--cinnabar);
+}
+
+.alpha-status .out {
   color: var(--ink-dim);
-  font-size: 11.5px;
-  line-height: 1.7;
-  opacity: 0.82;
 }
 
 .xfade {
@@ -1310,6 +1266,9 @@ main {
 
 .xfade-live {
   position: relative;
+}
+
+.xfade-stale + .xfade-live {
   animation: xfade-in 320ms ease 90ms both;
 }
 
@@ -1895,17 +1854,6 @@ main {
 
   .alpha-cell {
     min-height: 34px;
-  }
-
-  .alpha-head-row {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .alpha-title em {
-    display: block;
-    margin: 2px 0 0;
   }
 
   .detail-board {

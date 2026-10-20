@@ -1,12 +1,17 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { letterGlyphKey, rosterFor, sharedSlotsFor, slotLabel } from '../data/letterSlots';
+import {
+  letterGlyphKey,
+  rosterFor,
+  sharedSlotsFor,
+  slotLabel,
+  type LetterChangeSummary,
+} from '../data/letterSlots';
 import { scriptById } from '../data/writingSystems';
 import { familyFor } from '../data/fontFallback';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { alphabetGroup, useAlphabetPaths } from '../lib/alphabetPaths';
 import { interpolatePath, prepare, type PreparedGlyph } from '../lib/morph';
 import { FontGlyph, ImageGlyph, PathGlyph } from './Glyph';
-import { CrossFade } from './CrossFade';
 
 /**
  * 字母场 —— 把一整套字母表从一种文字连续变形到另一种文字。
@@ -97,15 +102,14 @@ export function AlphabetField({
   a,
   b,
   t,
-  showHeading = true,
-  showNote = true,
+  morphing = false,
+  summary = null,
 }: {
   a: string;
   b: string;
   t: number;
-  /** 嵌入统一字形场时，标题与统计由外层统一编排 */
-  showHeading?: boolean;
-  showNote?: boolean;
+  morphing?: boolean;
+  summary?: LetterChangeSummary | null;
 }) {
   const paths = useAlphabetPaths(a, b);
   // 一家的完整字表 = 手工核过的同源槽位 + 这一家自己的其余字母（自动补位）。
@@ -210,54 +214,14 @@ export function AlphabetField({
 
   if (!slots.length) return null;
 
-  let added = 0;
-  let lost = 0;
-  let kept = 0;
-  for (const slot of slots) {
-    const ca = ma[slot];
-    const cb = mb[slot];
-    if (ca && cb) kept++;
-    else if (cb) added++;
-    else lost++;
-  }
-  // 一边完全没有手工同源位时，整场都是"增 / 删"，说明这一段的对应关系还没核过
-  const swapOnly = kept === 0 && added > 0 && lost > 0;
-
   const nameA = scriptById[a]?.nameZh ?? a;
   const nameB = scriptById[b]?.nameZh ?? b;
 
-  // 关系两端是同一体系时只写名字，不写成"甲 → 甲"
-  const heading = a === b ? nameA : `${nameA} → ${nameB}`;
-
-  // 格子数、增删数一样时，表头与脚注保持稳定；它们变化时按分段标识
-  // 做交叉淡变，和新字表一起替换。
-  const note = `格子按"同源槽位"排列，不是各自字母表的书写顺序。${
-    added || lost ? '只在一边出现的格子就是字母表的增删：它们会飞入或飞出。' : ''
-  }${
-    swapOnly ? '这一段还没有核对过的同源字母，两边的字表各自整批进出，不做形变。' : ''
-  }`;
-
   return (
-    <section className="alpha-field" aria-label={`${nameA}到${nameB}的字母对照`}>
-      {showHeading && (
-        <div className="alpha-head">
-          <CrossFade
-            token={`${heading}|${kept}|${added}|${lost}`}
-            className="alpha-head-row"
-          >
-          <span className="alpha-title">
-            字母全表
-            <em>{heading}</em>
-          </span>
-            <span className="alpha-legend">
-              同源 {kept}
-              {added ? <b className="in">· 新增 {added}</b> : null}
-              {lost ? <b className="out">· 消失 {lost}</b> : null}
-            </span>
-          </CrossFade>
-        </div>
-      )}
-
+    <section
+      className={`alpha-field${morphing ? ' is-morphing' : ''}`}
+      aria-label={`${nameA}到${nameB}的字母对照`}
+    >
       <div className="alpha-scroll">
         <div className="alpha-grid" ref={gridRef}>
           {slots.map((slot, i) => {
@@ -362,13 +326,19 @@ export function AlphabetField({
         </div>
       </div>
 
-      {showNote && (
-        <div className="alpha-note">
-          <CrossFade token={note} className="alpha-note-line">
-            {note}
-          </CrossFade>
-        </div>
-      )}
+      <p className="alpha-status" aria-live="polite">
+        {morphing ? (
+          '整表变形中'
+        ) : summary ? (
+          <>
+            <span>同源 {summary.kept}</span>
+            <b className="in">新增 {summary.added}</b>
+            <b className="out">消失 {summary.lost}</b>
+          </>
+        ) : (
+          '同源槽位'
+        )}
+      </p>
     </section>
   );
 }

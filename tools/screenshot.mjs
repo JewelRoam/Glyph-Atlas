@@ -327,6 +327,18 @@ try {
     await transitionPage.locator('.focus-workbench').scrollIntoViewIfNeeded();
     await transitionPage.waitForTimeout(250);
     const beforeScroll = await transitionPage.locator('.focus').evaluate((element) => element.scrollTop);
+    const beforeGeometry = await transitionPage.evaluate(() => {
+      const grid = document.querySelector('.alpha-grid');
+      const field = document.querySelector('.focus-field-column');
+      const status = document.querySelector('.alpha-status');
+      return {
+        gridTop:
+          grid && field
+            ? grid.getBoundingClientRect().top - field.getBoundingClientRect().top
+            : null,
+        statusHeight: status?.getBoundingClientRect().height ?? null,
+      };
+    });
     const coptic = transitionPage
       .locator('.relation-rail[data-side="child"] .relation-link')
       .filter({ hasText: '科普特' })
@@ -336,9 +348,64 @@ try {
     } else {
       await coptic.click();
       await transitionPage.waitForTimeout(80);
-      const morphHeading = await transitionPage.locator('.alpha-title em').first().textContent();
-      if (!morphHeading?.includes('→')) fail('节点切换', '有共享槽位的直系关系未启动整表形变');
+      const morphing = await transitionPage.locator('.alpha-field.is-morphing').count();
+      const morphStatus = await transitionPage.locator('.alpha-status').textContent();
+      const duringGeometry = await transitionPage.evaluate(() => {
+        const grid = document.querySelector('.alpha-grid');
+        const field = document.querySelector('.focus-field-column');
+        const status = document.querySelector('.alpha-status');
+        return {
+          gridTop:
+            grid && field
+              ? grid.getBoundingClientRect().top - field.getBoundingClientRect().top
+              : null,
+          statusHeight: status?.getBoundingClientRect().height ?? null,
+        };
+      });
+      if (morphing === 0) fail('节点切换', '有共享槽位的直系关系未启动整表形变');
+      if (!morphStatus?.includes('整表变形中')) {
+        fail('节点切换', `变形中状态异常：${morphStatus ?? '空'}`);
+      }
+      if (/同源|新增|消失/.test(morphStatus ?? '')) {
+        fail('节点切换', '变形动画尚未结束就显示了增删统计');
+      }
+      if (
+        beforeGeometry.gridTop === null ||
+        duringGeometry.gridTop === null ||
+        Math.abs(beforeGeometry.gridTop - duringGeometry.gridTop) > 1.5 ||
+        beforeGeometry.statusHeight === null ||
+        duringGeometry.statusHeight === null ||
+        Math.abs(beforeGeometry.statusHeight - duringGeometry.statusHeight) > 1.5
+      ) {
+        fail('节点切换', '变形开始后字形场或状态行发生布局位移');
+      }
       await transitionPage.waitForTimeout(1100);
+      const finalStatus = await transitionPage.locator('.alpha-status').textContent();
+      const finalGeometry = await transitionPage.evaluate(() => {
+        const grid = document.querySelector('.alpha-grid');
+        const field = document.querySelector('.focus-field-column');
+        const status = document.querySelector('.alpha-status');
+        return {
+          gridTop:
+            grid && field
+              ? grid.getBoundingClientRect().top - field.getBoundingClientRect().top
+              : null,
+          statusHeight: status?.getBoundingClientRect().height ?? null,
+        };
+      });
+      if (!finalStatus?.includes('同源') || !finalStatus.includes('新增') || !finalStatus.includes('消失')) {
+        fail('节点切换', `变形完成后未显示稳定统计：${finalStatus ?? '空'}`);
+      }
+      if (
+        beforeGeometry.gridTop === null ||
+        finalGeometry.gridTop === null ||
+        Math.abs(beforeGeometry.gridTop - finalGeometry.gridTop) > 1.5 ||
+        beforeGeometry.statusHeight === null ||
+        finalGeometry.statusHeight === null ||
+        Math.abs(beforeGeometry.statusHeight - finalGeometry.statusHeight) > 1.5
+      ) {
+        fail('节点切换', '变形结束后字形场或状态行发生布局位移');
+      }
       const afterState = await transitionPage.locator('.focus').evaluate((element) => ({
         scrollTop: element.scrollTop,
         maxScroll: element.scrollHeight - element.clientHeight,
@@ -351,6 +418,9 @@ try {
         );
       }
       if (!transitionPage.url().includes('?script=coptic')) fail('节点切换', 'URL 未更新为单一 script 参数');
+      await transitionPage.waitForTimeout(400);
+      const persistentStatus = await transitionPage.locator('.alpha-status').textContent();
+      if (persistentStatus !== finalStatus) fail('节点切换', '增删统计未在动画结束后持续显示');
       await screenshot(transitionPage, '15-node-morph-coptic');
     }
   } finally {

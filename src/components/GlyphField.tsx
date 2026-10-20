@@ -1,6 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ScriptContext } from '../data/scriptContext';
-import { hasRoster, manualSharedSlotCount } from '../data/letterSlots';
+import {
+  hasRoster,
+  letterChangeSummary,
+  manualSharedSlotCount,
+  type LetterChangeSummary,
+} from '../data/letterSlots';
 import { graphRelations } from '../data/graphRelations';
 import { AlphabetField } from './AlphabetField';
 import { CrossFade } from './CrossFade';
@@ -55,6 +60,7 @@ export function GlyphField({
   const letterField = hasRoster(scriptId);
   const [fromScript, setFromScript] = useState<string | null>(null);
   const [morphT, setMorphT] = useState(1);
+  const [lastChange, setLastChange] = useState<LetterChangeSummary | null>(null);
   const previousRef = useRef(scriptId);
   const frameRef = useRef<number | null>(null);
 
@@ -69,17 +75,19 @@ export function GlyphField({
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const sharedSlots = manualSharedSlotCount(from, scriptId);
-    if (
-      !reducedMotion &&
+    const comparable =
       hasDirectTransmission(from, scriptId) &&
       sharedSlots > 0 &&
       hasRoster(from) &&
-      hasRoster(scriptId)
-    ) {
+      hasRoster(scriptId);
+
+    if (comparable && !reducedMotion) {
+      setLastChange(null);
       setFromScript(from);
       setMorphT(0);
       return;
     }
+    setLastChange(comparable ? letterChangeSummary(from, scriptId) : null);
     setFromScript(null);
     setMorphT(1);
   }, [scriptId]);
@@ -95,6 +103,7 @@ export function GlyphField({
         return;
       }
       frameRef.current = null;
+      setLastChange(letterChangeSummary(fromScript, scriptId));
       setFromScript(null);
       setMorphT(1);
     };
@@ -115,22 +124,20 @@ export function GlyphField({
         a={fromScript ?? scriptId}
         b={scriptId}
         t={fromScript ? morphT : 1}
-        showHeading={Boolean(fromScript)}
-        showNote={Boolean(fromScript)}
+        morphing={Boolean(fromScript)}
+        summary={fromScript ? null : lastChange}
       />
-      {!fromScript && (
-        <footer className="glyph-field-source">
-          <span>{letterSourceLabel(context)}</span>
-          {context.materials.source.license ? (
-            <span>{context.materials.source.license}</span>
-          ) : null}
-          {letterSourceLink(context) ? (
-            <a href={letterSourceLink(context)} target="_blank" rel="noreferrer">
-              字形来源 ↗
-            </a>
-          ) : null}
-        </footer>
-      )}
+      <footer className="glyph-field-source">
+        <span>{letterSourceLabel(context)}</span>
+        {context.materials.source.license ? (
+          <span>{context.materials.source.license}</span>
+        ) : null}
+        {letterSourceLink(context) ? (
+          <a href={letterSourceLink(context)} target="_blank" rel="noreferrer">
+            字形来源 ↗
+          </a>
+        ) : null}
+      </footer>
     </div>
   ) : (
     <GlyphBoard system={context.system} />

@@ -4616,6 +4616,25 @@ export function sharedSlotsFor(
   });
 }
 
+/** 两套字表之间的同源、新增与消失数。 */
+export interface LetterChangeSummary {
+  kept: number;
+  added: number;
+  lost: number;
+}
+
+export function letterChangeSummary(a: string, b: string): LetterChangeSummary {
+  const ma = rosterFor(a);
+  const mb = rosterFor(b);
+  const summary: LetterChangeSummary = { kept: 0, added: 0, lost: 0 };
+  for (const slot of sharedSlotsFor(a, b, ma, mb)) {
+    if (ma[slot] && mb[slot]) summary.kept++;
+    else if (mb[slot]) summary.added++;
+    else summary.lost++;
+  }
+  return summary;
+}
+
 /** 槽位名的查表 */
 export const slotLabel: Record<string, string> = Object.fromEntries(
   SLOTS.map((s) => [s.id, s.label]),

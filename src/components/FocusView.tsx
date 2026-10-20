@@ -47,8 +47,8 @@ export function FocusView({
     const target = pendingScrollRef.current;
     if (!focus || target === null) return;
 
-    // 字母场在切换后的第一帧会展开关系表头与说明；等它完成两轮布局再落位，
-    // 否则浏览器会先按旧高度钳制滚动值，内容变高后仍停在较浅的位置。
+    // 关系列与字形场会在切换后的第一帧更新；等两轮布局完成再落位，避免
+    // 浏览器先按旧高度钳制滚动值。
     focus.scrollTop = target;
     const first = requestAnimationFrame(() => {
       focus.scrollTop = target;
