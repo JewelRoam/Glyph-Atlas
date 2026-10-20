@@ -297,6 +297,34 @@ async function inspectNoTrack(page) {
   }
 }
 
+async function inspectWalkPlate(page) {
+  const plate = page.locator('.walk-stage .walk-center .image-glyph').first();
+  if (!(await plate.count())) throw new Error('字形舞台没有渲染站点的实物图版');
+  // 图片按需加载；先把舞台滚进视口，再等图版完成解码。
+  await plate.scrollIntoViewIfNeeded();
+  await plate
+    .locator('img')
+    .evaluate((img) => (img.complete ? img.decode().catch(() => {}) : undefined));
+  await page.waitForFunction(
+    (el) => {
+      const img = el.querySelector('img');
+      return Boolean(img?.complete && img.naturalWidth);
+    },
+    await plate.elementHandle(),
+  );
+  const state = await plate.evaluate((el) => {
+    const img = el.querySelector('img');
+    return {
+      background: getComputedStyle(el).backgroundColor,
+      loaded: Boolean(img?.complete && img?.naturalWidth),
+    };
+  });
+  if (!state.loaded) throw new Error('字形舞台的实物图版加载失败');
+  if (!state.background.match(/^rgba?\(255, 255, 255(?:, 1)?\)$/)) {
+    throw new Error(`字形舞台的实物图版不是白底：${state.background}`);
+  }
+}
+
 async function resetFocusScroll(page) {
   await page.locator('.focus').evaluate((el) => el.scrollTo({ top: 0, behavior: 'instant' }));
   await page.waitForTimeout(180);
@@ -507,6 +535,18 @@ try {
     height: 860,
     query: '?script=jurchen',
     steps: [inspectNoTrack],
+  });
+  await shoot('29-focus-libyco-berber', {
+    query: '?script=libyco-berber&lineage=libyco-berber-tifinagh&stop=libyco-berber-dougga',
+    steps: [inspectWalkPlate],
+    expectWalk: true,
+  });
+  await shoot('30-focus-libyco-berber-mobile', {
+    width: 420,
+    height: 860,
+    query: '?script=libyco-berber&lineage=libyco-berber-tifinagh&stop=libyco-berber-dougga',
+    steps: [inspectWalkPlate],
+    expectWalk: true,
   });
 } finally {
   await browser.close();

@@ -1106,6 +1106,52 @@ export const lineages: Lineage[] = [
   },
 
   {
+    id: 'libyco-berber-tifinagh',
+    nameZh: '古代利比亚字母 → 提非纳文',
+    nameEn: 'Libyco-Berber → Tifinagh',
+    mode: 'chain',
+    // 目前只核实了书体传统的阶段承接；具体古字母与新提非纳字母的逐字对应尚未查清。
+    alphabetField: 'hidden',
+    source:
+      'Unicode 提非纳文提案 N2739R：利比亚书体 → 撒哈拉提非纳（Libyco-Berber / Old Tuareg）' +
+      ' → 图阿雷格提非纳 → 新提非纳文',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2004/04142r-n2739r-tifinagh.pdf',
+      'https://www.unicode.org/charts/PDF/U2D30.pdf',
+    ],
+    description:
+      '柏柏尔字母传统从古代利比亚书体一路延续至今。Unicode 提案把这条传统分为利比亚、' +
+      '撒哈拉提非纳、图阿雷格提非纳与新提非纳几个阶段；今天摩洛哥采用的新提非纳文，' +
+      '其字母表由柏柏尔学院整理，字形取自更早的图阿雷格传统。' +
+      '这条轨道只展示传统承接的两端：前站是道加利比亚—布匿双语铭文的早期图录，' +
+      '后站是新提非纳的 yaz（ⵣ）。古利比亚字母没有统一编码，也没有可靠的逐字历史字库，' +
+      '现有材料不足以逐个确认古字母与现代字母的对应，因此不铺开整表，也不把两站的字形' +
+      '硬说成同一字位。',
+    stops: [
+      {
+        id: 'libyco-berber-dougga',
+        script: 'libyco-berber',
+        image: 'glyphs/libyco-berber/dougga-bilingual-plate.jpg',
+        label: '道加利比亚—布匿双语铭文图录',
+        asset: {
+          kind: 'image',
+          credit: 'Wilhelm Gesenius / Wikimedia Commons',
+          license: '公有领域',
+          home: 'https://commons.wikimedia.org/wiki/File:Dougga_Libyan-Punic_inscription_in_Gesenius%27s_1837_Scripturae_Linguaeque_Phoeniciae_Monumenta.jpg',
+        },
+      },
+      {
+        id: 'tifinagh-yaz',
+        script: 'tifinagh',
+        char: 'ⵣ',
+        label: '新提非纳 yaz',
+        phonetic: 'z',
+        sourceRef: 'https://www.unicode.org/charts/PDF/U2D30.pdf',
+      },
+    ],
+  },
+
+  {
     id: 'aegean-line',
     nameZh: '克里特象形文字 → 线形文字 A → 线形文字 B → 塞浦路斯',
     nameEn: 'Cretan hieroglyphs → Linear A → Linear B → Cypriot',

@@ -1631,7 +1631,9 @@ const writingSystemData: WritingSystem[] = [
     sourceRefs: [
       'https://en.wikipedia.org/wiki/Libyco-Berber_alphabet',
       'https://en.wikipedia.org/wiki/Tifinagh',
+      'https://www.unicode.org/L2/L2004/04142r-n2739r-tifinagh.pdf',
     ],
+    lineageEntry: { lineageId: 'libyco-berber-tifinagh', stopId: 'libyco-berber-dougga' },
   },
   {
     id: 'tifinagh', nameZh: '提非纳文', nameEn: 'Tifinagh',
@@ -1640,8 +1642,14 @@ const writingSystemData: WritingSystem[] = [
     type: 'abjad', status: 'living', direction: 'ltr',
     unicodeBlock: 'Tifinagh U+2D30', sample: 'ⴰ',
     fontFamily: 'Noto Sans Tifinagh',
-    note: '柏柏尔／阿马齐格人的文字，源自腓尼基—布匿字母，经利比亚—古提非纳文一路演变；'
-      + '二十世纪由柏柏尔学院整理为新提非纳文，字母顺序以 IRCAM 为准，今最常见书写方向为从左到右。',
+    note: '柏柏尔／阿马齐格人的文字，承自古代利比亚—柏柏尔字母传统；'
+      + '该传统与腓尼基／布匿影响的关系仍有争论。二十世纪由柏柏尔学院整理为新提非纳文，'
+      + '字母顺序以 IRCAM 为准，今最常见书写方向为从左到右。',
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2004/04142r-n2739r-tifinagh.pdf',
+      'https://www.unicode.org/charts/PDF/U2D30.pdf',
+    ],
+    lineageEntry: { lineageId: 'libyco-berber-tifinagh', stopId: 'tifinagh-yaz' },
   },
   {
     id: 'nsibidi', nameZh: '恩西比迪', nameEn: 'Nsibidi',

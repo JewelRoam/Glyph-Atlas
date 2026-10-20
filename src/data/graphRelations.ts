@@ -328,7 +328,10 @@ export const graphRelations: GraphRelation[] = [
   },
   {
     parent: 'libyco-berber', child: 'tifinagh', kind: 'descent', evidence: 'sourced',
-    sourceRefs: ['https://en.wikipedia.org/wiki/Tifinagh'],
+    sourceRefs: [
+      'https://www.unicode.org/L2/L2004/04142r-n2739r-tifinagh.pdf',
+      'https://en.wikipedia.org/wiki/Tifinagh',
+    ],
     note: '提非纳文承自古代利比亚—柏柏尔字母。',
   },
   {
