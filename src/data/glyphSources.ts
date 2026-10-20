@@ -65,10 +65,9 @@ const OVERRIDES: Record<string, GlyphSource> = {
     home: 'https://fonts.google.com/?query=Noto%20Sans%20Siddham',
     plates: glyphPlates.siddham,
   },
-  gaudi: {
-    kind: 'none',
-    note: '高迪文没有独立 Unicode 编码，也缺少可逐字核对的公有领域字母表；这里留空，不以孟加拉文或悉昙文字体代替。',
-  },
+  gaudi: plateSource('gaudi',
+    '高迪文没有独立 Unicode 编码，也没有可靠的开源字库；这里用 11 世纪《八千颂般若经》写本图版展示其书体，不以孟加拉文或悉昙文字体代替。',
+  ),
   'chinese-oracle': {
     kind: 'font',
     family: 'Glyph Atlas Oracle Bone',

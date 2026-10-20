@@ -80,7 +80,7 @@ brahmi	ok	Noto Sans Brahmi
 pallava	ok	-	无字库，用帕拉瓦字母表图（元音 9、辅音 35）
 kadamba	ok	-	无字库，用埃达卡尔铭文拓本图版
 siddham	ok	Noto Sans Siddham	
-gaudi	blank	-	无 Unicode 编码，缺少可逐字核对的公有领域字母表；体系焦点留空，不以孟加拉文或悉昙文字体代替
+gaudi	ok	-	只有图版：11 世纪《八千颂般若经》高迪文写本；无 Unicode 编码，不以孟加拉文或悉昙文字体代替
 nagari	ok	-	无字库，用城文辅音表图版
 devanagari	ok	Noto Sans Devanagari	
 nandinagari	ok	Noto Sans Nandinagari	

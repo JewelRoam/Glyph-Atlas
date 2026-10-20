@@ -189,6 +189,12 @@
   东汉《裴岑碑》拓本。隶书把篆书的圆转写成方折，笔画末尾带波磔，汉字从此定型为今天熟悉的方块结构。
   出处：https://commons.wikimedia.org/wiki/File:%E8%A3%B4%E5%B2%91%E7%A2%91%E6%8B%93%E6%9C%AC.jpg
 
+### 高迪文（`gaudi`）
+
+- `public/glyphs/gaudi/mamaki-manuscript.jpg` — 佚名写本 / Wikimedia Commons，公有领域
+  《八千颂般若经》写本，约 11 世纪，帕拉王朝；卷面中央为 Māmakī 像，两侧为高迪文书写的棕榈叶写本文字。
+  出处：https://commons.wikimedia.org/wiki/File:M%C4%81mak%C4%AB_with_a_vajra_on_a_lotus.jpg
+
 ### 东巴文（`dongba`）
 
 - `public/glyphs/dongba/lijiang-wall-sample.jpg` — BrokenSphere / Wikimedia Commons，CC BY-SA 3.0

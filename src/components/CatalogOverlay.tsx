@@ -3,6 +3,7 @@ import { graphSystems, writingSystems } from '../data';
 import { glyphSourceFor, imageFor } from '../data/glyphSources';
 import { familyFor } from '../data/fontFallback';
 import type { Family, Status } from '../data/types';
+import { assetUrl } from '../lib/assets';
 import { FAMILY_ORDER } from '../lib/layout';
 import {
   FAMILY_COLOR,
@@ -33,10 +34,19 @@ const STATUS_FILTERS: { id: StatusFilter; label: string; test: (status: Status) 
 
 function CatalogGlyph({ system }: { system: (typeof writingSystems)[number] }) {
   const source = glyphSourceFor(system);
-  const plate = system.sample ? imageFor(source, system.sample) : undefined;
+  const sampleImage = system.sample ? imageFor(source, system.sample) : undefined;
+  const plate = source.plates?.[0];
+  const image = sampleImage ?? plate?.src;
   const family = familyFor(system.id, system.fontFamily);
-  if (plate) {
-    return <ImageGlyph src={plate} label={system.sample ?? system.nameZh} size={52} />;
+  if (image) {
+    return (
+      <ImageGlyph
+        src={assetUrl(image)}
+        label={system.sample ?? system.nameZh}
+        size={52}
+        credit={sampleImage ? source.credit : plate?.credit}
+      />
+    );
   }
   return (
     <FontGlyph

@@ -178,6 +178,15 @@ export const glyphPlates: Record<string, GlyphPlate[]> = {
       home: 'https://commons.wikimedia.org/wiki/File:Das_Buch_der_Schrift_(Faulmann)_145.jpg',
     },
   ],
+  gaudi: [
+    {
+      src: 'glyphs/gaudi/mamaki-manuscript.jpg',
+      caption: '《八千颂般若经》写本中的高迪文书体，约 11 世纪，帕拉王朝；卷面中央为 Māmakī 像，两侧为棕榈叶写本上的墨书。',
+      credit: '佚名写本 / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:M%C4%81mak%C4%AB_with_a_vajra_on_a_lotus.jpg',
+    },
+  ],
   nagari: [
     {
       src: 'glyphs/nagari/consonant-table.png',

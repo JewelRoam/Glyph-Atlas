@@ -341,14 +341,17 @@ try {
     { focus: true },
   );
 
-  const emptyPage = await browser.newPage({ viewport: { width: 1440, height: 940 } });
+  const gaudiPage = await browser.newPage({ viewport: { width: 1440, height: 940 } });
   try {
-    await open(emptyPage, '?script=gaudi', '无素材节点');
-    const emptyMetrics = await inspectVisual(emptyPage, '无素材节点', { focus: true });
-    if (emptyMetrics.glyphFieldCount !== 0) fail('无素材节点', '仍渲染空字形场');
-    await screenshot(emptyPage, '14-node-no-material');
+    await open(gaudiPage, '?script=gaudi', '高迪文图版');
+    const gaudiMetrics = await inspectVisual(gaudiPage, '高迪文图版', { focus: true });
+    if (gaudiMetrics.glyphFieldCount !== 1) fail('高迪文图版', '缺少统一字形场');
+    if ((await gaudiPage.locator('.focus .plate img').count()) === 0) {
+      fail('高迪文图版', '缺少写本图版');
+    }
+    await screenshot(gaudiPage, '14-node-gaudi-plate');
   } finally {
-    await emptyPage.close();
+    await gaudiPage.close();
   }
 
   const transitionPage = await browser.newPage({ viewport: { width: 1440, height: 940 } });
@@ -553,6 +556,20 @@ try {
     await catalog.waitForTimeout(250);
     await screenshot(catalog, '22-catalog');
     if ((await catalog.locator('.catalog').count()) !== 1) fail('检索层', '检索浮层未打开');
+    const missingIcons = await catalog.locator('.catalog-card').evaluateAll((cards) =>
+      cards
+        .filter((card) => !card.querySelector('.catalog-glyph img, .catalog-glyph .font-glyph'))
+        .map((card) => card.querySelector('.catalog-card-title strong')?.textContent ?? '未知条目'),
+    );
+    if (missingIcons.length) fail('检索层', `${missingIcons.length} 条记录没有图标：${missingIcons.join('、')}`);
+    await catalog.getByPlaceholder('名称、英文名、国家、地区或谱系').fill('高迪文');
+    await catalog.waitForTimeout(300);
+    const gaudiCard = catalog.locator('.catalog-card').filter({ hasText: '高迪文' });
+    const gaudiThumb = gaudiCard.locator('.catalog-glyph img');
+    if ((await gaudiCard.count()) !== 1 || !(await gaudiThumb.evaluate((image) => image.complete && image.naturalWidth > 0))) {
+      fail('检索层', '高迪文没有加载第一幅图版');
+    }
+    await screenshot(catalog, '23-catalog-gaudi');
   } finally {
     await catalog.close();
   }
