@@ -211,3 +211,11 @@ braille	ok	Noto Sans Symbols 2	Noto Sans Symbols 2 覆盖盲文点阵 U+2800
 signwriting	ok	Noto Sans SignWriting	Noto Sans SignWriting 是这套手语书写系统的字体
 shavian	ok	Noto Sans Shavian	
 khipu	ok	-	不是图形文字，用 Locke《古代奇普》图版
+southwestern-iberian	ok	-	只有图版，出处登记在 CREDITS
+southeastern-iberian	ok	-	只有图版，出处登记在 CREDITS
+northeastern-iberian	ok	-	只有图版，出处登记在 CREDITS
+celtiberian	ok	-	只有图版，出处登记在 CREDITS
+greco-iberian	ok	-	只有图版，出处登记在 CREDITS
+gupta	ok	-	只有图版，出处登记在 CREDITS
+bactrian	ok	-	只有图版，出处登记在 CREDITS
+pyu	ok	-	只有图版，出处登记在 CREDITS

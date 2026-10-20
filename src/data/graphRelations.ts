@@ -142,6 +142,31 @@ export const graphRelations: GraphRelation[] = [
     sourceRefs: ['https://en.wikipedia.org/wiki/Greek_alphabet'],
     note: '希腊字母从腓尼基辅音字母表借入并改造出元音字母。',
   },
+  {
+    parent: 'phoenician', child: 'southeastern-iberian', kind: 'influence', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Paleohispanic_scripts'],
+    note: '伊比利亚半音节文字与腓尼基字母共享来源关系；它并非腓尼基字母的连续书体，具体形成机制仍有争议。',
+  },
+  {
+    parent: 'phoenician', child: 'southwestern-iberian', kind: 'influence', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Paleohispanic_scripts'],
+    note: '西南伊比利亚文属于腓尼基来源的伊比利亚半音节传统；符号释读与具体起源路径仍有争议。',
+  },
+  {
+    parent: 'southeastern-iberian', child: 'northeastern-iberian', kind: 'descent', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Northeastern_Iberian_script'],
+    note: '东北伊比利亚文源自东南文是当前最广泛接受的假设，并非没有异议的定论。',
+  },
+  {
+    parent: 'northeastern-iberian', child: 'celtiberian', kind: 'descent', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Celtiberian_script'],
+    note: '凯尔特伊比利亚文直接改编自东北伊比利亚文，基础符号表由 28 个减为 26 个。',
+  },
+  {
+    parent: 'greek', child: 'greco-iberian', kind: 'descent', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Greco-Iberian_alphabet'],
+    note: '希腊—伊比利亚字母直接改编自爱奥尼亚希腊字母，是伊比利亚半岛上少见的全音素文字。',
+  },
   { parent: 'greek', child: 'carian', kind: 'descent', evidence: 'pending' },
   { parent: 'greek', child: 'lydian', kind: 'descent', evidence: 'pending' },
   { parent: 'greek', child: 'lycian', kind: 'descent', evidence: 'pending' },
@@ -183,6 +208,11 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'greek', child: 'georgian', kind: 'influence', evidence: 'pending' },
   { parent: 'cyrillic', child: 'old-permic', kind: 'borrowing', evidence: 'pending' },
   { parent: 'greek', child: 'old-permic', kind: 'borrowing', evidence: 'pending' },
+  {
+    parent: 'greek', child: 'bactrian', kind: 'borrowing', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Bactrian_language'],
+    note: '巴克特里亚文借用希腊字母书写巴克特里亚语，并新增 Ϸ/ϸ sho；这是书写制度的借用，不是希腊书体的连续直系演变。',
+  },
   { parent: 'greek', child: 'elbasan', kind: 'borrowing', evidence: 'pending' },
   { parent: 'greek', child: 'vithkuqi', kind: 'borrowing', evidence: 'pending' },
   { parent: 'latin', child: 'deseret', kind: 'model', evidence: 'pending' },
@@ -190,7 +220,16 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'aramaic', child: 'brahmi', kind: 'influence', evidence: 'pending' },
   { parent: 'brahmi', child: 'pallava', kind: 'descent', evidence: 'pending' },
   { parent: 'brahmi', child: 'kadamba', kind: 'descent', evidence: 'pending' },
-  { parent: 'brahmi', child: 'siddham', kind: 'descent', evidence: 'pending' },
+  {
+    parent: 'brahmi', child: 'gupta', kind: 'descent', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Gupta_script'],
+    note: '笈多文承自阿育王婆罗米书体，是婆罗米与后续印度文字之间的关键阶段。',
+  },
+  {
+    parent: 'gupta', child: 'siddham', kind: 'descent', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Gupta_script'],
+    note: '悉昙文由笈多文发展而来，不是婆罗米文的直接分支。',
+  },
   {
     parent: 'siddham', child: 'gaudi', kind: 'descent', evidence: 'sourced',
     sourceRefs: [
@@ -221,7 +260,11 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'siddham', child: 'bengali', kind: 'descent', evidence: 'pending' },
   { parent: 'nagari', child: 'gujarati', kind: 'descent', evidence: 'pending' },
   { parent: 'sharada', child: 'gurmukhi', kind: 'descent', evidence: 'pending' },
-  { parent: 'brahmi', child: 'sharada', kind: 'descent', evidence: 'pending' },
+  {
+    parent: 'gupta', child: 'sharada', kind: 'descent', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Gupta_script'],
+    note: '夏拉达文由笈多文发展而来，不是婆罗米文的直接分支。',
+  },
   { parent: 'sharada', child: 'takri', kind: 'descent', evidence: 'pending' },
   { parent: 'takri', child: 'dogra', kind: 'descent', evidence: 'pending' },
   { parent: 'siddham', child: 'odia', kind: 'descent', evidence: 'pending' },
@@ -229,6 +272,11 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'brahmi', child: 'saurashtra', kind: 'influence', evidence: 'pending' },
   { parent: 'kadamba', child: 'telugu', kind: 'descent', evidence: 'pending' },
   { parent: 'kadamba', child: 'kannada', kind: 'descent', evidence: 'pending' },
+  {
+    parent: 'kadamba', child: 'pyu', kind: 'influence', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Pyu_script'],
+    note: '骠文最直接的先驱可能是卡丹巴文，同时也受南、北印度婆罗米系文字影响；这里不把假设写成确定的直系传承。',
+  },
   { parent: 'pallava', child: 'grantha', kind: 'descent', evidence: 'pending' },
   { parent: 'grantha', child: 'malayalam', kind: 'descent', evidence: 'pending' },
   { parent: 'brahmi', child: 'sinhala', kind: 'descent', evidence: 'pending' },

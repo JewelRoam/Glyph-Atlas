@@ -327,4 +327,118 @@ export const glyphPlates: Record<string, GlyphPlate[]> = {
       home: 'https://commons.wikimedia.org/wiki/File:Copan,_Hieroglyphic_Stairway_(15958739725).jpg',
     },
   ],
+  'southwestern-iberian': [
+    {
+      src: 'glyphs/southwestern-iberian/southwest-signary.png',
+      caption: '西南伊比利亚文符号表（Valerio 2008）。这套文字通常从右向左书写，也出现牛耕式与螺旋式行文；符号释读仍有不少分歧。',
+      credit: 'Valerio / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:Southwest_Iberian_script_(Valerio_2008).png',
+    },
+    {
+      src: 'glyphs/southwestern-iberian/fonte-velha.jpg',
+      caption: '葡萄牙阿尔莫多瓦的丰特韦利亚（Fonte Velha）墓碑摹本。此类石碑是西南伊比利亚文最常见的实物载体。',
+      credit: 'Papix / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:I_tarteso.jpg',
+    },
+  ],
+  'southeastern-iberian': [
+    {
+      src: 'glyphs/southeastern-iberian/correa-2004-signary.jpg',
+      caption: '东南伊比利亚文符号表（Correa 2004）。红色标记的可能音值仍属争议部分；这套文字只在前 4 至前 2 世纪的铭文中使用。',
+      credit: 'Tautintanes / Wikimedia Commons',
+      license: 'CC BY-SA 3.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Un_signari_ib%C3%A8ric_sud-oriental_(Correa_2004).jpg',
+    },
+  ],
+  'northeastern-iberian': [
+    {
+      src: 'glyphs/northeastern-iberian/iberian-signary.png',
+      caption: '东北伊比利亚文的基础符号表，约 28 个符号。塞音按后续元音分写，其余辅音与元音单写，构成半岛特有的半音节制度。',
+      credit: 'Siteve77 / Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Paleohispanic_(Iberian)_script.png',
+    },
+    {
+      src: 'glyphs/northeastern-iberian/paleohispanic-origin.png',
+      caption: '伊比利亚半音节文字与腓尼基字母的来源对照。颜色标出可能借用的字形，具体形成过程仍是研究问题。',
+      credit: 'Eavoldisely / Wikimedia Commons',
+      license: 'CC0 1.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Paleohispanic_script_origin.png',
+    },
+  ],
+  celtiberian: [
+    {
+      src: 'glyphs/celtiberian/western-signary.jpg',
+      caption: '凯尔特伊比利亚文西部变体的符号表。它直接改编自东北伊比利亚文，并省略了后者的一个颤音符号和一个鼻音符号。',
+      credit: 'Tautintanes / Wikimedia Commons',
+      license: 'CC BY 2.5',
+      home: 'https://commons.wikimedia.org/wiki/File:Un_signari_celtib%C3%A8ric_occidental.jpg',
+    },
+    {
+      src: 'glyphs/celtiberian/luzaga-bronze.jpg',
+      caption: '卢萨加铜板（Bronce de Luzaga）拓片，凯尔特伊比利亚文的重要长铭之一。',
+      credit: 'Papix / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:Bronce_luzaga.jpg',
+    },
+  ],
+  'greco-iberian': [
+    {
+      src: 'glyphs/greco-iberian/alphabet.jpg',
+      caption: '希腊—伊比利亚字母表。蓝红两色分别标出希腊字母原型与伊比利亚语的音值；它不是半音节文字，而是直接改编的爱奥尼亚式全音素字母。',
+      credit: 'Tautintanes / Wikimedia Commons',
+      license: 'CC BY-SA 3.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Un_alfabet_greco-ib%C3%A8ric.jpg',
+    },
+  ],
+  gupta: [
+    {
+      src: 'glyphs/gupta/mandsaur-532.jpg',
+      caption: '曼达索尔石刻铭文（532 年），笈多书体用于书写梵语。笈多文承自婆罗米文，又分化出悉昙文、夏拉达文等支系。',
+      credit: 'J. F. Fleet / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:Sanskrit_Samskrita_in_the_Mandsaur_stone_inscription_of_Yashodharman-Vishnuvardhana_532_CE.jpg',
+    },
+    {
+      src: 'glyphs/gupta/kushan-signet.jpg',
+      caption: '贵霜印章上的婆罗米书体铭文，展示 3 世纪前后向笈多书体过渡的字形形态。',
+      credit: 'CNG Coins / Wikimedia Commons',
+      license: 'CC BY-SA 3.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Kushan_signet_in_Gupta_Brahmi_script_3rd_century_CE.jpg',
+    },
+  ],
+  bactrian: [
+    {
+      src: 'glyphs/bactrian/alphabet.jpg',
+      caption: '巴克特里亚字母的碑铭体与草写体对照。它以希腊字母为基础，并用新增的 Ϸ/ϸ sho 表示 /ʃ/。',
+      credit: 'Drdpw、Dcoetzee、Flanker、पाटलिपुत्र / Wikimedia Commons',
+      license: 'CC BY-SA 3.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Bactrian_alphabet_(block_and_cursive_letters).jpg',
+    },
+    {
+      src: 'glyphs/bactrian/document-4c.jpg',
+      caption: '阿富汗北部出土的 4 世纪巴克特里亚语文书。日常草写字形与钱币、石刻上的碑铭体差异明显。',
+      credit: 'Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Bactrian_document_Northern_Afghanistan_4th_century.jpg',
+    },
+  ],
+  pyu: [
+    {
+      src: 'glyphs/pyu/alphabet.jpg',
+      caption: '博物馆展出的骠文字母表。骠文以婆罗米系字母书写骠语，约在 2 至 6 世纪逐渐形成。',
+      credit: 'Ninjastrikers / Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      home: 'https://commons.wikimedia.org/wiki/File:Pyu_Alphabets.jpg',
+    },
+    {
+      src: 'glyphs/pyu/myazedi.jpg',
+      caption: '妙齐提碑上的骠文部分。碑铭以骠文、孟文、巴利文与缅甸文并刻，是研究骠文与缅甸文字传统的重要材料。',
+      credit: 'Hybernator / Wikimedia Commons',
+      license: '公有领域',
+      home: 'https://commons.wikimedia.org/wiki/File:Myazedi-Inscription-Pyu.JPG',
+    },
+  ],
 };

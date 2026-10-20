@@ -119,6 +119,14 @@ const OVERRIDES: Record<string, GlyphSource> = {
     'khipu',
     'dongba',
     'maya',
+    'southwestern-iberian',
+    'southeastern-iberian',
+    'northeastern-iberian',
+    'celtiberian',
+    'greco-iberian',
+    'gupta',
+    'bactrian',
+    'pyu',
   ),
 };
 

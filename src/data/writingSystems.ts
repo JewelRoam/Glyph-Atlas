@@ -398,6 +398,68 @@ const writingSystemData: WritingSystem[] = [
   },
 
   // ─────────────────────────────────────────────
+  // 四之二、伊比利亚半岛：半音节文字与希腊式字母
+  // ─────────────────────────────────────────────
+  {
+    id: 'southwestern-iberian', nameZh: '西南伊比利亚文', nameEn: 'Southwestern Iberian Script',
+    alias: ['Tartessian', 'South Lusitanian', '塔特索斯文'],
+    origin: 'influence', parents: [], dateFrom: -800, dateTo: -600,
+    family: 'other', region: '伊比利亚半岛西南部', countries: ['葡萄牙', '西班牙'],
+    type: 'mixed', status: 'extinct', direction: 'mixed',
+    note: '常称塔特索斯文，是伊比利亚半岛已知最早的书写体系；通常从右向左，也见牛耕式与螺旋式行文。符号释读尚未完成，目前约有二十个符号的读法取得较广泛共识。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Southwest_Paleohispanic_script',
+      'https://en.wikipedia.org/wiki/Paleohispanic_scripts',
+    ],
+  },
+  {
+    id: 'southeastern-iberian', nameZh: '东南伊比利亚文', nameEn: 'Southeastern Iberian Script',
+    alias: ['Meridional', '南伊比利亚文'],
+    origin: 'influence', parents: [], dateFrom: -400, dateTo: -200,
+    family: 'other', region: '伊比利亚半岛东南部', countries: ['西班牙'],
+    type: 'mixed', status: 'extinct', direction: 'rtl',
+    note: '与东北伊比利亚文共用“塞音按元音分写、其余辅音单写”的半音节原则；现存铭文主要在前 4 至前 2 世纪，受腓尼基字母影响的形成过程仍有争议。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Southeastern_Iberian_script',
+      'https://en.wikipedia.org/wiki/Paleohispanic_scripts',
+    ],
+  },
+  {
+    id: 'northeastern-iberian', nameZh: '东北伊比利亚文', nameEn: 'Northeastern Iberian Script',
+    alias: ['Levantine Iberian', '莱万特伊比利亚文'],
+    origin: 'derived', parents: [], dateFrom: -400, dateTo: -100,
+    family: 'other', region: '伊比利亚半岛东北部', countries: ['西班牙', '法国'],
+    type: 'mixed', status: 'extinct', direction: 'ltr',
+    note: '伊比利亚半音节文字中材料最多的一支，基础符号表约 28 个；学界最广泛接受的来源假设是它由东南伊比利亚文发展而来。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Northeastern_Iberian_script',
+      'https://en.wikipedia.org/wiki/Paleohispanic_scripts',
+    ],
+  },
+  {
+    id: 'celtiberian', nameZh: '凯尔特伊比利亚文', nameEn: 'Celtiberian Script',
+    origin: 'derived', parents: [], dateFrom: -200, dateTo: -100,
+    family: 'other', region: '埃布罗河谷与杜罗河上游', countries: ['西班牙'],
+    type: 'mixed', status: 'extinct', direction: 'ltr',
+    note: '东北伊比利亚文的直接改编，基础符号表由 28 个减为 26 个；现存铭文通常归于前 2 至前 1 世纪。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Celtiberian_script',
+      'https://en.wikipedia.org/wiki/Paleohispanic_scripts',
+    ],
+  },
+  {
+    id: 'greco-iberian', nameZh: '希腊—伊比利亚字母', nameEn: 'Greco-Iberian Alphabet',
+    origin: 'derived', parents: [], dateFrom: -400, dateTo: -100,
+    family: 'greek', region: '伊比利亚半岛东南海岸', countries: ['西班牙'],
+    type: 'alphabet', status: 'extinct', direction: 'ltr',
+    note: '直接改编自爱奥尼亚希腊字母，不使用伊比利亚半音节文字的音节字；现存铭文集中在阿利坎特与穆尔西亚，约为前 4 世纪。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Greco-Iberian_alphabet',
+      'https://en.wikipedia.org/wiki/Paleohispanic_scripts',
+    ],
+  },
+
+  // ─────────────────────────────────────────────
   // 五、希腊—拉丁—西里尔：欧洲字母的主干
   // ─────────────────────────────────────────────
   {
@@ -614,9 +676,20 @@ const writingSystemData: WritingSystem[] = [
     type: 'abugida', status: 'extinct',
   },
   {
+    id: 'gupta', nameZh: '笈多文', nameEn: 'Gupta Script',
+    alias: ['Gupta Brahmi', 'Late Brahmi', '笈多婆罗米文'],
+    origin: 'derived', parents: [], dateFrom: 320, dateTo: 550,
+    family: 'indic', region: '印度次大陆北部', countries: ['印度'],
+    type: 'abugida', status: 'historical', direction: 'ltr',
+    note: '承自阿育王婆罗米书体，是婆罗米向悉昙文、夏拉达文及后续印度文字过渡的关键阶段；字母表有 5 个独立元音和 32 个辅音。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Gupta_script',
+    ],
+  },
+  {
     id: 'siddham', nameZh: '悉昙文', nameEn: 'Siddham',
     alias: ['Kutila', 'Siddhamātṛkā', '库提拉文'],
-    origin: 'derived', parents: ['brahmi'], dateFrom: 600, dateTo: 1200,
+    origin: 'derived', parents: ['gupta'], dateFrom: 600, dateTo: 1200,
     family: 'indic', region: '南亚', countries: ['印度', '中国', '日本'],
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Siddham U+11580', sample: '𑖎', fontFamily: 'Noto Sans Siddham',
@@ -741,7 +814,7 @@ const writingSystemData: WritingSystem[] = [
   },
   {
     id: 'sharada', nameZh: '夏拉达文', nameEn: 'Sharada',
-    origin: 'derived', parents: ['brahmi'], dateFrom: 800, dateTo: 1900,
+    origin: 'derived', parents: ['gupta'], dateFrom: 800, dateTo: 1900,
     family: 'indic', region: '南亚', countries: ['印度', '巴基斯坦'],
     type: 'abugida', status: 'historical', direction: 'ltr',
     unicodeBlock: 'Sharada U+11180', sample: '𑆑',
@@ -1118,6 +1191,16 @@ const writingSystemData: WritingSystem[] = [
     note: '东南亚最古老的文字之一，缅文即由它改造而来。',
   },
   {
+    id: 'pyu', nameZh: '骠文', nameEn: 'Pyu Script',
+    origin: 'influence', parents: [], dateFrom: 200, dateTo: 1200,
+    family: 'seasia', region: '缅甸中部', countries: ['缅甸'],
+    type: 'abugida', status: 'historical', direction: 'ltr',
+    note: '用于记录已消亡的骠语，约在 2 至 6 世纪逐渐形成；早期铭文常与婆罗米系文字夹写，最直接的先驱可能是南印度的卡丹巴文。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Pyu_script',
+    ],
+  },
+  {
     id: 'ahom', nameZh: '阿豪姆文', nameEn: 'Ahom',
     origin: 'derived', parents: ['mon'], dateFrom: 1200, dateTo: null,
     family: 'seasia', region: '阿萨姆', countries: ['印度'],
@@ -1425,6 +1508,17 @@ const writingSystemData: WritingSystem[] = [
   // ─────────────────────────────────────────────
   // 八、中亚与草原
   // ─────────────────────────────────────────────
+  {
+    id: 'bactrian', nameZh: '巴克特里亚文', nameEn: 'Bactrian Script',
+    alias: ['Greco-Bactrian script', '贵霜文'],
+    origin: 'derived', parents: [], dateFrom: -300, dateTo: 900,
+    family: 'centralasia', region: '巴克特里亚与兴都库什', countries: ['阿富汗', '巴基斯坦', '塔吉克斯坦'],
+    type: 'alphabet', status: 'historical',
+    note: '以希腊字母书写巴克特里亚语，并新增 Ϸ/ϸ sho 表示 /ʃ/；文献包括钱币、印章、铭文与契约，最晚实例约在 9 世纪末。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Bactrian_language',
+    ],
+  },
   {
     id: 'old-sogdian', nameZh: '古粟特字母', nameEn: 'Old Sogdian',
     origin: 'derived', parents: ['aramaic'], dateFrom: -100, dateTo: 600,

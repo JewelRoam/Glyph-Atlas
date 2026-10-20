@@ -205,3 +205,75 @@
   科潘的象形文字阶梯，两千多个字块连缀成一段完整的王朝史。
   出处：https://commons.wikimedia.org/wiki/File:Copan,_Hieroglyphic_Stairway_(15958739725).jpg
 
+
+### 西南伊比利亚文（`southwestern-iberian`）
+
+- `public/glyphs/southwestern-iberian/southwest-signary.png` — Valerio / Wikimedia Commons，公有领域
+  依 Valerio 2008 绘制的西南伊比利亚文符号表，并标出与腓尼基字母的可能来源对照。
+  出处：https://commons.wikimedia.org/wiki/File:Southwest_Iberian_script_(Valerio_2008).png
+
+- `public/glyphs/southwestern-iberian/fonte-velha.jpg` — Papix / Wikimedia Commons，公有领域
+  葡萄牙本萨弗里姆出土的丰特韦利亚墓碑，用西南伊比利亚文刻写。
+  出处：https://commons.wikimedia.org/wiki/File:I_tarteso.jpg
+
+### 东南伊比利亚文（`southeastern-iberian`）
+
+- `public/glyphs/southeastern-iberian/correa-2004-signary.jpg` — Tautintanes / Wikimedia Commons，CC BY-SA 3.0
+  依 Correa 2004 绘制的东南伊比利亚文符号表。
+  出处：https://commons.wikimedia.org/wiki/File:Un_signari_ib%C3%A8ric_sud-oriental_(Correa_2004).jpg
+
+### 东北伊比利亚文（`northeastern-iberian`）
+
+- `public/glyphs/northeastern-iberian/iberian-signary.png` — Siteve77 / Wikimedia Commons，CC BY-SA 4.0
+  东北伊比利亚文基础符号表。
+  出处：https://commons.wikimedia.org/wiki/File:Paleohispanic_(Iberian)_script.png
+
+- `public/glyphs/northeastern-iberian/paleohispanic-origin.png` — Eavoldisely / Wikimedia Commons，CC0 1.0
+  腓尼基字母、南伊比利亚与北伊比利亚符号的对照图。
+  出处：https://commons.wikimedia.org/wiki/File:Paleohispanic_script_origin.png
+
+### 凯尔特伊比利亚文（`celtiberian`）
+
+- `public/glyphs/celtiberian/western-signary.jpg` — Tautintanes / Wikimedia Commons，CC BY 2.5
+  凯尔特伊比利亚文西部变体符号表。
+  出处：https://commons.wikimedia.org/wiki/File:Un_signari_celtib%C3%A8ric_occidental.jpg
+
+- `public/glyphs/celtiberian/luzaga-bronze.jpg` — Papix / Wikimedia Commons，公有领域
+  卢萨加铜板拓片，凯尔特伊比利亚文的重要长铭之一。
+  出处：https://commons.wikimedia.org/wiki/File:Bronce_luzaga.jpg
+
+### 希腊—伊比利亚字母（`greco-iberian`）
+
+- `public/glyphs/greco-iberian/alphabet.jpg` — Tautintanes / Wikimedia Commons，CC BY-SA 3.0
+  希腊—伊比利亚字母表，以颜色对照希腊字母原型与伊比利亚语音值。
+  出处：https://commons.wikimedia.org/wiki/File:Un_alfabet_greco-ib%C3%A8ric.jpg
+
+### 笈多文（`gupta`）
+
+- `public/glyphs/gupta/mandsaur-532.jpg` — J. F. Fleet / Wikimedia Commons，公有领域
+  曼达索尔石刻铭文（532 年）中的梵语笈多书体。
+  出处：https://commons.wikimedia.org/wiki/File:Sanskrit_Samskrita_in_the_Mandsaur_stone_inscription_of_Yashodharman-Vishnuvardhana_532_CE.jpg
+
+- `public/glyphs/gupta/kushan-signet.jpg` — CNG Coins / Wikimedia Commons，CC BY-SA 3.0
+  贵霜印章上的笈多婆罗米书体铭文，约 3 世纪。
+  出处：https://commons.wikimedia.org/wiki/File:Kushan_signet_in_Gupta_Brahmi_script_3rd_century_CE.jpg
+
+### 巴克特里亚文（`bactrian`）
+
+- `public/glyphs/bactrian/alphabet.jpg` — Drdpw、Dcoetzee、Flanker、पाटलिपुत्र / Wikimedia Commons，CC BY-SA 3.0
+  巴克特里亚字母的碑铭体与草写体对照，灰色部分为所借用的希腊字母原型。
+  出处：https://commons.wikimedia.org/wiki/File:Bactrian_alphabet_(block_and_cursive_letters).jpg
+
+- `public/glyphs/bactrian/document-4c.jpg` — Wikimedia Commons，CC BY-SA 4.0
+  阿富汗北部出土的 4 世纪巴克特里亚语文书。
+  出处：https://commons.wikimedia.org/wiki/File:Bactrian_document_Northern_Afghanistan_4th_century.jpg
+
+### 骠文（`pyu`）
+
+- `public/glyphs/pyu/alphabet.jpg` — Ninjastrikers / Wikimedia Commons，CC BY-SA 4.0
+  博物馆展出的骠文字母表。
+  出处：https://commons.wikimedia.org/wiki/File:Pyu_Alphabets.jpg
+
+- `public/glyphs/pyu/myazedi.jpg` — Hybernator / Wikimedia Commons，公有领域
+  妙齐提碑上的骠文部分。
+  出处：https://commons.wikimedia.org/wiki/File:Myazedi-Inscription-Pyu.JPG
