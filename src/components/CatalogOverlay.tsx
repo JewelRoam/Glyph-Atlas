@@ -48,7 +48,7 @@ function CatalogGlyph({ system }: { system: (typeof writingSystems)[number] }) {
   );
 }
 
-/** 覆盖在全图之上的检索层：按名称、国家与谱系检索，点选后直接进入字形街景。 */
+/** 覆盖在全图之上的检索层：按名称、国家与谱系检索，点选后直接进入体系节点。 */
 export function CatalogOverlay({
   onClose,
   onOpenScript,

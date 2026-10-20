@@ -4330,6 +4330,21 @@ export function hasLetterMap(scriptId: string): boolean {
 }
 
 /**
+ * 两套字表之间真正由人工核过的同源槽位数。
+ *
+ * rosterFor() 里的自动补位只说明两边都收录了某个字符，不构成同源证据；
+ * 字形场只有在 letterMaps 的共享槽位上才允许做逐字形变。
+ */
+export function manualSharedSlotCount(a: string, b: string): number {
+  const mapA = letterMaps[a];
+  const mapB = letterMaps[b];
+  if (!mapA || !mapB) return 0;
+  return Object.keys(mapA).filter(
+    (slot) => Boolean(mapA[slot]) && Boolean(mapB[slot]),
+  ).length;
+}
+
+/**
  * 会自动补位的书写体系类型。
  *
  * 字母表、辅音音素文字、元音附标文字、音节文字、特征文字都有确定的字母清单，

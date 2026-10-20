@@ -97,25 +97,20 @@ export function AlphabetField({
   a,
   b,
   t,
-  overrides,
+  showHeading = true,
+  showNote = true,
 }: {
   a: string;
   b: string;
   t: number;
-  /** 当前轨道对两边字表的覆盖：scriptId → slotId → char */
-  overrides?: Record<string, Record<string, string>>;
+  /** 嵌入统一字形场时，标题与统计由外层统一编排 */
+  showHeading?: boolean;
+  showNote?: boolean;
 }) {
   const paths = useAlphabetPaths(a, b);
-  // 一家的完整字表 = 手工核过的同源槽位 + 这一家自己的其余字母（自动补位），
-  // 再叠加当前轨道的局部覆盖。覆盖必须在并集之前合并，否则新引入的槽位会丢。
-  const ma = useMemo(
-    () => ({ ...rosterFor(a), ...(overrides?.[a] ?? {}) }),
-    [a, overrides],
-  );
-  const mb = useMemo(
-    () => ({ ...rosterFor(b), ...(overrides?.[b] ?? {}) }),
-    [b, overrides],
-  );
+  // 一家的完整字表 = 手工核过的同源槽位 + 这一家自己的其余字母（自动补位）。
+  const ma = useMemo(() => rosterFor(a), [a]);
+  const mb = useMemo(() => rosterFor(b), [b]);
   const slots = useMemo(() => sharedSlotsFor(a, b, ma, mb), [a, b, ma, mb]);
   const gridRef = useRef<HTMLDivElement | null>(null);
   const rectsRef = useRef(new Map<string, DOMRect>());
@@ -151,9 +146,8 @@ export function AlphabetField({
   const pathsPending = !paths && (Boolean(alphabetGroup(a)) || Boolean(alphabetGroup(b)));
 
   /**
-   * 一段轨道上的格子数会变（走到下一站时这一段的槽位增减），横向网格随之重排。
-   * 直接重排会让整排字母"啪"地跳一下，所以这里按 FLIP 把每个格子从旧位置
-   * 滑到新位置。
+   * 两个节点之间的槽位会增删，横向网格随之重排。直接重排会让整排字母
+   * "啪"地跳一下，所以这里按 FLIP 把每个格子从旧位置滑到新位置。
    */
   useLayoutEffect(() => {
     const grid = gridRef.current;
@@ -232,11 +226,11 @@ export function AlphabetField({
   const nameA = scriptById[a]?.nameZh ?? a;
   const nameB = scriptById[b]?.nameZh ?? b;
 
-  // 同一种文字（轨道最后一站）只写名字，不写成"甲 → 甲"
+  // 关系两端是同一体系时只写名字，不写成"甲 → 甲"
   const heading = a === b ? nameA : `${nameA} → ${nameB}`;
 
-  // 这一段的两句说明。格子数、增删数一样，只有走到下一站才会变，
-  // 所以按它们做交叉淡变的分段标识，换段时表头与脚注跟着格子一起换。
+  // 格子数、增删数一样时，表头与脚注保持稳定；它们变化时按分段标识
+  // 做交叉淡变，和新字表一起替换。
   const note = `格子按"同源槽位"排列，不是各自字母表的书写顺序。${
     added || lost ? '只在一边出现的格子就是字母表的增删：它们会飞入或飞出。' : ''
   }${
@@ -245,22 +239,24 @@ export function AlphabetField({
 
   return (
     <section className="alpha-field" aria-label={`${nameA}到${nameB}的字母对照`}>
-      <div className="alpha-head">
-        <CrossFade
-          token={`${heading}|${kept}|${added}|${lost}`}
-          className="alpha-head-row"
-        >
+      {showHeading && (
+        <div className="alpha-head">
+          <CrossFade
+            token={`${heading}|${kept}|${added}|${lost}`}
+            className="alpha-head-row"
+          >
           <span className="alpha-title">
             字母全表
             <em>{heading}</em>
           </span>
-          <span className="alpha-legend">
-            同源 {kept}
-            {added ? <b className="in">· 新增 {added}</b> : null}
-            {lost ? <b className="out">· 消失 {lost}</b> : null}
-          </span>
-        </CrossFade>
-      </div>
+            <span className="alpha-legend">
+              同源 {kept}
+              {added ? <b className="in">· 新增 {added}</b> : null}
+              {lost ? <b className="out">· 消失 {lost}</b> : null}
+            </span>
+          </CrossFade>
+        </div>
+      )}
 
       <div className="alpha-scroll">
         <div className="alpha-grid" ref={gridRef}>
@@ -366,11 +362,13 @@ export function AlphabetField({
         </div>
       </div>
 
-      <div className="alpha-note">
-        <CrossFade token={note} className="alpha-note-line">
-          {note}
-        </CrossFade>
-      </div>
+      {showNote && (
+        <div className="alpha-note">
+          <CrossFade token={note} className="alpha-note-line">
+            {note}
+          </CrossFade>
+        </div>
+      )}
     </section>
   );
 }

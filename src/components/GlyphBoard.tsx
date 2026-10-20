@@ -106,10 +106,7 @@ export function GlyphBoard({ system }: { system: WritingSystem }) {
   return (
     <section className="detail-board">
       <header className="board-head">
-        <div>
-          <span>字形图版</span>
-          <h2>字形样本</h2>
-        </div>
+        <span className="board-kicker">字形</span>
         <span className="board-count">{countText}</span>
       </header>
 

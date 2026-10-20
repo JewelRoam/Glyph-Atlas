@@ -94,7 +94,7 @@ export interface AtlasViewport {
 }
 
 interface Props {
-  /** 从字形街景返回时恢复的视图；首次进入传 null。 */
+  /** 从体系节点返回时恢复的视图；首次进入传 null。 */
   initialView?: AtlasViewport | null;
   onViewChange: (view: AtlasViewport) => void;
   onOpenScript: (scriptId: string) => void;

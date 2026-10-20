@@ -1,42 +1,18 @@
-import { useEffect, useRef, type CSSProperties } from 'react';
-import {
-  adjacentStops,
-  lineageEntryFor,
-  lineagesByScript,
-  scriptContextFor,
-  scriptById,
-  stopRefFromParams,
-  stopRefFor,
-  writingSystems,
-  type LineageStopRef,
-  type ScriptGraphNeighborContext,
-} from '../data';
-import type { GraphRelationKind, WritingSystem } from '../data/types';
+import { useLayoutEffect, useRef, type CSSProperties } from 'react';
+import { scriptContextFor, writingSystems } from '../data';
 import {
   FAMILY_COLOR,
   FAMILY_LABEL,
-  LINEAGE_MODE_HINT,
-  LINEAGE_MODE_LABEL,
   ORIGIN_LABEL,
   STATUS_LABEL,
   TYPE_LABEL,
   formatSpan,
 } from '../lib/time';
-import { GlyphBoard } from './GlyphBoard';
-import { LineageStage } from './LineageStage';
+import { GlyphField } from './GlyphField';
+import { RelationRail } from './RelationRail';
 
 export interface FocusLocation {
-  /** 用户进入的体系焦点。轨道向前行走进入其他体系时保持不变。 */
   scriptId: string;
-  lineageId?: string;
-  stopId?: string;
-}
-
-interface FocusViewProps {
-  location: FocusLocation;
-  onOpenScript: (scriptId: string) => void;
-  onOpenTrack: (track: LineageStopRef) => void;
-  onStationChange: (track: LineageStopRef) => void;
 }
 
 const DIRECTION_LABEL: Record<string, string> = {
@@ -47,208 +23,71 @@ const DIRECTION_LABEL: Record<string, string> = {
   mixed: '多向并用',
 };
 
-const RELATION_LABEL: Record<GraphRelationKind, string> = {
-  descent: '直系演变',
-  borrowing: '借用',
-  influence: '影响',
-  model: '造字模型',
-};
-
-function stationNumber(track: LineageStopRef) {
-  return `${String(track.index + 1).padStart(2, '0')} / ${String(track.lineage.stops.length).padStart(2, '0')}`;
-}
-
-function relationTitle(relation: ScriptGraphNeighborContext['relation']) {
-  return RELATION_LABEL[relation.kind];
-}
-
-function RelationPortal({
-  neighbor,
-  direction,
-  onOpen,
-}: {
-  neighbor: ScriptGraphNeighborContext;
-  direction: 'parent' | 'child';
-  onOpen: (scriptId: string) => void;
-}) {
-  const system = neighbor.node.system;
-  return (
-    <button
-      className="relation-portal"
-      data-direction={direction}
-      onClick={() => onOpen(system.id)}
-    >
-      <span className="relation-direction" aria-hidden="true">
-        {direction === 'parent' ? '←' : '→'}
-      </span>
-      <span className="relation-copy">
-        <span className="relation-kind">{relationTitle(neighbor.relation)}</span>
-        <strong>{system.nameZh}</strong>
-        <em>{system.nameEn}</em>
-        {neighbor.relation.note ? <small>{neighbor.relation.note}</small> : null}
-      </span>
-    </button>
-  );
-}
-
-function StationDossier({
-  system,
-  track,
-  onOpenTrack,
-}: {
-  system: WritingSystem;
-  track: LineageStopRef;
-  onOpenTrack: (track: LineageStopRef) => void;
-}) {
-  const { previous, next } = adjacentStops(track);
-  const source = track.stop.sourceRef ?? track.lineage.sourceRefs[0];
-  return (
-    <section className="dossier-section station-dossier" aria-labelledby="station-heading">
-      <header className="dossier-kicker">
-        <span id="station-heading">当前站点</span>
-        <b>{stationNumber(track)}</b>
-      </header>
-      <h2>{track.stop.label ?? system.nameZh}</h2>
-      <p className="station-ident">
-        {system.nameZh}
-        {track.stop.phonetic ? <span> /{track.stop.phonetic}/</span> : null}
-      </p>
-
-      {(previous || next) && (
-        <nav className="station-neighbors" aria-label="沿线前后站点">
-          {previous ? (
-            <button onClick={() => onOpenTrack(previous)}>
-              <span>上一站</span>
-              <strong>{previous.stop.label ?? previous.stop.script}</strong>
-            </button>
-          ) : (
-            <span className="station-end">轨道起点</span>
-          )}
-          {next ? (
-            <button onClick={() => onOpenTrack(next)}>
-              <span>下一站</span>
-              <strong>{next.stop.label ?? next.stop.script}</strong>
-            </button>
-          ) : (
-            <span className="station-end">轨道终点</span>
-          )}
-        </nav>
-      )}
-
-      {(source || track.stop.asset) && (
-        <div className="station-source">
-          <span>字形依据</span>
-          {source ? (
-            <a href={source} target="_blank" rel="noreferrer">
-              查看出处 ↗
-            </a>
-          ) : null}
-          {track.stop.asset?.credit ? <em>{track.stop.asset.credit}</em> : null}
-        </div>
-      )}
-    </section>
-  );
-}
-
-function GraphRelations({
-  context,
-  onOpenScript,
-}: {
-  context: NonNullable<ReturnType<typeof scriptContextFor>>;
-  onOpenScript: (scriptId: string) => void;
-}) {
-  if (!context.graph.parentNeighbors.length && !context.graph.childNeighbors.length) return null;
-  return (
-    <section className="dossier-section graph-relations" aria-labelledby="relations-heading">
-      <header className="dossier-kicker">
-        <span id="relations-heading">图谱关系</span>
-        <b>{context.graph.parentNeighbors.length + context.graph.childNeighbors.length}</b>
-      </header>
-      {context.graph.parentNeighbors.length > 0 && (
-        <div className="relation-group">
-          <h3>来自</h3>
-          {context.graph.parentNeighbors.map((neighbor) => (
-            <RelationPortal
-              key={`${neighbor.relation.parent}>${neighbor.relation.child}`}
-              neighbor={neighbor}
-              direction="parent"
-              onOpen={onOpenScript}
-            />
-          ))}
-        </div>
-      )}
-      {context.graph.childNeighbors.length > 0 && (
-        <div className="relation-group">
-          <h3>去向</h3>
-          {context.graph.childNeighbors.map((neighbor) => (
-            <RelationPortal
-              key={`${neighbor.relation.parent}>${neighbor.relation.child}`}
-              neighbor={neighbor}
-              direction="child"
-              onOpen={onOpenScript}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
 /**
- * 一个书写体系的统一焦点。
+ * 一个书写体系的节点页。
  *
- * 左栏沿已核实的字形轨道连续行走，右栏始终解释当前站点、
- * 体系档案与直接图谱关系。全图和检索都从这里进入，不存在第二套详情。
+ * 来源与去向分别占据中央字形场两侧；每一个相邻体系都是可进入的节点入口。
+ * 页面不再区分总览与独立详情，进入节点后看到的就是完整体系。
  */
 export function FocusView({
   location,
   onOpenScript,
-  onOpenTrack,
-  onStationChange,
-}: FocusViewProps) {
+}: {
+  location: FocusLocation;
+  onOpenScript: (scriptId: string) => void;
+}) {
   const focusRef = useRef<HTMLElement>(null);
+  const pendingScrollRef = useRef<number | null>(null);
+  const framesRef = useRef<number[]>([]);
+  const context = scriptContextFor(location.scriptId);
 
-  // 只有从全图、检索或关系入口切换到另一体系焦点时才回到页首；
-  // 同一条轨道内前后换站必须留在用户当前观看的位置。
-  useEffect(() => {
-    focusRef.current?.scrollTo({ top: 0 });
+  useLayoutEffect(() => {
+    const focus = focusRef.current;
+    const frames = framesRef.current;
+    const target = pendingScrollRef.current;
+    if (!focus || target === null) return;
+
+    // 字母场在切换后的第一帧会展开关系表头与说明；等它完成两轮布局再落位，
+    // 否则浏览器会先按旧高度钳制滚动值，内容变高后仍停在较浅的位置。
+    focus.scrollTop = target;
+    const first = requestAnimationFrame(() => {
+      focus.scrollTop = target;
+      const second = requestAnimationFrame(() => {
+        focus.scrollTop = target;
+        pendingScrollRef.current = null;
+      });
+      frames.push(second);
+    });
+    frames.push(first);
+
+    return () => {
+      for (const frame of frames.splice(0)) cancelAnimationFrame(frame);
+    };
   }, [location.scriptId]);
 
-  const context = scriptContextFor(location.scriptId);
   if (!context) return null;
 
-  const requested = stopRefFromParams(location.lineageId, location.stopId);
-  const requestedTrack = requested?.lineage.stops.some(
-    (stop) => stop.script === location.scriptId,
-  )
-    ? requested
-    : undefined;
-  const fallbackTrack = lineageEntryFor(location.scriptId)?.track;
-  const activeTrack = requestedTrack ?? fallbackTrack;
-  const stationSystem = activeTrack ? scriptById[activeTrack.stop.script] : undefined;
-  const tracks = lineagesByScript.get(location.scriptId) ?? [];
-  const hasGraphRelations =
-    context.graph.parentNeighbors.length + context.graph.childNeighbors.length > 0;
-  const system = context.system;
-  const graphNumber = String(writingSystems.findIndex((item) => item.id === system.id) + 1).padStart(
-    3,
-    '0',
-  );
+  const { system } = context;
+  const graphNumber = String(
+    writingSystems.findIndex((item) => item.id === system.id) + 1,
+  ).padStart(3, '0');
+  const hasGlyphField = context.materials.materialReady;
+  const openRelatedScript = (scriptId: string) => {
+    pendingScrollRef.current = focusRef.current?.scrollTop ?? 0;
+    onOpenScript(scriptId);
+  };
 
   return (
     <article
       ref={focusRef}
       className="focus"
-      style={
-        {
-          '--family-color': FAMILY_COLOR[system.family],
-        } as CSSProperties
-      }
+      style={{ '--family-color': FAMILY_COLOR[system.family] } as CSSProperties}
     >
       <header className="focus-head">
         <span className="focus-index" aria-hidden="true">
           {graphNumber}
         </span>
+
         <div className="focus-heading">
           <span className="focus-kicker">
             {FAMILY_LABEL[system.family]} · {TYPE_LABEL[system.type]} ·{' '}
@@ -257,21 +96,21 @@ export function FocusView({
           <h1>{system.nameZh}</h1>
           <p>{system.nameEn}</p>
         </div>
+
         <div className="focus-context">
           {system.note ? <p className="focus-summary">{system.note}</p> : null}
           <p className="focus-spec">
             <span>
+              <b>状态</b>
+              {STATUS_LABEL[system.status]}
+            </span>
+            <span>
               <b>方向</b>
               {DIRECTION_LABEL[system.direction ?? 'ltr']}
             </span>
-            {system.unicodeBlock ? (
-              <span>
-                <b>Unicode</b>
-                <em>{system.unicodeBlock}</em>
-              </span>
-            ) : null}
           </p>
         </div>
+
         <dl className="focus-facts">
           <div>
             <dt>年代</dt>
@@ -285,94 +124,28 @@ export function FocusView({
             <dt>使用地区</dt>
             <dd>{system.countries.join(' · ') || '—'}</dd>
           </div>
-          <div>
-            <dt>状态</dt>
-            <dd>{STATUS_LABEL[system.status]}</dd>
-          </div>
         </dl>
       </header>
 
-      {(activeTrack || hasGraphRelations) && (
-        <div className={`focus-workspace ${activeTrack ? '' : 'without-track'}`}>
-          {activeTrack ? (
-            <section className="focus-stage-column" aria-labelledby="lineage-heading">
-              <header className="stage-heading">
-                <div>
-                  <span>字形演变</span>
-                  <h2 id="lineage-heading">{activeTrack.lineage.nameZh}</h2>
-                </div>
-                {activeTrack.lineage.mode ? (
-                  <span className="lineage-mode">
-                    {LINEAGE_MODE_LABEL[activeTrack.lineage.mode]}
-                  </span>
-                ) : null}
-              </header>
+      <div className={`focus-workbench ${hasGlyphField ? '' : 'without-glyph'}`}>
+        <RelationRail
+          side="parent"
+          neighbors={context.graph.parentNeighbors}
+          onOpen={openRelatedScript}
+        />
 
-              {tracks.length > 0 && (
-                <div className="track-switcher" aria-label="选择字形轨道">
-                  {tracks.map((track, index) => {
-                    const active = track.id === activeTrack.lineage.id;
-                    return (
-                      <button
-                        key={track.id}
-                        className={active ? 'active' : ''}
-                        aria-pressed={active}
-                        onClick={() => {
-                          const stop =
-                            track.stops.find((candidate) => candidate.script === system.id) ??
-                            track.stops[0];
-                          const ref = stopRefFor(track.id, stop);
-                          if (ref) onOpenTrack(ref);
-                        }}
-                        title={track.description}
-                      >
-                        <span>{String(index + 1).padStart(2, '0')}</span>
-                        <strong>{track.nameZh}</strong>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+        {hasGlyphField ? (
+          <div className="focus-field-column">
+            <GlyphField context={context} />
+          </div>
+        ) : null}
 
-              <LineageStage
-                lineage={activeTrack.lineage}
-                stationId={activeTrack.stop.id}
-                onStationChange={onStationChange}
-              />
-              <footer className="lineage-footnote">
-                <p>{activeTrack.lineage.description}</p>
-                <div>
-                  {activeTrack.lineage.mode ? (
-                    <span>{LINEAGE_MODE_HINT[activeTrack.lineage.mode]}</span>
-                  ) : null}
-                  <a
-                    href={activeTrack.lineage.sourceRefs[0]}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    依据 · {activeTrack.lineage.source} ↗
-                  </a>
-                </div>
-              </footer>
-            </section>
-          ) : null}
-
-          {hasGraphRelations ? (
-            <aside className="focus-dossier" aria-label={`${system.nameZh}档案`}>
-              {activeTrack ? (
-                <StationDossier
-                  system={stationSystem ?? system}
-                  track={activeTrack}
-                  onOpenTrack={onOpenTrack}
-                />
-              ) : null}
-              <GraphRelations context={context} onOpenScript={onOpenScript} />
-            </aside>
-          ) : null}
-        </div>
-      )}
-
-      <GlyphBoard system={system} />
+        <RelationRail
+          side="child"
+          neighbors={context.graph.childNeighbors}
+          onOpen={openRelatedScript}
+        />
+      </div>
     </article>
   );
 }

@@ -3,31 +3,24 @@ import { AtlasGraph, type AtlasViewport } from './components/AtlasGraph';
 import { CatalogOverlay } from './components/CatalogOverlay';
 import { FocusView, type FocusLocation } from './components/FocusView';
 import {
+  graphRelationCount,
   graphSystems,
   independentSystems,
-  lineages,
-  lineageEntryFor,
   livingSystems,
   scriptById,
 } from './data';
-import type { LineageStopRef } from './data/lineageIndex';
 import './App.css';
 
 function focusFromUrl(): FocusLocation | null {
   const params = new URLSearchParams(window.location.search);
   const scriptId = params.get('script');
   if (!scriptId || !scriptById[scriptId]) return null;
-  return {
-    scriptId,
-    lineageId: params.get('lineage') ?? undefined,
-    stopId: params.get('stop') ?? undefined,
-  };
+  // 旧链接中的 lineage / stop 参数仍可打开对应体系；节点页只以 script 定位。
+  return { scriptId };
 }
 
 function focusUrl(location: FocusLocation): string {
   const params = new URLSearchParams({ script: location.scriptId });
-  if (location.lineageId) params.set('lineage', location.lineageId);
-  if (location.stopId) params.set('stop', location.stopId);
   return `${window.location.pathname}?${params.toString()}`;
 }
 
@@ -36,7 +29,7 @@ function atlasUrl(): string {
 }
 
 /**
- * 全站只有两层空间：演化全图，以及从一个节点进入的字形街景。
+ * 全站只有两层空间：演化全图，以及一个书写体系的节点页。
  * 检索是覆盖在全图上的查找层，不占第三个页面。
  */
 export default function App() {
@@ -44,45 +37,11 @@ export default function App() {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [atlasView, setAtlasView] = useState<AtlasViewport | null>(null);
   const catalogTriggerRef = useRef<HTMLButtonElement>(null);
-  const focusScriptRef = useRef<string | null>(focus?.scriptId ?? null);
-
-  useEffect(() => {
-    focusScriptRef.current = focus?.scriptId ?? null;
-  }, [focus?.scriptId]);
 
   const openScript = useCallback((scriptId: string) => {
-    const entry = lineageEntryFor(scriptId)?.track;
-    const next: FocusLocation = entry
-      ? { scriptId, lineageId: entry.lineage.id, stopId: entry.stop.id }
-      : { scriptId };
+    const next: FocusLocation = { scriptId };
     window.history.pushState({ glyphAtlas: 'focus' }, '', focusUrl(next));
     setFocus(next);
-  }, []);
-
-  const openTrack = useCallback((track: LineageStopRef) => {
-    const next: FocusLocation = {
-      scriptId: track.stop.script,
-      lineageId: track.lineage.id,
-      stopId: track.stop.id,
-    };
-    window.history.pushState({ glyphAtlas: 'focus' }, '', focusUrl(next));
-    setFocus(next);
-  }, []);
-
-  const moveToStation = useCallback((track: LineageStopRef) => {
-    // 沿线行走只改变当前站点；页头仍属于用户进入的体系焦点。
-    const scriptId = focusScriptRef.current ?? track.stop.script;
-    const next: FocusLocation = {
-      scriptId,
-      lineageId: track.lineage.id,
-      stopId: track.stop.id,
-    };
-    window.history.replaceState(
-      { glyphAtlas: 'focus', station: next.stopId },
-      '',
-      focusUrl(next),
-    );
-    setFocus((previous) => (previous ? { ...previous, ...next } : next));
   }, []);
 
   const returnToAtlas = useCallback(() => {
@@ -152,20 +111,15 @@ export default function App() {
             <span>今仍使用</span>
           </div>
           <div>
-            <b>{lineages.length}</b>
-            <span>字形轨道</span>
+            <b>{graphRelationCount}</b>
+            <span>演化关系</span>
           </div>
         </div>
       </header>
 
       <main>
         {focus ? (
-          <FocusView
-            location={focus}
-            onOpenScript={openScript}
-            onOpenTrack={openTrack}
-            onStationChange={moveToStation}
-          />
+          <FocusView location={focus} onOpenScript={openScript} />
         ) : (
           <div className="atlas-layout">
             <AtlasGraph
