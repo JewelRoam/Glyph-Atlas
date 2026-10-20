@@ -15,7 +15,7 @@ import { buildTimeScale } from '../lib/timescale';
  *  · 陈设层（不缩放）：左侧谱系名、顶部年代刻度。文字属于"地图注记"，
  *    不该随着缩放变大变小，所以它们渲染在 SVG 之外，按当前变换换算位置。
  *
- * 节点的名字标签留在坐标系内，但字号按 1/k 反向补偿，屏幕上始终 12.5px；
+ * 节点的名字标签留在坐标系内，但字号按 1/k 反向补偿，屏幕上始终 13px；
  * 缩得太小时再按"屏幕矩形是否相撞"做一轮取舍，宁可少显示几个名字，
  * 也不让文字叠成一团（这和地图软件的做法是同一件事）。
  */
@@ -30,7 +30,9 @@ const AXIS_WIDTH_MIN = 2100;
 const AXIS_WIDTH_MAX = 4600;
 
 /** 标签在屏幕上的目标字号（像素），不随缩放变化 */
-const NODE_LABEL_PX = 11.5;
+const NODE_LABEL_PX = 13;
+const NODE_LABEL_FONT =
+  '"PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif';
 /**
  * 名字相对节点的偏移（屏幕像素）。基线往上抬 7px，右移 9px。
  * 渲染与碰撞检测共用这两个数字，避免"画在这里、判定在那里"。
@@ -38,16 +40,16 @@ const NODE_LABEL_PX = 11.5;
 const LABEL_DX = 9;
 const LABEL_DY = -7;
 /**
- * 名字行盒相对基线的上下缘（屏幕像素）。中文在 11.5px 下实测为
- * 基线上方 12px、下方 4px，共 16px 高——比 font-size 大不少。
+ * 名字行盒相对基线的上下缘（屏幕像素）。中文在 13px 下实测为
+ * 基线上方约 14px、下方约 5px，共 19px 高——比 font-size 大不少。
  * 碰撞检测必须按这个真实高度算，否则相邻行会"判定通过、肉眼叠字"。
  */
 const LABEL_BOX_ABOVE = NODE_LABEL_PX * 1.05;
 const LABEL_BOX_BELOW = NODE_LABEL_PX * 0.38;
 /** 相邻名字之间至少留出的水平空隙（屏幕像素） */
 const LABEL_GAP = 6;
-const LANE_LABEL_PX = 12.5;
-const TICK_LABEL_PX = 11;
+const LANE_LABEL_PX = 14;
+const TICK_LABEL_PX = 12;
 /** 年代刻度用的字体（与 CSS 的 --antique 保持一致），量宽度时要用同一个 */
 const TICK_FONT = '"Cardo", "Iowan Old Style", "Palatino Linotype", "Songti SC", Georgia, serif';
 /** 刻度的字距（CSS letter-spacing: 0.08em），量宽度时要算进去 */
@@ -132,7 +134,7 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
   const labelWidth = useCallback(
     (s: WritingSystem) =>
       // 28 图单位 ≈ 两侧各 7px（NOMINAL_K 下）的呼吸，跟下面的取舍判定对齐
-      measureText(s.nameZh, NODE_LABEL_PX) / NOMINAL_K + 28,
+      measureText(s.nameZh, NODE_LABEL_PX, NODE_LABEL_FONT) / NOMINAL_K + 28,
     [],
   );
 
@@ -297,47 +299,52 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
    * 两侧都撞上才折叠不画。相邻两行一左一右错开，能把不少"注定被藏掉"
    * 的名字救回来；中央字形与连线用的是同一套屏幕坐标，所以判定即所见。
    *
-   * 判定矩形按 11.5px 中文的实测行盒（基线上方 12px、下方 4px）算，
+   * 判定矩形按 13px 中文的实测行盒（基线上方 14px、下方 5px）算，
    * 比 font-size 大得多——用 font-size 当高度会"判定通过、肉眼叠字"。
    */
   const labelPlan = useMemo(() => {
     const hidden = new Set<string>();
     const flipped = new Set<string>();
     const placed: { x0: number; x1: number; y0: number; y1: number }[] = [];
-    if (!showLabels || view.k > 1.6) return { hidden, flipped };
-    const ordered = [...layout.nodes].sort(
-      (a, b) =>
-        Number(b.sys.origin === 'independent') - Number(a.sys.origin === 'independent') ||
-        (STATUS_RANK[a.sys.status] ?? 5) - (STATUS_RANK[b.sys.status] ?? 5) ||
-        a.y - b.y ||
-        a.x - b.x,
-    );
-    // 手机总览空间有限，只保留独立起源与高优先级节点；放大后完整标注仍会回来。
-    const labelBudget = size.w < 620 ? 26 : ordered.length;
+    if (!showLabels) return { hidden, flipped };
+    const ordered = layout.nodes
+      .filter((n) => {
+        const screenX = GUTTER + view.x + n.x * view.k;
+        const screenY = view.y + n.y * view.k;
+        return screenX >= GUTTER && screenX <= size.w && screenY >= TOP_PAD && screenY <= size.h;
+      })
+      .sort(
+        (a, b) =>
+          Number(b.sys.origin === 'independent') - Number(a.sys.origin === 'independent') ||
+          (STATUS_RANK[a.sys.status] ?? 5) - (STATUS_RANK[b.sys.status] ?? 5) ||
+          a.y - b.y ||
+          a.x - b.x,
+      );
     /** 与已占位矩形是否相撞（留 LABEL_GAP 呼吸） */
     const free = (r: { x0: number; x1: number; y0: number; y1: number }) =>
       !placed.some(
         (o) => r.x0 < o.x1 + LABEL_GAP && r.x1 + LABEL_GAP > o.x0 && r.y0 < o.y1 && r.y1 > o.y0,
       );
-    for (const n of ordered.slice(0, labelBudget)) {
-      const w = measureText(n.sys.nameZh, NODE_LABEL_PX);
-      const dotX = view.x + n.x * view.k;
+    const inside = (r: { x0: number; x1: number; y0: number; y1: number }) =>
+      r.x0 >= GUTTER + 3 && r.x1 <= size.w - 3 && r.y0 >= TOP_PAD && r.y1 <= size.h;
+    for (const n of ordered) {
+      const w = measureText(n.sys.nameZh, NODE_LABEL_PX, NODE_LABEL_FONT);
+      const dotX = GUTTER + view.x + n.x * view.k;
       const baseline = view.y + n.y * view.k + LABEL_DY;
       const y0 = baseline - LABEL_BOX_ABOVE;
       const y1 = baseline + LABEL_BOX_BELOW;
       const right = { x0: dotX + LABEL_DX, x1: dotX + LABEL_DX + w, y0, y1 };
       const left = { x0: dotX - LABEL_DX - w, x1: dotX - LABEL_DX, y0, y1 };
-      if (free(right)) placed.push(right);
-      else if (left.x0 >= view.x + 2 && free(left)) {
+      if (inside(right) && free(right)) placed.push(right);
+      else if (inside(left) && free(left)) {
         placed.push(left);
         flipped.add(n.sys.id);
       } else {
         hidden.add(n.sys.id);
       }
     }
-    for (const n of ordered.slice(labelBudget)) hidden.add(n.sys.id);
     return { hidden, flipped };
-  }, [showLabels, layout, size.w, view]);
+  }, [showLabels, layout, size.h, size.w, view]);
 
   return (
     <div className="atlas" ref={wrapRef} style={{ '--u': u } as CSSProperties}>
