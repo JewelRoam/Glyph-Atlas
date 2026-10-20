@@ -157,6 +157,21 @@ async function inspectVisual(page, name, { strictLabels = false, focus = false }
       }
     }
 
+    const statItems = [...document.querySelectorAll('.stats > div')].filter(visible);
+    const statRects = statItems.map((element) => element.getBoundingClientRect());
+    const statsRect = document.querySelector('.stats')?.getBoundingClientRect();
+    const actionsRect = document.querySelector('.topbar-actions')?.getBoundingClientRect();
+    const intersects = (a, b) =>
+      !!a && !!b && a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
+    const statOverlaps = statRects.reduce(
+      (count, rect, index) =>
+        count + statRects.slice(index + 1).filter((other) => intersects(rect, other)).length,
+      0,
+    );
+    const laneLabels = [...document.querySelectorAll('.lane-label')].filter(visible);
+    const laneLegend = document.querySelector('.atlas-legend');
+    const legendItems = [...document.querySelectorAll('.atlas-legend-item')].filter(visible);
+
     const focusElement = document.querySelector('.focus');
     const alphaScroll = document.querySelector('.alpha-scroll');
     const images = [...document.querySelectorAll('.focus img')].filter(visible);
@@ -173,6 +188,18 @@ async function inspectVisual(page, name, { strictLabels = false, focus = false }
       labelCount: labels.length,
       overlaps,
       overlapPairs: overlapPairs.slice(0, 5),
+      statCount: statItems.length,
+      statOverlaps,
+      statRowSpread:
+        statRects.length > 0
+          ? Math.max(...statRects.map((rect) => rect.top)) -
+            Math.min(...statRects.map((rect) => rect.top))
+          : 0,
+      statActionsOverlap: intersects(statsRect, actionsRect),
+      topbarOverflowX: statsRect ? Math.max(0, Math.round(statsRect.right - window.innerWidth)) : 0,
+      laneLabelCount: laneLabels.length,
+      legendItemCount: legendItems.length,
+      legendVisible: laneLegend ? visible(laneLegend) : false,
       pageOverflowX: document.documentElement.scrollWidth - window.innerWidth,
       graphOverflowX: document.querySelector('.atlas-layout')
         ? document.querySelector('.atlas-layout').scrollWidth - window.innerWidth
@@ -211,6 +238,9 @@ async function inspectVisual(page, name, { strictLabels = false, focus = false }
   if (metrics.pageOverflowX > 1 || metrics.focusOverflowX > 1) {
     fail(name, `横向溢出 page=${metrics.pageOverflowX}px focus=${metrics.focusOverflowX}px`);
   }
+  if (metrics.statOverlaps > 0) fail(name, `顶栏统计互相重叠 ${metrics.statOverlaps} 处`);
+  if (metrics.statActionsOverlap) fail(name, '顶栏统计与导航动作重叠');
+  if (metrics.topbarOverflowX > 1) fail(name, `顶栏统计越出视口 ${metrics.topbarOverflowX}px`);
   if (strictLabels && metrics.overlaps > 0) {
     fail(name, `${metrics.overlaps} 处节点标签重叠：${metrics.overlapPairs.join(' / ')}`);
   }
@@ -490,9 +520,25 @@ try {
     await mobileClick.close();
   }
 
-  await runViewport('19-mobile-atlas', { width: 420, height: 860 }, '', {
-    strictLabels: true,
-  });
+  for (const width of [320, 375, 420]) {
+    const atlas = await runViewport(
+      `19-mobile-atlas-${width}`,
+      { width, height: 860 },
+      '',
+      { strictLabels: true },
+    );
+    if (atlas.statCount !== 4) fail(`移动端全图 ${width}px`, `馆藏统计仅 ${atlas.statCount} 项`);
+    if (atlas.statRowSpread > 3) {
+      fail(`移动端全图 ${width}px`, `馆藏统计未保持同一行（顶差 ${atlas.statRowSpread}px）`);
+    }
+    if (atlas.laneLabelCount !== 0 || !atlas.legendVisible || atlas.legendItemCount === 0) {
+      fail(
+        `移动端全图 ${width}px`,
+        `谱系陈设未切换为颜色脊与图例：标签 ${atlas.laneLabelCount}，图例 ${atlas.legendItemCount}`,
+      );
+    }
+    pass(`移动端全图 ${width}px：四组馆藏、下方 ${atlas.legendItemCount} 项谱系图例`);
+  }
   await runViewport('20-atlas-1024', { width: 1024, height: 768 }, '', {
     strictLabels: true,
   });

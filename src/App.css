@@ -28,9 +28,10 @@
   position: relative;
   z-index: 20;
   display: flex;
+  container: topbar / inline-size;
   align-items: center;
   justify-content: space-between;
-  gap: 28px;
+  gap: clamp(12px, 3vw, 28px);
   height: 64px;
   flex: 0 0 64px;
   padding: 0 clamp(18px, 2.2vw, 36px);
@@ -121,6 +122,36 @@
   letter-spacing: 0.08em;
 }
 
+/* 顶栏按自身可用宽度排版，而不是按设备宽度猜。空间收紧时，
+   四组统计从“数字 + 标签”横排改为四等分题记，标签始终完整保留。 */
+@container topbar (max-width: 600px) {
+  .stats {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(4px, 1.5cqw, 10px);
+  }
+
+  .stats div {
+    grid-template-columns: 1fr;
+    gap: 1px;
+    justify-items: center;
+  }
+
+  .stats b {
+    font-size: clamp(14px, 4.2cqw, 17px);
+  }
+
+  .stats span {
+    font-size: clamp(10.5px, 2.8cqw, 11px);
+    letter-spacing: 0.025em;
+  }
+
+  .topbar.is-focus .stats {
+    display: none;
+  }
+}
+
 main {
   position: relative;
   display: flex;
@@ -153,8 +184,19 @@ main {
 
 .atlas {
   position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.atlas-canvas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -180,6 +222,14 @@ main {
   inset: 0 auto 0 0;
   border-right: 1px solid var(--line-mid);
   background: linear-gradient(90deg, var(--bg) 82%, rgba(16, 14, 12, 0.65));
+}
+
+.lane-spine-mark {
+  position: absolute;
+  left: 0;
+  width: 4px;
+  border-radius: 0 2px 2px 0;
+  opacity: 0.8;
 }
 
 .lane-label {
@@ -300,6 +350,37 @@ main {
   font-size: 12px;
   line-height: 1.5;
   letter-spacing: 0.04em;
+}
+
+.atlas-legend {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 6px 13px;
+  align-items: center;
+  padding: 10px 16px 12px;
+  border-top: 1px solid var(--line-mid);
+  background: linear-gradient(180deg, rgba(23, 20, 15, 0.82), var(--bg));
+  color: var(--ink-dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  line-height: 1.25;
+}
+
+.atlas-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.atlas-legend-item i {
+  display: block;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1591,9 +1672,6 @@ main {
       minmax(190px, 0.58fr);
   }
 
-  .stats div:nth-child(4) {
-    display: none;
-  }
 }
 
 @media (max-width: 1120px) {
@@ -1626,10 +1704,6 @@ main {
       minmax(178px, 0.52fr);
   }
 
-  .stats div:nth-child(3) {
-    display: none;
-  }
-
   .catalog-results {
     gap: 0 20px;
   }
@@ -1640,14 +1714,6 @@ main {
     height: 58px;
     flex-basis: 58px;
     gap: 14px;
-  }
-
-  .stats {
-    gap: 14px;
-  }
-
-  .stats div:nth-child(n + 2) {
-    display: none;
   }
 
   .focus-head {
@@ -1726,10 +1792,6 @@ main {
   }
 
   .catalog-trigger-key {
-    display: none;
-  }
-
-  .stats {
     display: none;
   }
 

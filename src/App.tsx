@@ -78,7 +78,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="topbar">
+      <header className={`topbar ${focus ? 'is-focus' : ''}`}>
         <div className="topbar-actions">
           {focus && (
             <button className="topbar-return" onClick={returnToAtlas}>

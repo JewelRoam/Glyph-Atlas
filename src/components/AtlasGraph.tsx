@@ -14,6 +14,7 @@ import { buildTimeScale } from '../lib/timescale';
  *  · 坐标系层（会缩放平移）：泳道底色、年代竖线、演化边、节点与生命线；
  *  · 陈设层（不缩放）：左侧谱系名、顶部年代刻度。文字属于"地图注记"，
  *    不该随着缩放变大变小，所以它们渲染在 SVG 之外，按当前变换换算位置。
+ *    窄屏放不下谱系名时，左侧只留一条颜色脊，完整名称移到图下图例。
  *
  * 节点的名字标签留在坐标系内，但字号按 1/k 反向补偿，屏幕上始终 13px；
  * 缩得太小时再按"屏幕矩形是否相撞"做一轮取舍，宁可少显示几个名字，
@@ -71,10 +72,14 @@ const ZOOM_MIN = 0.18;
 const ZOOM_MAX = 6;
 /** 顶部留给年代刻度的空白（屏幕像素） */
 const TOP_PAD = 26;
-/** 左侧谱系名留白宽度（屏幕像素），由最长的谱系名撑开 */
-const GUTTER = Math.round(
+/** 左侧谱系名自然留白宽度（屏幕像素），由最长的谱系名撑开 */
+const LANE_LABEL_GUTTER = Math.round(
   Math.max(...FAMILY_ORDER.map((f) => measureText(FAMILY_LABEL[f], LANE_LABEL_PX))) + 30,
 );
+/** 谱系名最多占画布宽度的五分之一；超过时改用颜色脊与下方图例。 */
+const LANE_GUTTER_MAX_RATIO = 0.2;
+/** 窄屏颜色脊宽度（屏幕像素）。 */
+const LANE_SPINE_WIDTH = 9;
 
 /** 年代刻度的位置 */
 const TICKS = [-3000, -2000, -1000, 0, 1000, 2000];
@@ -120,8 +125,13 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
     onViewChangeRef.current = onViewChange;
   }, [onViewChange]);
 
-  /** 画布可用宽度（扣掉左侧泳道名留白） */
-  const plotW = Math.max(160, size.w - GUTTER);
+  // 不按设备型号猜断点：直接比较谱系名所需宽度与当前画布。
+  // 当标签会侵占过多绘图区时，整组标签改为图例，而不是逐字缩写。
+  const showLaneLabels = size.w > 0 && LANE_LABEL_GUTTER <= size.w * LANE_GUTTER_MAX_RATIO;
+  const gutter = showLaneLabels ? LANE_LABEL_GUTTER : LANE_SPINE_WIDTH;
+
+  /** 画布可用宽度（扣掉左侧谱系陈设） */
+  const plotW = Math.max(160, size.w - gutter);
   /** 时间轴总宽：随画布伸缩，见文件头的 AXIS_WIDTH_RATIO */
   const axisWidth = Math.min(
     AXIS_WIDTH_MAX,
@@ -275,8 +285,8 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
     const out: { t: number; left: number; label: string }[] = [];
     let lastRight = -Infinity;
     for (const t of TICKS) {
-      const left = GUTTER + view.x + xScale(t) * view.k + 5;
-      if (left < GUTTER + 2 || left > size.w - 30) continue;
+      const left = gutter + view.x + xScale(t) * view.k + 5;
+      if (left < gutter + 2 || left > size.w - 30) continue;
       const label = formatYearShort(t);
       if (left < lastRight + 10) continue;
       lastRight =
@@ -286,7 +296,7 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
       out.push({ t, left, label });
     }
     return out;
-  }, [view, xScale, size.w]);
+  }, [gutter, view, xScale, size.w]);
 
   /** 一屏幕像素对应多少图坐标单位 */
   const u = 1 / view.k;
@@ -309,9 +319,9 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
     if (!showLabels) return { hidden, flipped };
     const ordered = layout.nodes
       .filter((n) => {
-        const screenX = GUTTER + view.x + n.x * view.k;
+        const screenX = gutter + view.x + n.x * view.k;
         const screenY = view.y + n.y * view.k;
-        return screenX >= GUTTER && screenX <= size.w && screenY >= TOP_PAD && screenY <= size.h;
+        return screenX >= gutter && screenX <= size.w && screenY >= TOP_PAD && screenY <= size.h;
       })
       .sort(
         (a, b) =>
@@ -326,10 +336,10 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
         (o) => r.x0 < o.x1 + LABEL_GAP && r.x1 + LABEL_GAP > o.x0 && r.y0 < o.y1 && r.y1 > o.y0,
       );
     const inside = (r: { x0: number; x1: number; y0: number; y1: number }) =>
-      r.x0 >= GUTTER + 3 && r.x1 <= size.w - 3 && r.y0 >= TOP_PAD && r.y1 <= size.h;
+      r.x0 >= gutter + 3 && r.x1 <= size.w - 3 && r.y0 >= TOP_PAD && r.y1 <= size.h;
     for (const n of ordered) {
       const w = measureText(n.sys.nameZh, NODE_LABEL_PX, NODE_LABEL_FONT);
-      const dotX = GUTTER + view.x + n.x * view.k;
+      const dotX = gutter + view.x + n.x * view.k;
       const baseline = view.y + n.y * view.k + LABEL_DY;
       const y0 = baseline - LABEL_BOX_ABOVE;
       const y1 = baseline + LABEL_BOX_BELOW;
@@ -344,199 +354,223 @@ export function AtlasGraph({ initialView, onViewChange, onOpenScript }: Props) {
       }
     }
     return { hidden, flipped };
-  }, [showLabels, layout, size.h, size.w, view]);
+  }, [gutter, showLabels, layout, size.h, size.w, view]);
 
   return (
-    <div className="atlas" ref={wrapRef} style={{ '--u': u } as CSSProperties}>
-      <svg
-        ref={svgRef}
-        width={size.w}
-        height={size.h}
-        className="atlas-svg"
-        role="img"
-        aria-label="世界书写体系演化图谱：横轴为年代，纵轴按谱系分区，连线表示衍生关系"
-      >
-        <defs>
-          <marker
-            id="arrow"
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerWidth="6"
-            markerHeight="6"
-            orient="auto-start-reverse"
-          >
-            <path d="M0 0 L10 5 L0 10 z" fill="#4b4438" />
-          </marker>
-          <clipPath id="plot-clip">
-            <rect x={GUTTER} y={0} width={plotW} height={size.h} />
-          </clipPath>
-        </defs>
+    <div className="atlas" style={{ '--u': u } as CSSProperties}>
+      <div className="atlas-canvas" ref={wrapRef}>
+        <svg
+          ref={svgRef}
+          width={size.w}
+          height={size.h}
+          className="atlas-svg"
+          role="img"
+          aria-label="世界书写体系演化图谱：横轴为年代，纵轴按谱系分区，连线表示衍生关系"
+        >
+          <defs>
+            <marker
+              id="arrow"
+              viewBox="0 0 10 10"
+              refX="9"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M0 0 L10 5 L0 10 z" fill="#4b4438" />
+            </marker>
+            <clipPath id="plot-clip">
+              <rect x={gutter} y={0} width={plotW} height={size.h} />
+            </clipPath>
+          </defs>
 
-        <g clipPath="url(#plot-clip)">
-          <g transform={`translate(${GUTTER},0)`}>
-            <g ref={gRef}>
-              {/* 泳道底色 */}
-              {layout.lanes.map((lane, i) => (
-                <rect
-                  key={lane.family}
-                  x={-GUTTER * u}
-                  y={lane.y0}
-                  width={layout.width + GUTTER * u}
-                  height={lane.y1 - lane.y0}
-                  fill={i % 2 === 0 ? 'rgba(239,230,214,0.022)' : 'transparent'}
-                />
-              ))}
-
-              {/* 年代竖线 */}
-              {TICKS.map((t) => {
-                const gx = xScale(t);
-                return (
-                  <line
-                    key={t}
-                    x1={gx}
-                    x2={gx}
-                    y1={0}
-                    y2={layout.height}
-                    stroke="rgba(239,230,214,0.09)"
-                    strokeDasharray={`${2 * u} ${6 * u}`}
+          <g clipPath="url(#plot-clip)">
+            <g transform={`translate(${gutter},0)`}>
+              <g ref={gRef}>
+                {/* 泳道底色 */}
+                {layout.lanes.map((lane, i) => (
+                  <rect
+                    key={lane.family}
+                    x={-gutter * u}
+                    y={lane.y0}
+                    width={layout.width + gutter * u}
+                    height={lane.y1 - lane.y0}
+                    fill={i % 2 === 0 ? 'rgba(239,230,214,0.022)' : 'transparent'}
                   />
-                );
-              })}
+                ))}
 
-              {/* 演化边 */}
-              <g className="edges">
-                {layout.nodes.map((n) =>
-                  n.sys.parents.map((pid) => {
-                    const p = nodePos.get(pid);
-                    if (!p) return null;
-                    const dx = Math.max(30, (n.x - p.x) * 0.45);
-                    const active =
-                      focusId &&
-                      (n.sys.id === focusId ||
-                        pid === focusId ||
-                        rel?.ancestors.has(n.sys.id) ||
-                        rel?.descendants.has(pid));
-                    return (
-                      <path
-                        key={`${pid}-${n.sys.id}`}
-                        d={`M${p.x} ${p.y} C${p.x + dx} ${p.y}, ${n.x - dx} ${n.y}, ${n.x} ${n.y}`}
-                        className={`edge ${isDimmed(n.sys.id) && isDimmed(pid) ? 'dim' : ''} ${active ? 'active' : ''}`}
-                        markerEnd="url(#arrow)"
-                      />
-                    );
-                  }),
-                )}
-              </g>
-
-              {/* 节点 */}
-              <g className="nodes">
-                {layout.nodes.map((n) => {
-                  const color = FAMILY_COLOR[n.sys.family];
-                  const dim = isDimmed(n.sys.id);
-                  const folded = labelPlan.hidden.has(n.sys.id);
-                  const flipped = labelPlan.flipped.has(n.sys.id);
-                  const showLabel = showLabels && (!folded || n.sys.id === hovered);
+                {/* 年代竖线 */}
+                {TICKS.map((t) => {
+                  const gx = xScale(t);
                   return (
-                    <g
-                      key={n.sys.id}
-                      className={`node ${dim ? 'dim' : ''}`}
-                      transform={`translate(${n.x},${n.y})`}
-                      onMouseEnter={() => setHovered(n.sys.id)}
-                      onMouseLeave={() => setHovered(null)}
-                      onClick={() => onOpenScript(n.sys.id)}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`查看${n.sys.nameZh}的演变`}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          onOpenScript(n.sys.id);
-                        }
-                      }}
-                    >
-                      {/* 生命线 */}
-                      <line
-                        x1={0}
-                        x2={Math.max(6, n.x2 - n.x)}
-                        y1={0}
-                        y2={0}
-                        stroke={color}
-                        strokeOpacity={n.sys.status === 'living' ? 0.75 : 0.32}
-                        strokeDasharray={
-                          n.sys.status === 'extinct' || n.sys.status === 'undeciphered'
-                            ? `${3 * u} ${3 * u}`
-                            : undefined
-                        }
-                      />
-                      {/* 放大的透明命中区：小圆点也要好点中 */}
-                      <circle r={10 * u} fill="transparent" />
-                      <circle r={4.4 * u} fill={color} stroke="#0d1018" strokeWidth={1.4 * u} />
-                      {showLabel && (
-                        <text
-                          className={`node-label ${folded ? 'was-folded' : ''}`}
-                          x={(flipped ? -LABEL_DX : LABEL_DX) * u}
-                          y={LABEL_DY * u}
-                          textAnchor={flipped ? 'end' : 'start'}
-                          fontSize={labelSize}
-                          fill={n.sys.status === 'extinct' ? '#9d9483' : '#e8dfd0'}
-                        >
-                          {n.sys.nameZh}
-                        </text>
-                      )}
-                    </g>
+                    <line
+                      key={t}
+                      x1={gx}
+                      x2={gx}
+                      y1={0}
+                      y2={layout.height}
+                      stroke="rgba(239,230,214,0.09)"
+                      strokeDasharray={`${2 * u} ${6 * u}`}
+                    />
                   );
                 })}
+
+                {/* 演化边 */}
+                <g className="edges">
+                  {layout.nodes.map((n) =>
+                    n.sys.parents.map((pid) => {
+                      const p = nodePos.get(pid);
+                      if (!p) return null;
+                      const dx = Math.max(30, (n.x - p.x) * 0.45);
+                      const active =
+                        focusId &&
+                        (n.sys.id === focusId ||
+                          pid === focusId ||
+                          rel?.ancestors.has(n.sys.id) ||
+                          rel?.descendants.has(pid));
+                      return (
+                        <path
+                          key={`${pid}-${n.sys.id}`}
+                          d={`M${p.x} ${p.y} C${p.x + dx} ${p.y}, ${n.x - dx} ${n.y}, ${n.x} ${n.y}`}
+                          className={`edge ${isDimmed(n.sys.id) && isDimmed(pid) ? 'dim' : ''} ${active ? 'active' : ''}`}
+                          markerEnd="url(#arrow)"
+                        />
+                      );
+                    }),
+                  )}
+                </g>
+
+                {/* 节点 */}
+                <g className="nodes">
+                  {layout.nodes.map((n) => {
+                    const color = FAMILY_COLOR[n.sys.family];
+                    const dim = isDimmed(n.sys.id);
+                    const folded = labelPlan.hidden.has(n.sys.id);
+                    const flipped = labelPlan.flipped.has(n.sys.id);
+                    const showLabel = showLabels && (!folded || n.sys.id === hovered);
+                    return (
+                      <g
+                        key={n.sys.id}
+                        className={`node ${dim ? 'dim' : ''}`}
+                        transform={`translate(${n.x},${n.y})`}
+                        onMouseEnter={() => setHovered(n.sys.id)}
+                        onMouseLeave={() => setHovered(null)}
+                        onClick={() => onOpenScript(n.sys.id)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`查看${n.sys.nameZh}的演变`}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            onOpenScript(n.sys.id);
+                          }
+                        }}
+                      >
+                        {/* 生命线 */}
+                        <line
+                          x1={0}
+                          x2={Math.max(6, n.x2 - n.x)}
+                          y1={0}
+                          y2={0}
+                          stroke={color}
+                          strokeOpacity={n.sys.status === 'living' ? 0.75 : 0.32}
+                          strokeDasharray={
+                            n.sys.status === 'extinct' || n.sys.status === 'undeciphered'
+                              ? `${3 * u} ${3 * u}`
+                              : undefined
+                          }
+                        />
+                        {/* 放大的透明命中区：小圆点也要好点中 */}
+                        <circle r={10 * u} fill="transparent" />
+                        <circle r={4.4 * u} fill={color} stroke="#0d1018" strokeWidth={1.4 * u} />
+                        {showLabel && (
+                          <text
+                            className={`node-label ${folded ? 'was-folded' : ''}`}
+                            x={(flipped ? -LABEL_DX : LABEL_DX) * u}
+                            y={LABEL_DY * u}
+                            textAnchor={flipped ? 'end' : 'start'}
+                            fontSize={labelSize}
+                            fill={n.sys.status === 'extinct' ? '#9d9483' : '#e8dfd0'}
+                          >
+                            {n.sys.nameZh}
+                          </text>
+                        )}
+                      </g>
+                    );
+                  })}
+                </g>
               </g>
             </g>
           </g>
-        </g>
-      </svg>
+        </svg>
 
-      {/* 陈设层：不随缩放改变字号与线宽 */}
-      <div className="atlas-furniture" aria-hidden="true">
-        <div className="gutter" style={{ width: GUTTER }} />
-        {layout.lanes.map((lane) => {
-          const top = view.y + ((lane.y0 + lane.y1) / 2) * view.k;
-          if (top < -20 || top > size.h + 20) return null;
-          return (
+        {/* 陈设层：不随缩放改变字号与线宽 */}
+        <div className="atlas-furniture" aria-hidden="true">
+          <div className="gutter" style={{ width: gutter }} />
+          {showLaneLabels
+            ? layout.lanes.map((lane) => {
+                const top = view.y + ((lane.y0 + lane.y1) / 2) * view.k;
+                if (top < -20 || top > size.h + 20) return null;
+                return (
+                  <span
+                    key={lane.family}
+                    className="lane-label"
+                    style={{ top, width: gutter - 14, color: FAMILY_COLOR[lane.family] }}
+                  >
+                    {FAMILY_LABEL[lane.family]}
+                  </span>
+                );
+              })
+            : layout.lanes.map((lane) => {
+                const top = view.y + lane.y0 * view.k;
+                const height = (lane.y1 - lane.y0) * view.k;
+                if (top > size.h || top + height < 0) return null;
+                return (
+                  <span
+                    key={lane.family}
+                    className="lane-spine-mark"
+                    style={{ top, height, background: FAMILY_COLOR[lane.family] }}
+                  />
+                );
+              })}
+          {tickLabels.map(({ t, left, label }) => (
             <span
-              key={lane.family}
-              className="lane-label"
-              style={{ top, width: GUTTER - 14, color: FAMILY_COLOR[lane.family] }}
+              key={t}
+              className="tick-label"
+              style={{ left, top: TOP_PAD / 2, fontSize: TICK_LABEL_PX }}
             >
+              {label}
+            </span>
+          ))}
+        </div>
+
+        <div className="atlas-tools">
+          <button
+            className={showLabels ? 'on' : ''}
+            aria-pressed={showLabels}
+            onClick={() => setShowLabels((v) => !v)}
+            title="名字太挤时，图谱会自动取舍；关掉可以只看星座一样的节点与连线"
+          >
+            标注
+          </button>
+          <button onClick={() => reposition('fit')}>总览</button>
+          <button onClick={() => reposition('origin')}>1:1</button>
+        </div>
+
+        {showLabels && labelPlan.hidden.size > 0 && (
+          <div className="atlas-hint">另 {labelPlan.hidden.size} 个重叠标注已折叠</div>
+        )}
+      </div>
+
+      {!showLaneLabels && size.w > 0 && (
+        <div className="atlas-legend" aria-label="谱系图例">
+          {layout.lanes.map((lane) => (
+            <span className="atlas-legend-item" key={lane.family}>
+              <i style={{ background: FAMILY_COLOR[lane.family] }} aria-hidden="true" />
               {FAMILY_LABEL[lane.family]}
             </span>
-          );
-        })}
-        {tickLabels.map(({ t, left, label }) => (
-          <span
-            key={t}
-            className="tick-label"
-            style={{ left, top: TOP_PAD / 2, fontSize: TICK_LABEL_PX }}
-          >
-            {label}
-          </span>
-        ))}
-      </div>
-
-      <div className="atlas-tools">
-        <button
-          className={showLabels ? 'on' : ''}
-          aria-pressed={showLabels}
-          onClick={() => setShowLabels((v) => !v)}
-          title="名字太挤时，图谱会自动取舍；关掉可以只看星座一样的节点与连线"
-        >
-          标注
-        </button>
-        <button onClick={() => reposition('fit')}>总览</button>
-        <button onClick={() => reposition('origin')}>1:1</button>
-      </div>
-
-      {/* 谱系配色看左侧泳道名就够了，不再另设图例；
-          只有真的折叠了标注时才留一行小字，免得页脚常驻一堆说明。 */}
-      {showLabels && labelPlan.hidden.size > 0 && (
-        <div className="atlas-hint">另 {labelPlan.hidden.size} 个重叠标注已折叠</div>
+          ))}
+        </div>
       )}
     </div>
   );
