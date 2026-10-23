@@ -324,15 +324,66 @@ export const graphRelations: GraphRelation[] = [
     ],
     note: '玛钦文三十个基础字母按藏文三十字母逐字建模；传统年代很早，但现存实物不能证明 7—10 世纪已有此文字。',
   },
-  { parent: 'chinese-oracle', child: 'chinese-seal', kind: 'descent', evidence: 'pending' },
-  { parent: 'chinese-seal', child: 'chinese-clerical', kind: 'descent', evidence: 'pending' },
-  { parent: 'chinese-clerical', child: 'chinese-regular', kind: 'descent', evidence: 'pending' },
-  { parent: 'chinese-regular', child: 'hiragana', kind: 'borrowing', evidence: 'pending' },
-  { parent: 'chinese-regular', child: 'katakana', kind: 'borrowing', evidence: 'pending' },
-  { parent: 'chinese-regular', child: 'chunom', kind: 'borrowing', evidence: 'pending' },
-  { parent: 'chinese-regular', child: 'sawndip', kind: 'borrowing', evidence: 'pending' },
-  { parent: 'chinese-regular', child: 'tangut', kind: 'model', evidence: 'pending' },
-  { parent: 'chinese-regular', child: 'khitan-large', kind: 'model', evidence: 'pending' },
+  {
+    parent: 'chinese-oracle', child: 'chinese-seal', kind: 'descent', evidence: 'sourced',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Oracle_bone_script',
+      'https://en.wikipedia.org/wiki/Seal_script',
+    ],
+    note: '小篆承自商周文字传统；甲骨文与秦小篆之间还经过金文等阶段，这里以现有代表节点相连。',
+  },
+  {
+    parent: 'chinese-seal', child: 'chinese-clerical', kind: 'descent', evidence: 'sourced',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Clerical_script',
+      'https://en.wikipedia.org/wiki/Chinese_script_styles',
+    ],
+    note: '隶书在战国晚期至秦代从秦系书体中发展，并与小篆长期并行；这条边表示书体传统的承接，不表示每字由小篆直接改写。',
+  },
+  {
+    parent: 'chinese-clerical', child: 'chinese-regular', kind: 'descent', evidence: 'sourced',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Regular_script',
+      'https://en.wikipedia.org/wiki/Clerical_script',
+    ],
+    note: '楷书由汉隶及早期行书逐步演化，东汉末至三国时期成形。',
+  },
+  {
+    parent: 'chinese-regular', child: 'hiragana', kind: 'borrowing', evidence: 'sourced',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Hiragana',
+      'https://en.wikipedia.org/wiki/Man%27y%C5%8Dgana',
+    ],
+    note: '平假名由万叶假名中的汉字草书体简化而成，是经万叶假名发生的间接借用。',
+  },
+  {
+    parent: 'chinese-regular', child: 'katakana', kind: 'borrowing', evidence: 'sourced',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Katakana',
+      'https://en.wikipedia.org/wiki/Man%27y%C5%8Dgana',
+    ],
+    note: '片假名截取万叶假名所用汉字的局部形成，同样属于间接借用。',
+  },
+  {
+    parent: 'chinese-regular', child: 'chunom', kind: 'borrowing', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Ch%E1%BB%AF_N%C3%B4m'],
+    note: '字喃以汉字为基础，借音、借义并另造新字记录越南语。',
+  },
+  {
+    parent: 'chinese-regular', child: 'sawndip', kind: 'borrowing', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Sawndip'],
+    note: '方块壮字混合使用汉字、仿汉字新造字与其他符号记录壮语。',
+  },
+  {
+    parent: 'chinese-regular', child: 'tangut', kind: 'model', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Tangut_script'],
+    note: '西夏文在笔画形态与方块字格局上参照汉字，构字方法与字形系统另行创制。',
+  },
+  {
+    parent: 'chinese-regular', child: 'khitan-large', kind: 'model', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Khitan_large_script'],
+    note: '契丹大字按汉字的书写观念与方块格局创制，多数契丹字不能直接对应汉字。',
+  },
   {
     parent: 'old-uyghur', child: 'khitan-small', kind: 'model', evidence: 'sourced',
     sourceRefs: ['https://en.wikipedia.org/wiki/Khitan_small_script'],
@@ -343,7 +394,11 @@ export const graphRelations: GraphRelation[] = [
     sourceRefs: ['https://en.wikipedia.org/wiki/Jurchen_script'],
     note: '女真文由契丹文创制而来，后者又源于汉字。',
   },
-  { parent: 'chinese-regular', child: 'nushu', kind: 'borrowing', evidence: 'pending' },
+  {
+    parent: 'chinese-regular', child: 'nushu', kind: 'borrowing', evidence: 'sourced',
+    sourceRefs: ['https://en.wikipedia.org/wiki/N%C3%BCshu'],
+    note: '女书字形取自汉字的草写或变体传统，具体来源仍有讨论；这里记录字形传统的借用，不作逐字直系断言。',
+  },
   { parent: 'latin', child: 'lisu', kind: 'model', evidence: 'pending' },
   { parent: 'aramaic', child: 'old-sogdian', kind: 'descent', evidence: 'pending' },
   { parent: 'old-sogdian', child: 'sogdian', kind: 'descent', evidence: 'pending' },

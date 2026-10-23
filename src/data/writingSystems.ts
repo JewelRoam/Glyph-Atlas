@@ -1365,6 +1365,10 @@ const writingSystemData: WritingSystem[] = [
     type: 'logographic', status: 'historical', direction: 'ttb',
     sample: '日', fontFamily: 'Glyph Atlas Small Seal',
     note: '秦统一文字后的标准书体；字形自《說文解字》刻本描摹，未收字不列出。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Seal_script',
+      'https://en.wikipedia.org/wiki/Chinese_script_styles',
+    ],
   },
   {
     id: 'chinese-clerical', nameZh: '隶书', nameEn: 'Chinese Clerical Script',
@@ -1372,7 +1376,11 @@ const writingSystemData: WritingSystem[] = [
     origin: 'derived', parents: ['chinese-seal'], dateFrom: -200, dateTo: 200,
     family: 'sinic', region: '中国', countries: ['中国'],
     type: 'logographic', status: 'historical', direction: 'ttb',
-    note: '由小篆草写演变而来，笔画出现波磔，是汉字由圆转方的转折点。',
+    note: '战国晚期至秦代从秦系书体中发展，与小篆长期并行；笔画出现波磔，是汉字由圆转方的转折点。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Clerical_script',
+      'https://en.wikipedia.org/wiki/Chinese_script_styles',
+    ],
   },
   {
     id: 'chinese-regular', nameZh: '楷书（汉字）', nameEn: 'Chinese (Regular Script)',
@@ -1381,6 +1389,10 @@ const writingSystemData: WritingSystem[] = [
     type: 'logographic', status: 'living', direction: 'ttb',
     unicodeBlock: 'CJK Unified Ideographs U+4E00', sample: '鹰', fontFamily: 'LXGW WenKai TC',
     note: '唯一从古至今连续使用的语素文字，字符量以万计。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Regular_script',
+      'https://en.wikipedia.org/wiki/Chinese_script_styles',
+    ],
     lineageEntry: { lineageId: 'chinese-evolution', stopId: 'chinese-regular' },
   },
   {
@@ -1391,6 +1403,10 @@ const writingSystemData: WritingSystem[] = [
     type: 'syllabary', status: 'living', direction: 'mixed',
     unicodeBlock: 'Hiragana U+3040', sample: 'あ', fontFamily: 'Noto Serif JP',
     note: '由汉字草书简化而来。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Hiragana',
+      'https://en.wikipedia.org/wiki/Man%27y%C5%8Dgana',
+    ],
   },
   {
     id: 'katakana', nameZh: '片假名', nameEn: 'Katakana',
@@ -1400,6 +1416,10 @@ const writingSystemData: WritingSystem[] = [
     type: 'syllabary', status: 'living', direction: 'mixed',
     unicodeBlock: 'Katakana U+30A0', sample: 'ア', fontFamily: 'Noto Serif JP',
     note: '由汉字楷书的局部笔画截取而来。',
+    sourceRefs: [
+      'https://en.wikipedia.org/wiki/Katakana',
+      'https://en.wikipedia.org/wiki/Man%27y%C5%8Dgana',
+    ],
   },
   {
     id: 'hangul', nameZh: '谚文（韩文）', nameEn: 'Hangul',
@@ -1416,6 +1436,7 @@ const writingSystemData: WritingSystem[] = [
     type: 'logographic', status: 'extinct', direction: 'ttb',
     sample: '日', fontFamily: 'Noto Serif SC',
     note: '借汉字与自造字记越南语；自造字多在 Unicode 扩展区，Google Fonts 的 CJK 字库不覆盖，字形表只列借用汉字。',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Ch%E1%BB%AF_N%C3%B4m'],
   },
   {
     id: 'sawndip', nameZh: '方块壮字', nameEn: 'Sawndip',
@@ -1424,6 +1445,7 @@ const writingSystemData: WritingSystem[] = [
     type: 'logographic', status: 'living', direction: 'ttb',
     sample: '田', fontFamily: 'Noto Serif SC',
     note: '借汉字与自造字记壮语；自造字多在 Unicode 扩展区，Google Fonts 的 CJK 字库不覆盖，字形表只列借用汉字。',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Sawndip'],
   },
   {
     id: 'tangut', nameZh: '西夏文', nameEn: 'Tangut',
@@ -1433,12 +1455,14 @@ const writingSystemData: WritingSystem[] = [
     unicodeBlock: 'Tangut U+17000', sample: '𗀀',
     fontFamily: 'Noto Serif Tangut',
     note: '形式上仿汉字，但笔画与构字原理皆为自创。',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Tangut_script'],
   },
   {
     id: 'khitan-large', nameZh: '契丹大字', nameEn: 'Khitan Large Script',
     origin: 'influence', parents: ['chinese-regular'], dateFrom: 920, dateTo: 1200,
     family: 'sinic', region: '东北亚', countries: ['中国'],
     type: 'logographic', status: 'extinct', direction: 'ttb',
+    sourceRefs: ['https://en.wikipedia.org/wiki/Khitan_large_script'],
   },
   {
     id: 'khitan-small', nameZh: '契丹小字', nameEn: 'Khitan Small Script',
@@ -1465,6 +1489,7 @@ const writingSystemData: WritingSystem[] = [
     unicodeBlock: 'Nushu U+1B170', sample: '𛆑',
     fontFamily: 'Noto Sans Nushu',
     note: '湖南江永女性专用的音节文字，由汉字变形改造。',
+    sourceRefs: ['https://en.wikipedia.org/wiki/N%C3%BCshu'],
   },
   {
     id: 'yi', nameZh: '彝文', nameEn: 'Yi',
