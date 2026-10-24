@@ -158,7 +158,7 @@ for (const system of writingSystems) {
 }
 
 console.log(
-  `✔ 字形来源体检：${writingSystems.length} 个书写体系、${rosters} 张字表 ${cells} 格、` +
+  `✔ 字形来源体检：${writingSystems.length} 条馆藏记录、${rosters} 张字表 ${cells} 格、` +
     `${stops} 个轨道站点、${recorded.size} 条轮廓`,
 );
 if (process.env.GLYPH_AUDIT_VERBOSE && notes.length) {

@@ -92,7 +92,7 @@ export default function App() {
             onClick={openCatalog}
             aria-haspopup="dialog"
           >
-            查找文字
+            查找馆藏
             <span className="catalog-trigger-key" aria-hidden="true">⌘ K</span>
           </button>
         </div>

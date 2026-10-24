@@ -58,7 +58,7 @@ function CatalogGlyph({ system }: { system: (typeof writingSystems)[number] }) {
   );
 }
 
-/** 覆盖在全图之上的检索层：按名称、国家与谱系检索，点选后直接进入体系节点。 */
+/** 覆盖在全图之上的馆藏检索层：按名称、国家与谱系检索，点选后进入记录页。 */
 export function CatalogOverlay({
   onClose,
   onOpenScript,
@@ -149,7 +149,7 @@ export function CatalogOverlay({
             <span className="catalog-kicker">
               全部馆藏 · {writingSystems.length} 条记录 · {graphSystems.length} 个书写体系
             </span>
-            <h1 id="catalog-title">查找文字</h1>
+            <h1 id="catalog-title">查找馆藏</h1>
           </div>
           <button className="catalog-close" onClick={onClose} aria-label="关闭查找">
             关闭 <span aria-hidden="true">Esc</span>
@@ -273,7 +273,7 @@ export function CatalogOverlay({
 
         {!rows.length && (
           <div className="catalog-empty">
-            <strong>没有匹配的书写体系</strong>
+            <strong>没有匹配的馆藏记录</strong>
             <p>试试缩短名称，或清除谱系与状态筛选。</p>
           </div>
         )}

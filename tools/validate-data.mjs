@@ -112,6 +112,7 @@ for (const s of writingSystems) {
 // 边是一等数据；WritingSystem.parents 只是它的投影。这里同时检查两边是否
 // 完全一致，避免不同界面读到一套关系、审计读到另一套关系。
 const RELATION_KINDS = new Set(['descent', 'borrowing', 'influence', 'model']);
+const CATALOG_ONLY_TYPES = new Set(['nonscript', 'notation']);
 const relationKeys = new Set();
 const outgoing = new Map();
 const incoming = new Map();
@@ -121,7 +122,11 @@ for (const relation of graphRelations) {
   relationKeys.add(key);
   if (relation.parent === relation.child) err(`[relations] 自环: ${key}`);
   if (!scriptById[relation.parent]) err(`[relations] ${key} 的父系不存在`);
+  else if (CATALOG_ONLY_TYPES.has(scriptById[relation.parent].type))
+    err(`[relations] ${key} 的父系不是书写体系，不能进入谱系`);
   if (!scriptById[relation.child]) err(`[relations] ${key} 的子系不存在`);
+  else if (CATALOG_ONLY_TYPES.has(scriptById[relation.child].type))
+    err(`[relations] ${key} 的子系不是书写体系，不能进入谱系`);
   if (!RELATION_KINDS.has(relation.kind))
     err(`[relations] ${key} 的 kind「${relation.kind}」无效`);
   if (!['pending', 'sourced'].includes(relation.evidence))
@@ -431,8 +436,8 @@ if (unexpandedLetters.length)
   );
 
 // 统计信息，顺便作为 README 的数字来源
-const independent = writingSystems.filter((s) => s.origin === 'independent');
-const graph = writingSystems.filter((s) => s.type !== 'nonscript');
+const graph = writingSystems.filter((s) => !CATALOG_ONLY_TYPES.has(s.type));
+const catalogOnly = writingSystems.filter((s) => CATALOG_ONLY_TYPES.has(s.type));
 const graphIndependent = graph.filter(
   (s) => s.origin === 'independent' && s.parents.length === 0,
 );
@@ -449,7 +454,7 @@ if (errors.length) {
 }
 console.log(
   `✔ 数据校验通过：${graph.length} 个书写体系进入图谱，` +
-    `${graphIndependent.length} 个独立起源（另有 ${independent.length - graphIndependent.length} 条非文字记录），` +
+    `${graphIndependent.length} 个独立起源（另有 ${catalogOnly.length} 条辅助馆藏记录），` +
     `${living.length} 个今仍使用，${lineages.length} 条血统轨道，` +
     `${graphRelations.length} 条有语义的图谱边`,
 );

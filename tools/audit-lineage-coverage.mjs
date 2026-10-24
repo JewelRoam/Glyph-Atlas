@@ -17,10 +17,10 @@ import {
   graphChildrenByScript,
   graphConnectionBetween,
   graphRelations,
+  graphSystems,
   lineages,
   scriptContextFor,
   scriptPortalFor,
-  writingSystems,
 } from '../src/data/index.ts';
 import {
   adjacentGraphLinks,
@@ -37,7 +37,7 @@ import { hasLetterMap, hasRoster, rosterFor } from '../src/data/letterSlots.ts';
 const json = process.argv.includes('--json');
 const strict = process.argv.includes('--strict');
 
-const systems = writingSystems.filter((system) => system.type !== 'nonscript');
+const systems = graphSystems;
 const stopRefs = lineages.flatMap((lineage) =>
   lineage.stops.map((stop, index) => ({ lineage, stop, index })),
 );

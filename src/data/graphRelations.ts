@@ -216,7 +216,6 @@ export const graphRelations: GraphRelation[] = [
   { parent: 'greek', child: 'elbasan', kind: 'borrowing', evidence: 'pending' },
   { parent: 'greek', child: 'vithkuqi', kind: 'borrowing', evidence: 'pending' },
   { parent: 'latin', child: 'deseret', kind: 'model', evidence: 'pending' },
-  { parent: 'latin', child: 'ipa', kind: 'borrowing', evidence: 'pending' },
   { parent: 'aramaic', child: 'brahmi', kind: 'influence', evidence: 'pending' },
   { parent: 'brahmi', child: 'pallava', kind: 'descent', evidence: 'pending' },
   { parent: 'brahmi', child: 'kadamba', kind: 'descent', evidence: 'pending' },

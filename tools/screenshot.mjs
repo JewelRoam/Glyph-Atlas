@@ -552,7 +552,7 @@ try {
   const catalog = await browser.newPage({ viewport: { width: 1440, height: 940 } });
   try {
     await open(catalog, '', '检索层');
-    await catalog.getByRole('button', { name: /查找文字/ }).click();
+    await catalog.getByRole('button', { name: /查找馆藏/ }).click();
     await catalog.waitForTimeout(250);
     await screenshot(catalog, '22-catalog');
     if ((await catalog.locator('.catalog').count()) !== 1) fail('检索层', '检索浮层未打开');

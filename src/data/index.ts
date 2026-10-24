@@ -65,11 +65,17 @@ export type {
 /**
  * 演化图使用的节点集合。
  *
- * 总表还包含奇普（结绳）等非文字记录系统；图谱节点只取书写体系。
+ * 馆藏还包含奇普（结绳）与国际音标等辅助记录；只有承担具体语言书写职能的
+ * 条目才进入谱系图。标音系统和记录系统保留在馆藏与检索中，不能借用书写
+ * 体系的传承边。
  */
-export const graphSystems: WritingSystem[] = writingSystems.filter(
-  (s) => s.type !== 'nonscript',
-);
+const CATALOG_ONLY_TYPES = new Set<WritingSystem['type']>(['nonscript', 'notation']);
+
+export function isGraphSystem(system: WritingSystem): boolean {
+  return !CATALOG_ONLY_TYPES.has(system.type);
+}
+
+export const graphSystems: WritingSystem[] = writingSystems.filter(isGraphSystem);
 
 /**
  * 独立起源（人类文字史上屈指可数的几次独立发明）。

@@ -633,11 +633,12 @@ const writingSystemData: WritingSystem[] = [
   },
   {
     id: 'ipa', nameZh: '国际音标', nameEn: 'IPA',
-    origin: 'derived', parents: ['latin'], dateFrom: 1888, dateTo: null,
+    origin: 'invented', parents: [], dateFrom: 1888, dateTo: null,
     family: 'modern', region: '国际', countries: ['国际通用'],
-    type: 'alphabet', status: 'living', direction: 'ltr',
+    type: 'notation', status: 'living', direction: 'ltr',
     unicodeBlock: 'IPA Extensions U+0250', sample: 'ə', fontFamily: 'Noto Sans',
-    note: '以拉丁字母为基础的语音标注系统。',
+    note: '由国际语音协会于 1888 年公布，以拉丁字母和其他既有符号组成，用于跨语言标音。',
+    sourceRefs: ['https://www.internationalphoneticassociation.org/'],
   },
   {
     id: 'duployan', nameZh: '杜普洛伊速记', nameEn: 'Duployan shorthand',

@@ -36,6 +36,7 @@ export const TYPE_LABEL: Record<string, string> = {
   mixed: '混合系统',
   undeciphered: '未破译',
   nonscript: '非文字记录系统',
+  notation: '标音系统',
 };
 
 /** 起源性质的中文名 */

@@ -77,7 +77,7 @@ const todo = by('todo');
 const wrong = by('wrong');
 
 console.log(
-  `✔ 字体核实台账：${rows.length} 个书写体系，${ok} 已核、${blank.length} 有意留空、` +
+  `✔ 字体核实台账：${rows.length} 条馆藏记录，${ok} 已核、${blank.length} 有意留空、` +
     `${wrong.length} 已知画错、${todo.length} 待核`,
 );
 if (blank.length) console.log(`   · 有意留空：${blank.map((r) => r.id).join('、')}`);
